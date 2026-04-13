@@ -1,0 +1,169 @@
+@import "tailwindcss";
+@import 'swiper/css';
+@import 'swiper/css/navigation';
+@import 'swiper/css/autoplay';
+
+:root {
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --primary: 221.2 83.2% 53.3%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 210 40% 96.1%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 221.2 83.2% 53.3%;
+  --radius: 0.5rem;
+
+  /* Sidebar widths */
+  --sidebar-width-expanded: 240px;
+  --sidebar-width-collapsed: 70px;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+/* Swiper Custom Styles */
+.institute-swiper {
+  padding: 1rem 0;
+  overflow: visible !important;
+}
+
+.swiper-button-prev,
+.swiper-button-next {
+  width: 40px !important;
+  height: 40px !important;
+  background: white !important;
+  border-radius: 50% !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+.swiper-button-prev::after,
+.swiper-button-next::after {
+  display: none;
+}
+
+.swiper-button-prev {
+  left: 0 !important;
+}
+
+.swiper-button-next {
+  right: 0 !important;
+}
+
+.swiper-button-disabled {
+  opacity: 0 !important;
+  cursor: not-allowed !important;
+}
+
+.swiper-slide {
+  height: auto !important;
+}
+
+/* Sidebar layout adjustments */
+.has-sidebar.sidebar-expanded main,
+.has-sidebar.sidebar-expanded .main-content {
+  margin-left: var(--sidebar-width-expanded);
+  width: calc(100% - var(--sidebar-width-expanded));
+  transition: margin-left 0.3s ease-in-out;
+}
+
+.has-sidebar.sidebar-collapsed main,
+.has-sidebar.sidebar-collapsed .main-content {
+  margin-left: var(--sidebar-width-collapsed);
+  width: calc(100% - var(--sidebar-width-collapsed));
+  transition: margin-left 0.3s ease-in-out;
+}
+
+.has-sidebar main,
+.has-sidebar .main-content {
+  margin-left: var(--sidebar-width-expanded);
+  width: calc(100% - var(--sidebar-width-expanded));
+  transition: margin-left 0.3s ease-in-out;
+}
+
+#main-content {
+  transition: margin-left 0.3s ease;
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* ✅ NEW: Soft floating animation (no delays) */
+@keyframes floatY {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.animate-float {
+  animation: floatY 4s ease-in-out infinite;
+}
+
+/* ✅ NEW: Gradient movement */
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradientShift 10s ease infinite;
+}
+
+/* ✅ NEW: Pop-in */
+@keyframes popIn {
+  from { opacity: 0; transform: translateY(10px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.animate-pop-in {
+  animation: popIn 0.35s ease-out both;
+}
+
+/* ✅ NEW: Scroll reveal helper */
+.reveal {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 500ms ease, transform 500ms ease;
+  will-change: opacity, transform;
+}
+
+.reveal.reveal-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Thin, nice scrollbar utility */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: #9ca3af #f3f4f6;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border-radius: 9999px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: #9ca3af;
+  border-radius: 9999px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background-color: #4b5563;
+}
