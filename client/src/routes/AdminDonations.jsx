@@ -28,6 +28,22 @@ const AdminDonations = () => {
   const [copiedUtrId, setCopiedUtrId] = useState(null);
   const [selectedTab, setSelectedTab] = useState('alumni');
 
+  // 🔹 Alumni filters
+  const [alumniStatusFilter, setAlumniStatusFilter] = useState('');
+  const [alumniCategoryFilter, setAlumniCategoryFilter] = useState('');
+  const [alumniBatchFilter, setAlumniBatchFilter] = useState('');
+  const [alumniAmountMin, setAlumniAmountMin] = useState('');
+  const [alumniAmountMax, setAlumniAmountMax] = useState('');
+  const [alumniDateRange, setAlumniDateRange] = useState(''); // '', 'today', 'week', 'month', 'year'
+
+  // 🔹 Student funding filters
+  const [studentStatusFilter, setStudentStatusFilter] = useState('');
+  const [studentCategoryFilter, setStudentCategoryFilter] = useState('');
+  const [studentBatchFilter, setStudentBatchFilter] = useState('');
+  const [studentAmountMin, setStudentAmountMin] = useState('');
+  const [studentAmountMax, setStudentAmountMax] = useState('');
+  const [studentDateRange, setStudentDateRange] = useState('');
+
   const navigate = useNavigate();
   useSidebarLayout(true);
 
@@ -79,7 +95,7 @@ const AdminDonations = () => {
     fetchData();
   }, [navigate]);
 
-   // ✅ date formatter: DD/MM/YYYY (day first, then month)
+  // ✅ date formatter: DD/MM/YYYY (day first, then month)
   const formatDate = (value) => {
     if (!value) return 'N/A';
     const d = new Date(value);
@@ -91,6 +107,147 @@ const AdminDonations = () => {
 
     return `${day}/${month}/${year}`;
   };
+
+  // ✅ Copy UTR to clipboard and show tick icon
+  const copyToClipboard = async (utrValue, id) => {
+    try {
+      if (!utrValue) return;
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(utrValue);
+      } else {
+        // Fallback for older browsers
+        const textarea = document.createElement('textarea');
+        textarea.value = utrValue;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+      }
+
+      setCopiedUtrId(id);
+
+      // Reset icon after 1.5s
+      setTimeout(() => {
+        setCopiedUtrId(null);
+      }, 1500);
+    } catch (err) {
+      console.error('Failed to copy UTR:', err);
+    }
+  };
+
+   // Helper: check if date is within selected range (today/week/month/year)
+  const isWithinRange = (dateValue, range) => {
+    if (!range || !dateValue) return true;
+
+    const d = new Date(dateValue);
+    if (Number.isNaN(d.getTime())) return false;
+
+    const now = new Date();
+    const start = new Date(now);
+
+    switch (range) {
+      case 'today':
+        return (
+          d.getDate() === now.getDate() &&
+          d.getMonth() === now.getMonth() &&
+          d.getFullYear() === now.getFullYear()
+        );
+      case 'week': {
+        const day = now.getDay(); // 0 = Sun
+        const diff = now.getDate() - day + (day === 0 ? -6 : 1); // Monday
+        start.setDate(diff);
+        start.setHours(0, 0, 0, 0);
+        return d >= start && d <= now;
+      }
+      case 'month':
+        start.setDate(1);
+        start.setHours(0, 0, 0, 0);
+        return (
+          d.getMonth() === now.getMonth() &&
+          d.getFullYear() === now.getFullYear() &&
+          d >= start &&
+          d <= now
+        );
+      case 'year':
+        start.setMonth(0, 1);
+        start.setHours(0, 0, 0, 0);
+        return d.getFullYear() === now.getFullYear() && d >= start && d <= now;
+      default:
+        return true;
+    }
+  };
+
+  // 🔹 FILTERED ALUMNI DONATIONS
+  const filteredDonations = donations.filter((donation) => {
+    // status
+    const statusMatch = alumniStatusFilter
+      ? donation.status === alumniStatusFilter
+      : true;
+
+    // category (purpose)
+    const categoryMatch = alumniCategoryFilter
+      ? (donation.purpose || '').toLowerCase().includes(
+          alumniCategoryFilter.toLowerCase()
+        )
+      : true;
+
+    // batch
+    const batchMatch = alumniBatchFilter
+      ? (donation.batch || '').toLowerCase().includes(
+          alumniBatchFilter.toLowerCase()
+        )
+      : true;
+
+    // amount range
+    const amount = Number(donation.amount || 0);
+    const minOk = alumniAmountMin
+      ? amount >= Number(alumniAmountMin)
+      : true;
+    const maxOk = alumniAmountMax
+      ? amount <= Number(alumniAmountMax)
+      : true;
+
+    // date range on paymentDate
+    const dateOk = isWithinRange(donation.paymentDate, alumniDateRange);
+
+    return statusMatch && categoryMatch && batchMatch && minOk && maxOk && dateOk;
+  });
+
+  // 🔹 FILTERED STUDENT OPPORTUNITIES
+  const filteredOpportunities = opportunities.filter((opp) => {
+    const statusMatch = studentStatusFilter
+      ? opp.status === studentStatusFilter
+      : true;
+
+    const categoryMatch = studentCategoryFilter
+      ? (opp.category || '').toLowerCase().includes(
+          studentCategoryFilter.toLowerCase()
+        )
+      : true;
+
+    const batchMatch = studentBatchFilter
+      ? (opp.batch || '').toLowerCase().includes(
+          studentBatchFilter.toLowerCase()
+        )
+      : true;
+
+    const amount = Number(opp.amount || 0);
+    const minOk = studentAmountMin
+      ? amount >= Number(studentAmountMin)
+      : true;
+    const maxOk = studentAmountMax
+      ? amount <= Number(studentAmountMax)
+      : true;
+
+    // date range on createdAt
+    const dateOk = isWithinRange(opp.createdAt, studentDateRange);
+
+    return statusMatch && categoryMatch && batchMatch && minOk && maxOk && dateOk;
+  });
 
   if (loading) {
     return (
@@ -120,10 +277,9 @@ const AdminDonations = () => {
               type="button"
               onClick={() => setSelectedTab('alumni')}
               className={`whitespace-nowrap py-2 px-1 border-b-2 text-sm font-medium
-                ${
-                  selectedTab === 'alumni'
-                    ? 'border-blue-600 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ${selectedTab === 'alumni'
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
             >
               Alumni Donation Requests
@@ -133,10 +289,9 @@ const AdminDonations = () => {
               type="button"
               onClick={() => setSelectedTab('students')}
               className={`whitespace-nowrap py-2 px-1 border-b-2 text-sm font-medium
-                ${
-                  selectedTab === 'students'
-                    ? 'border-blue-600 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ${selectedTab === 'students'
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
             >
               Student Funding Requests
@@ -147,16 +302,109 @@ const AdminDonations = () => {
         {/* ===== Tab Panels ===== */}
         {/* Alumni Donations Tab */}
         {selectedTab === 'alumni' && (
-          <section>
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">
-              Alumni Donation Requests
-            </h1>
+          <section className="space-y-6">
+            <div className="flex flex-col md:flex-row md:items-center gap-3">
+              <h1 className="text-xl font-bold text-gray-900">
+                Filter: 
+              </h1>
 
-            {donations.length === 0 ? (
-              <p className="text-gray-600 text-center">No donation requests found.</p>
+              {/* 🔹 Filters (responsive, like AdminProfile) */}
+              <form
+                onSubmit={(e) => e.preventDefault()}
+                className="flex flex-wrap gap-2 md:gap-3 text-xs sm:text-sm"
+              >
+                {/* Status */}
+                <select
+                  value={alumniStatusFilter}
+                  onChange={(e) => setAlumniStatusFilter(e.target.value)}
+                  className="px-3 py-2 border border-gray-300 rounded-lg w-full sm:w-36"
+                >
+                  <option value="">All Status</option>
+                  <option value="pending">Pending</option>
+                  <option value="accepted">Accepted</option>
+                  <option value="rejected">Rejected</option>
+                </select>
+
+                {/* Category (purpose) */}
+                <input
+                  type="text"
+                  value={alumniCategoryFilter}
+                  onChange={(e) => setAlumniCategoryFilter(e.target.value)}
+                  placeholder="Filter by category"
+                  className="px-3 py-2 border border-gray-300 rounded-lg w-full sm:w-40"
+                />
+
+                {/* Batch */}
+                <input
+                  type="text"
+                  value={alumniBatchFilter}
+                  onChange={(e) => setAlumniBatchFilter(e.target.value)}
+                  placeholder="Filter by batch"
+                  className="px-3 py-2 border border-gray-300 rounded-lg w-full sm:w-32"
+                />
+
+                {/* Amount range */}
+                <input
+                  type="number"
+                  value={alumniAmountMin}
+                  onChange={(e) => setAlumniAmountMin(e.target.value)}
+                  placeholder="Min amount"
+                  className="px-3 py-2 border border-gray-300 rounded-lg w-[47%] sm:w-28"
+                />
+                <input
+                  type="number"
+                  value={alumniAmountMax}
+                  onChange={(e) => setAlumniAmountMax(e.target.value)}
+                  placeholder="Max amount"
+                  className="px-3 py-2 border border-gray-300 rounded-lg w-[47%] sm:w-28"
+                />
+
+                {/* Payment date range */}
+                <select
+                  value={alumniDateRange}
+                  onChange={(e) => setAlumniDateRange(e.target.value)}
+                  className="px-3 py-2 border border-gray-300 rounded-lg w-full sm:w-40"
+                >
+                  <option value="">All Payment Dates</option>
+                  <option value="today">Today</option>
+                  <option value="week">This Week</option>
+                  <option value="month">This Month</option>
+                  <option value="year">This Year</option>
+                </select>
+
+                {(alumniStatusFilter ||
+                  alumniCategoryFilter ||
+                  alumniBatchFilter ||
+                  alumniAmountMin ||
+                  alumniAmountMax ||
+                  alumniDateRange) && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAlumniStatusFilter('');
+                      setAlumniCategoryFilter('');
+                      setAlumniBatchFilter('');
+                      setAlumniAmountMin('');
+                      setAlumniAmountMax('');
+                      setAlumniDateRange('');
+                    }}
+                    className="px-3 py-2 text-[11px] sm:text-xs font-semibold rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  >
+                    Clear
+                  </button>
+                )}
+              </form>
+            </div>
+
+            {filteredDonations.length === 0 ? (
+              <p className="text-gray-600 text-center">
+                {donations.length === 0
+                  ? 'No donation requests found.'
+                  : 'No donations match the selected filters.'}
+              </p>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {donations.map((donation) => (
+                {filteredDonations.map((donation) => (
                   // ...existing donation card JSX...
                   <div
                     key={donation._id}
@@ -184,6 +432,7 @@ const AdminDonations = () => {
 
                     {/* Details (uniform grid) */}
                     <div className="rounded-xl bg-gray-50 border border-gray-100 p-4 space-y-3 mb-4">
+                      {/* Email */}
                       <div className="flex items-start gap-2 text-sm text-gray-700">
                         <Mail className="mt-0.5 text-gray-500" size={16} />
                         <div className="min-w-0">
@@ -194,7 +443,8 @@ const AdminDonations = () => {
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {/* Amount + Payment Date (2 columns, first wider on sm+) */}
+                      <div className="grid grid-cols-1 sm:grid-cols-[1.3fr_1fr] gap-3">
                         <div className="flex items-start gap-2 text-sm text-gray-700">
                           <Wallet className="mt-0.5 text-gray-500" size={16} />
                           <div>
@@ -216,7 +466,8 @@ const AdminDonations = () => {
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {/* UTR + Batch (2 columns, first wider on sm+) */}
+                      <div className="grid grid-cols-1 sm:grid-cols-[1.3fr_1fr] gap-3">
                         {/* UTR */}
                         <div className="flex items-start gap-2 text-sm text-gray-700 min-w-0">
                           <Hash className="mt-0.5 text-gray-500 shrink-0" size={16} />
@@ -224,7 +475,7 @@ const AdminDonations = () => {
                             <p className="text-xs text-gray-500">UTR No.</p>
 
                             <div className="flex items-center gap-2 min-w-0">
-                              <p className="font-medium truncate max-w-[18ch] sm:max-w-[16ch]">
+                              <p className="font-medium break-all">
                                 {donation.utrNo || 'N/A'}
                               </p>
 
@@ -232,11 +483,10 @@ const AdminDonations = () => {
                                 <button
                                   type="button"
                                   onClick={() => copyToClipboard(donation.utrNo, donation._id)}
-                                  className={`shrink-0 inline-flex items-center justify-center rounded-md p-1.5 border transition ${
-                                    copiedUtrId === donation._id
+                                  className={`shrink-0 inline-flex items-center justify-center rounded-md p-1.5 border transition ${copiedUtrId === donation._id
                                       ? 'border-green-200 bg-green-50 text-green-700'
                                       : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900'
-                                  }`}
+                                    }`}
                                   title={
                                     copiedUtrId === donation._id ? 'Copied' : 'Copy UTR No.'
                                   }
@@ -355,15 +605,109 @@ const AdminDonations = () => {
 
         {/* Student Funding Requests Tab */}
         {selectedTab === 'students' && (
-          <section>
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">
-              Student Funding Requests
-            </h1>
-            {opportunities.length === 0 ? (
-              <p className="text-gray-600 text-center">No funding requests found.</p>
+          <section className="space-y-6">
+            <div className="flex flex-col md:flex-row md:items-center gap-3">
+              <h1 className="text-xl font-bold text-gray-900">
+                Filter: 
+              </h1>
+
+              {/* 🔹 Filters (responsive) */}
+              <form
+                onSubmit={(e) => e.preventDefault()}
+                className="flex flex-wrap gap-2 md:gap-3 text-xs sm:text-sm"
+              >
+                {/* Status */}
+                <select
+                  value={studentStatusFilter}
+                  onChange={(e) => setStudentStatusFilter(e.target.value)}
+                  className="px-3 py-2 border border-gray-300 rounded-lg w-full sm:w-36"
+                >
+                  <option value="">All Status</option>
+                  <option value="pending">Pending</option>
+                  <option value="approved">Approved</option>
+                  <option value="rejected">Rejected</option>
+                </select>
+
+                {/* Category */}
+                <input
+                  type="text"
+                  value={studentCategoryFilter}
+                  onChange={(e) => setStudentCategoryFilter(e.target.value)}
+                  placeholder="Filter by category"
+                  className="px-3 py-2 border border-gray-300 rounded-lg w-full sm:w-40"
+                />
+
+                {/* Batch */}
+                <input
+                  type="text"
+                  value={studentBatchFilter}
+                  onChange={(e) => setStudentBatchFilter(e.target.value)}
+                  placeholder="Filter by batch"
+                  className="px-3 py-2 border border-gray-300 rounded-lg w-full sm:w-32"
+                />
+
+                {/* Amount range (Amount Requested) */}
+                <input
+                  type="number"
+                  value={studentAmountMin}
+                  onChange={(e) => setStudentAmountMin(e.target.value)}
+                  placeholder="Min amount"
+                  className="px-3 py-2 border border-gray-300 rounded-lg w-[47%] sm:w-28"
+                />
+                <input
+                  type="number"
+                  value={studentAmountMax}
+                  onChange={(e) => setStudentAmountMax(e.target.value)}
+                  placeholder="Max amount"
+                  className="px-3 py-2 border border-gray-300 rounded-lg w-[47%] sm:w-28"
+                />
+
+                {/* Created date range */}
+                <select
+                  value={studentDateRange}
+                  onChange={(e) => setStudentDateRange(e.target.value)}
+                  className="px-3 py-2 border border-gray-300 rounded-lg w-full sm:w-40"
+                >
+                  <option value="">All Created Dates</option>
+                  <option value="today">Today</option>
+                  <option value="week">This Week</option>
+                  <option value="month">This Month</option>
+                  <option value="year">This Year</option>
+                </select>
+
+                {(studentStatusFilter ||
+                  studentCategoryFilter ||
+                  studentBatchFilter ||
+                  studentAmountMin ||
+                  studentAmountMax ||
+                  studentDateRange) && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setStudentStatusFilter('');
+                      setStudentCategoryFilter('');
+                      setStudentBatchFilter('');
+                      setStudentAmountMin('');
+                      setStudentAmountMax('');
+                      setStudentDateRange('');
+                    }}
+                    className="px-3 py-2 text-[11px] sm:text-xs font-semibold rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  >
+                    Clear
+                  </button>
+                )}
+              </form>
+            </div>
+
+            {filteredOpportunities.length === 0 ? (
+              <p className="text-gray-600 text-center">
+                {opportunities.length === 0
+                  ? 'No funding requests found.'
+                  : 'No funding requests match the selected filters.'}
+              </p>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {opportunities.map((opp) => (
+                {filteredOpportunities.map((opp) => (
                   // ...existing opportunity card JSX...
                   <div
                     key={opp._id}

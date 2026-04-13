@@ -142,10 +142,10 @@ const AdminProfile = () => {
         {/* Students Tab (default) */}
         {selectedTab === 'students' && (
           <section className="space-y-6">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-              <h2 className="text-2xl font-semibold text-gray-800">
-                Student Profiles
-              </h2>
+            <div className="flex flex-col md:flex-row md:items-center gap-3">
+              <h1 className="text-xl font-bold text-gray-900">
+                Filter: 
+              </h1>
 
               {/* 🔹 Filters (responsive) */}
               <form
@@ -288,10 +288,10 @@ const AdminProfile = () => {
         {/* Alumni Tab */}
         {selectedTab === 'alumni' && (
           <section className="space-y-6">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-              <h2 className="text-2xl font-semibold text-gray-800">
-                Alumni Profiles
-              </h2>
+            <div className="flex flex-col md:flex-row md:items-center gap-3">
+              <h1 className="text-xl font-bold text-gray-900">
+                Filter: 
+              </h1>
 
               {/* 🔹 Filters (responsive) */}
               <form
