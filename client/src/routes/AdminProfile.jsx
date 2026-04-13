@@ -14,6 +14,12 @@ const AdminProfile = () => {
   // default -> Student Profiles first
   const [selectedTab, setSelectedTab] = useState('students');
 
+  // 🔹 NEW: filter state (shared between tabs but independent per role)
+  const [studentBatchFilter, setStudentBatchFilter] = useState('');
+  const [studentBranchFilter, setStudentBranchFilter] = useState('');
+  const [alumniBatchFilter, setAlumniBatchFilter] = useState('');
+  const [alumniBranchFilter, setAlumniBranchFilter] = useState('');
+
   useSidebarLayout(true);
 
   // Fetch all users from /api/users
@@ -57,6 +63,27 @@ const AdminProfile = () => {
       setError('Failed to update user role');
     }
   };
+
+  // 🔹 Derived filtered lists
+  const filteredStudents = students.filter((u) => {
+    const batchMatch = studentBatchFilter
+      ? (u.batch || '').toLowerCase().includes(studentBatchFilter.toLowerCase())
+      : true;
+    const branchMatch = studentBranchFilter
+      ? (u.branch || '').toLowerCase().includes(studentBranchFilter.toLowerCase())
+      : true;
+    return batchMatch && branchMatch;
+  });
+
+  const filteredAlumni = alumni.filter((u) => {
+    const batchMatch = alumniBatchFilter
+      ? (u.batch || '').toLowerCase().includes(alumniBatchFilter.toLowerCase())
+      : true;
+    const branchMatch = alumniBranchFilter
+      ? (u.branch || '').toLowerCase().includes(alumniBranchFilter.toLowerCase())
+      : true;
+    return batchMatch && branchMatch;
+  });
 
   if (loading) {
     return (
@@ -115,14 +142,56 @@ const AdminProfile = () => {
         {/* Students Tab (default) */}
         {selectedTab === 'students' && (
           <section className="space-y-6">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+              <h2 className="text-2xl font-semibold text-gray-800">
+                Student Profiles
+              </h2>
 
-            {students.length === 0 ? (
-              <p className="text-gray-600">No student profiles found.</p>
+              {/* 🔹 Filters (responsive) */}
+              <form
+                onSubmit={(e) => e.preventDefault()}
+                className="flex flex-wrap gap-2 md:gap-3 text-sm"
+              >
+                <input
+                  type="text"
+                  value={studentBatchFilter}
+                  onChange={(e) => setStudentBatchFilter(e.target.value)}
+                  placeholder="Filter by batch"
+                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm w-full sm:w-40"
+                />
+                <input
+                  type="text"
+                  value={studentBranchFilter}
+                  onChange={(e) => setStudentBranchFilter(e.target.value)}
+                  placeholder="Filter by branch"
+                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm w-full sm:w-40"
+                />
+                {(studentBatchFilter || studentBranchFilter) && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setStudentBatchFilter('');
+                      setStudentBranchFilter('');
+                    }}
+                    className="px-3 py-2 text-xs font-semibold rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  >
+                    Clear
+                  </button>
+                )}
+              </form>
+            </div>
+
+            {filteredStudents.length === 0 ? (
+              <p className="text-gray-600">
+                {students.length === 0
+                  ? 'No student profiles found.'
+                  : 'No students match the selected filters.'}
+              </p>
             ) : (
               <>
                 {/* 🔹 Mobile: card layout (no horizontal scroll) */}
                 <div className="grid gap-4 md:hidden">
-                  {students.map((user) => (
+                  {filteredStudents.map((user) => (
                     <div
                       key={user._id}
                       className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex flex-col gap-3 transform transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md animate-pop-in"
@@ -168,7 +237,7 @@ const AdminProfile = () => {
                   ))}
                 </div>
 
-                {/* 🔹 md+ screens: keep existing table */}
+                {/* 🔹 md+ screens: table view */}
                 <div className="hidden md:block overflow-x-auto bg-white rounded-xl shadow">
                   <table className="min-w-full table-auto border-collapse text-left">
                     <thead className="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
@@ -181,7 +250,7 @@ const AdminProfile = () => {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100 text-sm">
-                      {students.map((user) => (
+                      {filteredStudents.map((user) => (
                         <tr
                           key={user._id}
                           className="hover:bg-gray-50 transition-colors"
@@ -219,14 +288,56 @@ const AdminProfile = () => {
         {/* Alumni Tab */}
         {selectedTab === 'alumni' && (
           <section className="space-y-6">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+              <h2 className="text-2xl font-semibold text-gray-800">
+                Alumni Profiles
+              </h2>
 
-            {alumni.length === 0 ? (
-              <p className="text-gray-600">No alumni profiles found.</p>
+              {/* 🔹 Filters (responsive) */}
+              <form
+                onSubmit={(e) => e.preventDefault()}
+                className="flex flex-wrap gap-2 md:gap-3 text-sm"
+              >
+                <input
+                  type="text"
+                  value={alumniBatchFilter}
+                  onChange={(e) => setAlumniBatchFilter(e.target.value)}
+                  placeholder="Filter by batch"
+                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm w-full sm:w-40"
+                />
+                <input
+                  type="text"
+                  value={alumniBranchFilter}
+                  onChange={(e) => setAlumniBranchFilter(e.target.value)}
+                  placeholder="Filter by branch"
+                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm w-full sm:w-40"
+                />
+                {(alumniBatchFilter || alumniBranchFilter) && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAlumniBatchFilter('');
+                      setAlumniBranchFilter('');
+                    }}
+                    className="px-3 py-2 text-xs font-semibold rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  >
+                    Clear
+                  </button>
+                )}
+              </form>
+            </div>
+
+            {filteredAlumni.length === 0 ? (
+              <p className="text-gray-600">
+                {alumni.length === 0
+                  ? 'No alumni profiles found.'
+                  : 'No alumni match the selected filters.'}
+              </p>
             ) : (
               <>
                 {/* 🔹 Mobile: card layout (no horizontal scroll) */}
                 <div className="grid gap-4 md:hidden">
-                  {alumni.map((user) => (
+                  {filteredAlumni.map((user) => (
                     <div
                       key={user._id}
                       className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex flex-col gap-3 transform transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md animate-pop-in"
@@ -263,7 +374,7 @@ const AdminProfile = () => {
                   ))}
                 </div>
 
-                {/* 🔹 md+ screens: keep existing table */}
+                {/* 🔹 md+ screens: table view */}
                 <div className="hidden md:block overflow-x-auto bg-white rounded-xl shadow">
                   <table className="min-w-full table-auto border-collapse text-left">
                     <thead className="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
@@ -275,7 +386,7 @@ const AdminProfile = () => {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100 text-sm">
-                      {alumni.map((user) => (
+                      {filteredAlumni.map((user) => (
                         <tr
                           key={user._id}
                           className="hover:bg-gray-50 transition-colors"
