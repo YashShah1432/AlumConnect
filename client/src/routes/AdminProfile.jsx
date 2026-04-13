@@ -2,20 +2,29 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/common/Layout';
 import axios from 'axios';
-import { useSidebarLayout } from '../hooks/useSidebarLayout'; 
+import { useSidebarLayout } from '../hooks/useSidebarLayout';
 
 const AdminProfile = () => {
   const [alumni, setAlumni] = useState([]);
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  // NEW: which tab is active: 'students' | 'alumni'
+  // default -> Student Profiles first
+  const [selectedTab, setSelectedTab] = useState('students');
+
   useSidebarLayout(true);
+
   // Fetch all users from /api/users
   const fetchUsers = async () => {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_backend_URL}/api/users`, {
-        withCredentials: true,
-      });
+      const res = await axios.get(
+        `${import.meta.env.VITE_backend_URL}/api/users`,
+        {
+          withCredentials: true,
+        }
+      );
       const users = res.data;
 
       // Separate into alumni vs. students
@@ -69,100 +78,140 @@ const AdminProfile = () => {
 
   return (
     <Layout>
-      <div className="max-w-7xl mx-auto px-4 py-8 space-y-12">
+      <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
+        {/* ===== Tabs Header (Students / Alumni) ===== */}
+        <div className="border-b border-gray-200">
+          <nav className="-mb-px flex space-x-6" aria-label="Tabs">
+            <button
+              type="button"
+              onClick={() => setSelectedTab('students')}
+              className={`whitespace-nowrap py-2 px-1 border-b-2 text-sm font-medium
+                ${
+                  selectedTab === 'students'
+                    ? 'border-blue-600 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+            >
+              Student Profiles
+            </button>
 
-        {/* Alumni Section */}
-        <section>
-          <h2 className="text-2xl font-semibold text-gray-800 mb-6">
-            Alumni Profiles
-          </h2>
-          {alumni.length === 0 ? (
-            <p className="text-gray-600">No alumni profiles found.</p>
-          ) : (
-            <div className="overflow-x-auto bg-white rounded-xl shadow">
-              <table className="min-w-full table-auto border-collapse text-left">
-                <thead className="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
-                  <tr>
-                    <th className="px-6 py-3 font-medium">Name</th>
-                    <th className="px-6 py-3 font-medium">Email</th>
-                    <th className="px-6 py-3 font-medium">Batch</th>
-                    <th className="px-6 py-3 font-medium">Branch</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100 text-sm">
-                  {alumni.map((user) => (
-                    <tr
-                      key={user._id}
-                      className="hover:bg-gray-50 transition-colors"
-                    >
-                      <td className="px-6 py-4 font-semibold text-gray-900">
-                        {user.name}
-                      </td>
-                      <td className="px-6 py-4 text-gray-600">{user.email}</td>
-                      <td className="px-6 py-4 text-gray-600">
-                        {user.batch || 'N/A'}
-                      </td>
-                      <td className="px-6 py-4 text-gray-600">
-                        {user.branch || 'N/A'}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </section>
+            <button
+              type="button"
+              onClick={() => setSelectedTab('alumni')}
+              className={`whitespace-nowrap py-2 px-1 border-b-2 text-sm font-medium
+                ${
+                  selectedTab === 'alumni'
+                    ? 'border-blue-600 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+            >
+              Alumni Profiles
+            </button>
+          </nav>
+        </div>
 
-        {/* Students Section */}
-        <section>
-          <h2 className="text-2xl font-semibold text-gray-800 mb-6">
-            Student Profiles
-          </h2>
-          {students.length === 0 ? (
-            <p className="text-gray-600">No student profiles found.</p>
-          ) : (
-            <div className="overflow-x-auto bg-white rounded-xl shadow">
-              <table className="min-w-full table-auto border-collapse text-left">
-                <thead className="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
-                  <tr>
-                    <th className="px-6 py-3 font-medium">Name</th>
-                    <th className="px-6 py-3 font-medium">Email</th>
-                    <th className="px-6 py-3 font-medium">Batch</th>
-                    <th className="px-6 py-3 font-medium">Branch</th>
-                    <th className="px-6 py-3 font-medium">Action</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100 text-sm">
-                  {students.map((user) => (
-                    <tr
-                      key={user._id}
-                      className="hover:bg-gray-50 transition-colors"
-                    >
-                      <td className="px-6 py-4 font-semibold text-gray-900">
-                        {user.name}
-                      </td>
-                      <td className="px-6 py-4 text-gray-600">{user.email}</td>
-                      <td className="px-6 py-4 text-gray-600">
-                        {user.batch || 'N/A'}
-                      </td>
-                      <td className="px-6 py-4 text-gray-600">
-                        {user.branch || 'N/A'}
-                      </td>
-                      <td className="px-6 py-4">
-                        <button
-                          onClick={() => handleMarkAsAlumni(user._id)}
-                          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition text-xs font-medium"
-                        >
-                          Mark as Alumni
-                        </button>
-                      </td>
+        {/* ===== Tab Panels ===== */}
+
+        {/* Students Tab (default) */}
+        {selectedTab === 'students' && (
+          <section>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-6">
+              Student Profiles
+            </h2>
+            {students.length === 0 ? (
+              <p className="text-gray-600">No student profiles found.</p>
+            ) : (
+              <div className="overflow-x-auto bg-white rounded-xl shadow">
+                <table className="min-w-full table-auto border-collapse text-left">
+                  <thead className="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
+                    <tr>
+                      <th className="px-6 py-3 font-medium">Name</th>
+                      <th className="px-6 py-3 font-medium">Email</th>
+                      <th className="px-6 py-3 font-medium">Batch</th>
+                      <th className="px-6 py-3 font-medium">Branch</th>
+                      <th className="px-6 py-3 font-medium">Action</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </section>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100 text-sm">
+                    {students.map((user) => (
+                      <tr
+                        key={user._id}
+                        className="hover:bg-gray-50 transition-colors"
+                      >
+                        <td className="px-6 py-4 font-semibold text-gray-900">
+                          {user.name}
+                        </td>
+                        <td className="px-6 py-4 text-gray-600">
+                          {user.email}
+                        </td>
+                        <td className="px-6 py-4 text-gray-600">
+                          {user.batch || 'N/A'}
+                        </td>
+                        <td className="px-6 py-4 text-gray-600">
+                          {user.branch || 'N/A'}
+                        </td>
+                        <td className="px-6 py-4">
+                          <button
+                            onClick={() => handleMarkAsAlumni(user._id)}
+                            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition text-xs font-medium"
+                          >
+                            Mark as Alumni
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
+        )}
+
+        {/* Alumni Tab */}
+        {selectedTab === 'alumni' && (
+          <section>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-6">
+              Alumni Profiles
+            </h2>
+            {alumni.length === 0 ? (
+              <p className="text-gray-600">No alumni profiles found.</p>
+            ) : (
+              <div className="overflow-x-auto bg-white rounded-xl shadow">
+                <table className="min-w-full table-auto border-collapse text-left">
+                  <thead className="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
+                    <tr>
+                      <th className="px-6 py-3 font-medium">Name</th>
+                      <th className="px-6 py-3 font-medium">Email</th>
+                      <th className="px-6 py-3 font-medium">Batch</th>
+                      <th className="px-6 py-3 font-medium">Branch</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100 text-sm">
+                    {alumni.map((user) => (
+                      <tr
+                        key={user._id}
+                        className="hover:bg-gray-50 transition-colors"
+                      >
+                        <td className="px-6 py-4 font-semibold text-gray-900">
+                          {user.name}
+                        </td>
+                        <td className="px-6 py-4 text-gray-600">
+                          {user.email}
+                        </td>
+                        <td className="px-6 py-4 text-gray-600">
+                          {user.batch || 'N/A'}
+                        </td>
+                        <td className="px-6 py-4 text-gray-600">
+                          {user.branch || 'N/A'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
+        )}
       </div>
     </Layout>
   );
