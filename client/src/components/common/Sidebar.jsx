@@ -293,24 +293,43 @@ const Sidebar = () => {
             showMobileBar ? "translate-y-0" : "-translate-y-full"
           }`}
         >
-          <nav className="grid grid-cols-4 w-full">
-            {menuItems.slice(0, 4).map((item) => {
-              const isActive = location.pathname.startsWith(item.path);
-              return (
-                <button
-                  key={item.path}
-                  onClick={() => handleNavigation(item.path)}
-                  className={`flex items-center justify-center px-2 py-3 text-xs font-medium text-center ${
-                    isActive
-                      ? "bg-blue-500 text-white"
-                      : "text-gray-600 hover:bg-gray-100 hover:text-gray-800"
-                  }`}
-                >
-                  {/* Mobile: label only, no icon */}
-                  {item.label}
-                </button>
-              );
-            })}
+          {/* 
+            Admin: flex row, Announcements gets more space
+            Others: 4 equal flex items
+          */}
+          <nav className="w-full flex">
+            {menuItems
+              // On mobile, show Profile only if admin
+              .filter((item) => {
+                if (item.label !== 'Profile') return true;
+                return role === 'admin';
+              })
+              .map((item) => {
+                const isActive = location.pathname.startsWith(item.path);
+
+                // For admin: Announcements a bit wider, others slightly smaller
+                const baseFlex =
+                  role === 'admin'
+                    ? item.label === 'Announcements'
+                      ? 'flex-[1.4]' // wider
+                      : 'flex-1'     // normal
+                    : 'flex-1';      // non-admins: all equal
+
+                return (
+                  <button
+                    key={item.path}
+                    onClick={() => handleNavigation(item.path)}
+                    className={`${baseFlex} flex items-center justify-center px-2 py-3 text-[11px] sm:text-xs font-medium text-center ${
+                      isActive
+                        ? 'bg-blue-500 text-white'
+                        : 'text-gray-600 hover:bg-gray-100 hover:text-gray-800'
+                    }`}
+                  >
+                    {/* Mobile: label only, no icon */}
+                    {item.label}
+                  </button>
+                );
+              })}
           </nav>
         </div>
       )}

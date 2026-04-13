@@ -114,101 +114,190 @@ const AdminProfile = () => {
 
         {/* Students Tab (default) */}
         {selectedTab === 'students' && (
-          <section>
-            <h2 className="text-2xl font-semibold text-gray-800 mb-6">
-              Student Profiles
-            </h2>
+          <section className="space-y-6">
+
             {students.length === 0 ? (
               <p className="text-gray-600">No student profiles found.</p>
             ) : (
-              <div className="overflow-x-auto bg-white rounded-xl shadow">
-                <table className="min-w-full table-auto border-collapse text-left">
-                  <thead className="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
-                    <tr>
-                      <th className="px-6 py-3 font-medium">Name</th>
-                      <th className="px-6 py-3 font-medium">Email</th>
-                      <th className="px-6 py-3 font-medium">Batch</th>
-                      <th className="px-6 py-3 font-medium">Branch</th>
-                      <th className="px-6 py-3 font-medium">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100 text-sm">
-                    {students.map((user) => (
-                      <tr
-                        key={user._id}
-                        className="hover:bg-gray-50 transition-colors"
-                      >
-                        <td className="px-6 py-4 font-semibold text-gray-900">
-                          {user.name}
-                        </td>
-                        <td className="px-6 py-4 text-gray-600">
+              <>
+                {/* 🔹 Mobile: card layout (no horizontal scroll) */}
+                <div className="grid gap-4 md:hidden">
+                  {students.map((user) => (
+                    <div
+                      key={user._id}
+                      className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex flex-col gap-3 transform transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md animate-pop-in"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-base font-semibold text-gray-900">
+                            {user.name}
+                          </p>
+                          <p className="text-xs text-gray-500 mt-0.5">
+                            Student • {user.batch || 'Batch N/A'}
+                          </p>
+                        </div>
+                        <span className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-blue-50 text-blue-600 text-sm font-semibold">
+                          {(user.name || 'U').charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+
+                      <div className="text-sm text-gray-700 space-y-1">
+                        <p className="break-all">
+                          <span className="text-gray-500 text-xs uppercase tracking-wide">
+                            Email:{' '}
+                          </span>
                           {user.email}
-                        </td>
-                        <td className="px-6 py-4 text-gray-600">
-                          {user.batch || 'N/A'}
-                        </td>
-                        <td className="px-6 py-4 text-gray-600">
+                        </p>
+                        <p>
+                          <span className="text-gray-500 text-xs uppercase tracking-wide">
+                            Branch:{' '}
+                          </span>
                           {user.branch || 'N/A'}
-                        </td>
-                        <td className="px-6 py-4">
-                          <button
-                            onClick={() => handleMarkAsAlumni(user._id)}
-                            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition text-xs font-medium"
-                          >
-                            Mark as Alumni
-                          </button>
-                        </td>
+                        </p>
+                      </div>
+
+                      <div className="pt-2 border-t border-gray-100 flex justify-end">
+                        <button
+                          onClick={() => handleMarkAsAlumni(user._id)}
+                          className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold bg-green-600 text-white hover:bg-green-700 transition-colors"
+                        >
+                          Mark as Alumni
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* 🔹 md+ screens: keep existing table */}
+                <div className="hidden md:block overflow-x-auto bg-white rounded-xl shadow">
+                  <table className="min-w-full table-auto border-collapse text-left">
+                    <thead className="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
+                      <tr>
+                        <th className="px-6 py-3 font-medium">Name</th>
+                        <th className="px-6 py-3 font-medium">Email</th>
+                        <th className="px-6 py-3 font-medium">Batch</th>
+                        <th className="px-6 py-3 font-medium">Branch</th>
+                        <th className="px-6 py-3 font-medium">Action</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100 text-sm">
+                      {students.map((user) => (
+                        <tr
+                          key={user._id}
+                          className="hover:bg-gray-50 transition-colors"
+                        >
+                          <td className="px-6 py-4 font-semibold text-gray-900">
+                            {user.name}
+                          </td>
+                          <td className="px-6 py-4 text-gray-600">
+                            {user.email}
+                          </td>
+                          <td className="px-6 py-4 text-gray-600">
+                            {user.batch || 'N/A'}
+                          </td>
+                          <td className="px-6 py-4 text-gray-600">
+                            {user.branch || 'N/A'}
+                          </td>
+                          <td className="px-6 py-4">
+                            <button
+                              onClick={() => handleMarkAsAlumni(user._id)}
+                              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition text-xs font-medium"
+                            >
+                              Mark as Alumni
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </>
             )}
           </section>
         )}
 
         {/* Alumni Tab */}
         {selectedTab === 'alumni' && (
-          <section>
-            <h2 className="text-2xl font-semibold text-gray-800 mb-6">
-              Alumni Profiles
-            </h2>
+          <section className="space-y-6">
+
             {alumni.length === 0 ? (
               <p className="text-gray-600">No alumni profiles found.</p>
             ) : (
-              <div className="overflow-x-auto bg-white rounded-xl shadow">
-                <table className="min-w-full table-auto border-collapse text-left">
-                  <thead className="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
-                    <tr>
-                      <th className="px-6 py-3 font-medium">Name</th>
-                      <th className="px-6 py-3 font-medium">Email</th>
-                      <th className="px-6 py-3 font-medium">Batch</th>
-                      <th className="px-6 py-3 font-medium">Branch</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100 text-sm">
-                    {alumni.map((user) => (
-                      <tr
-                        key={user._id}
-                        className="hover:bg-gray-50 transition-colors"
-                      >
-                        <td className="px-6 py-4 font-semibold text-gray-900">
-                          {user.name}
-                        </td>
-                        <td className="px-6 py-4 text-gray-600">
+              <>
+                {/* 🔹 Mobile: card layout (no horizontal scroll) */}
+                <div className="grid gap-4 md:hidden">
+                  {alumni.map((user) => (
+                    <div
+                      key={user._id}
+                      className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex flex-col gap-3 transform transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md animate-pop-in"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-base font-semibold text-gray-900">
+                            {user.name}
+                          </p>
+                          <p className="text-xs text-gray-500 mt-0.5">
+                            Alumni • {user.batch || 'Batch N/A'}
+                          </p>
+                        </div>
+                        <span className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-emerald-50 text-emerald-600 text-sm font-semibold">
+                          {(user.name || 'A').charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+
+                      <div className="text-sm text-gray-700 space-y-1">
+                        <p className="break-all">
+                          <span className="text-gray-500 text-xs uppercase tracking-wide">
+                            Email:{' '}
+                          </span>
                           {user.email}
-                        </td>
-                        <td className="px-6 py-4 text-gray-600">
-                          {user.batch || 'N/A'}
-                        </td>
-                        <td className="px-6 py-4 text-gray-600">
+                        </p>
+                        <p>
+                          <span className="text-gray-500 text-xs uppercase tracking-wide">
+                            Branch:{' '}
+                          </span>
                           {user.branch || 'N/A'}
-                        </td>
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* 🔹 md+ screens: keep existing table */}
+                <div className="hidden md:block overflow-x-auto bg-white rounded-xl shadow">
+                  <table className="min-w-full table-auto border-collapse text-left">
+                    <thead className="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
+                      <tr>
+                        <th className="px-6 py-3 font-medium">Name</th>
+                        <th className="px-6 py-3 font-medium">Email</th>
+                        <th className="px-6 py-3 font-medium">Batch</th>
+                        <th className="px-6 py-3 font-medium">Branch</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100 text-sm">
+                      {alumni.map((user) => (
+                        <tr
+                          key={user._id}
+                          className="hover:bg-gray-50 transition-colors"
+                        >
+                          <td className="px-6 py-4 font-semibold text-gray-900">
+                            {user.name}
+                          </td>
+                          <td className="px-6 py-4 text-gray-600">
+                            {user.email}
+                          </td>
+                          <td className="px-6 py-4 text-gray-600">
+                            {user.batch || 'N/A'}
+                          </td>
+                          <td className="px-6 py-4 text-gray-600">
+                            {user.branch || 'N/A'}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </>
             )}
           </section>
         )}
