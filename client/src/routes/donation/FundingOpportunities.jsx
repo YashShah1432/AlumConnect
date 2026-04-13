@@ -3,7 +3,7 @@ import Layout from '../../components/common/Layout';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useSidebarLayout } from '../../hooks/useSidebarLayout';
-import { Mail, Wallet, CalendarDays, GraduationCap, User } from 'lucide-react';
+import { Mail, Wallet, CalendarDays, GraduationCap } from 'lucide-react';
 
 const FundingOpportunities = () => {
   const navigate = useNavigate();
@@ -13,6 +13,9 @@ const FundingOpportunities = () => {
   const [roleLoading, setRoleLoading] = useState(true);
   const [error, setError] = useState('');
   const [currentUserRole, setCurrentUserRole] = useState(null);
+
+  // NEW: which tab is active for non‑students: 'students' | 'alumni'
+  const [selectedTab, setSelectedTab] = useState('students');
 
   useSidebarLayout(true);
 
@@ -27,9 +30,12 @@ const FundingOpportunities = () => {
   useEffect(() => {
     const fetchRole = async () => {
       try {
-        const res = await axios.get(`${import.meta.env.VITE_backend_URL}/auth/profile`, {
-          withCredentials: true,
-        });
+        const res = await axios.get(
+          `${import.meta.env.VITE_backend_URL}/auth/profile`,
+          {
+            withCredentials: true,
+          }
+        );
         setCurrentUserRole(res.data.role || null);
       } catch (err) {
         console.error('Error fetching user role:', err);
@@ -69,11 +75,20 @@ const FundingOpportunities = () => {
     fetchData();
   }, []);
 
+  const isStudent = currentUserRole === 'student';
+
+  // For students: hide any donation created by a student (safety)
+  const visibleDonations = isStudent
+    ? donations.filter((d) => d.userRole !== 'student')
+    : donations;
+
   if ((loading || roleLoading) && !error) {
     return (
       <Layout>
         <div className="flex justify-center items-center h-64">
-          <p className="text-blue-600 font-medium">Loading funding opportunities...</p>
+          <p className="text-blue-600 font-medium">
+            Loading funding opportunities...
+          </p>
         </div>
       </Layout>
     );
@@ -87,16 +102,9 @@ const FundingOpportunities = () => {
     );
   }
 
-  const isStudent = currentUserRole === 'student';
-
-  // For students: hide any donation created by a student (safety)
-  const visibleDonations = isStudent
-    ? donations.filter((d) => d.userRole !== 'student')
-    : donations;
-
   return (
     <Layout>
-      <div className="max-w-7xl mx-auto px-4 py-10 space-y-10">
+      <div className="max-w-7xl mx-auto px-4 py-10 space-y-8">
         {/* Back Button */}
         <div className="flex justify-start mb-2">
           <button
@@ -108,122 +116,61 @@ const FundingOpportunities = () => {
           </button>
         </div>
 
-        {/* Page Header */}
-        <div className="mb-6 text-center">
-          <h1 className="text-3xl font-bold text-gray-900">Funding Opportunities</h1>
-          {isStudent ? (
-            <p className="mt-2 text-gray-600 max-w-2xl mx-auto">
-              See how alumni are investing in the campus innovation ecosystem. These contributions
-              strengthen labs, clubs and student‑led initiatives across the institute.
-            </p>
-          ) : (
-            <p className="mt-2 text-gray-600 max-w-2xl mx-auto">
-              Explore how you can support student startups, research projects and innovation teams
-              through transparent, institute‑verified opportunities.
-            </p>
-          )}
+        {/* ===== Tabs Header ===== */}
+        <div className="border-b border-gray-200">
+          <nav className="-mb-px flex space-x-6" aria-label="Tabs">
+            {isStudent ? (
+              // Student: only Alumni Contributions tab (always selected style)
+              <button
+                type="button"
+                className="whitespace-nowrap py-2 px-1 border-b-2 text-sm font-medium border-blue-600 text-blue-600 cursor-default"
+              >
+                Alumni Contributions
+              </button>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setSelectedTab('students')}
+                  className={`whitespace-nowrap py-2 px-1 border-b-2 text-sm font-medium
+                    ${
+                      selectedTab === 'students'
+                        ? 'border-blue-600 text-blue-600'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }`}
+                >
+                  Student Funding Requests
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setSelectedTab('alumni')}
+                  className={`whitespace-nowrap py-2 px-1 border-b-2 text-sm font-medium
+                    ${
+                      selectedTab === 'alumni'
+                        ? 'border-blue-600 text-blue-600'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }`}
+                >
+                  Alumni Contributions
+                </button>
+              </>
+            )}
+          </nav>
         </div>
 
-        {/* =========================
-    Section 1: Alumni Contributions
-   ========================= */}
-        <section>
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">Alumni Contributions</h2>
-          {visibleDonations.length === 0 ? (
-            <p className="text-gray-600 text-center">No alumni donations available at the moment.</p>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {visibleDonations.map((donation) => (
-                <div
-                  key={donation._id}
-                  className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all p-5 sm:p-6 flex flex-col"
-                >
-                  {/* Header */}
-                  <div className="flex items-start justify-between gap-3 mb-4">
-                    <div className="min-w-0">
-                      <h3 className="text-lg sm:text-xl font-semibold text-gray-900 truncate">
-                        {donation.userName || donation.email || 'Unknown Alumni'}
-                      </h3>
-                    </div>
-                  </div>
+        {/* ========= Tab Panels / Sections ========= */}
 
-                  {/* Purpose badge */}
-                  <div className="mb-4">
-                    <span className="inline-flex items-center rounded-full bg-blue-50 text-blue-700 px-3 py-1 text-xs font-semibold">
-                      {donation.purpose || 'general'}
-                    </span>
-                  </div>
-
-                  {/* Details box */}
-                  <div className="rounded-xl bg-gray-50 border border-gray-100 p-4 space-y-3 mb-4">
-                    {/* ✅ Email FIRST and FULL WIDTH */}
-                    <div className="flex items-start gap-2 text-sm text-gray-700 min-w-0">
-                      <Mail className="mt-0.5 text-gray-500 shrink-0" size={16} />
-                      <div className="min-w-0 w-full">
-                        <p className="text-xs text-gray-500">Email</p>
-                        <p className="font-medium break-all">
-                          {donation.email || donation.userEmail || 'N/A'}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <div className="flex items-start gap-2 text-sm text-gray-700">
-                        <Wallet className="mt-0.5 text-gray-500" size={16} />
-                        <div>
-                          <p className="text-xs text-gray-500">Amount</p>
-                          <p className="font-semibold text-gray-900">
-                            ₹{Number(donation.amount || 0).toLocaleString()}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-start gap-2 text-sm text-gray-700">
-                        <CalendarDays className="mt-0.5 text-gray-500" size={16} />
-                        <div>
-                          <p className="text-xs text-gray-500">Payment Date</p>
-                          <p className="font-medium">{formatDate(donation.paymentDate)}</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <div className="flex items-start gap-2 text-sm text-gray-700 min-w-0">
-                        <GraduationCap className="mt-0.5 text-gray-500 shrink-0" size={16} />
-                        <div className="min-w-0">
-                          <p className="text-xs text-gray-500">Batch</p>
-                          <p className="font-medium text-gray-900 truncate">{donation.batch || 'N/A'}</p>
-                        </div>
-                      </div>
-
-                      {/* ✅ removed email from here (now first + full width) */}
-                    </div>
-
-                    {donation.comments ? (
-                      <div className="pt-2 border-t border-gray-200">
-                        <p className="text-xs text-gray-500 mb-1">Comments</p>
-                        <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
-                          {donation.comments}
-                        </p>
-                      </div>
-                    ) : null}
-                  </div>
-
-                  {/* No Contribute button in Alumni Contributions */}
-                </div>
-              ))}
-            </div>
-          )}
-        </section>
-
-        {/* =========================
-    Section 2: Student Funding Requests
-   ========================= */}
-        {!isStudent && (
-          <section>
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">Student Funding Requests</h2>
+        {/* For non‑students: Student Funding Requests tab (default) */}
+        {!isStudent && selectedTab === 'students' && (
+          <section className="space-y-4">
+            <h2 className="text-2xl font-semibold text-gray-900">
+              Student Funding Requests
+            </h2>
             {opportunities.length === 0 ? (
-              <p className="text-gray-600 text-center">No funding requests available at the moment.</p>
+              <p className="text-gray-600 text-center">
+                No funding requests available at the moment.
+              </p>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {opportunities.map((opp) => {
@@ -231,7 +178,10 @@ const FundingOpportunities = () => {
                   const isLocked = donationState === 'locked';
 
                   const fullName =
-                    opp.studentName || opp.authorName || opp.authorEmail || 'Student Team';
+                    opp.studentName ||
+                    opp.authorName ||
+                    opp.authorEmail ||
+                    'Student Team';
 
                   return (
                     <div
@@ -256,12 +206,14 @@ const FundingOpportunities = () => {
 
                       {/* Details box */}
                       <div className="rounded-xl bg-gray-50 border border-gray-100 p-4 space-y-3 mb-4">
-                        {/* ✅ Email FIRST and FULL WIDTH */}
+                        {/* Email FIRST and FULL WIDTH */}
                         <div className="flex items-start gap-2 text-sm text-gray-700 min-w-0">
                           <Mail className="mt-0.5 text-gray-500 shrink-0" size={16} />
                           <div className="min-w-0 w-full">
                             <p className="text-xs text-gray-500">Email</p>
-                            <p className="font-medium break-all">{opp.authorEmail || 'N/A'}</p>
+                            <p className="font-medium break-all">
+                              {opp.authorEmail || 'N/A'}
+                            </p>
                           </div>
                         </div>
 
@@ -269,7 +221,9 @@ const FundingOpportunities = () => {
                           <div className="flex items-start gap-2 text-sm text-gray-700">
                             <Wallet className="mt-0.5 text-gray-500" size={16} />
                             <div>
-                              <p className="text-xs text-gray-500">Amount Requested</p>
+                              <p className="text-xs text-gray-500">
+                                Amount Requested
+                              </p>
                               <p className="font-semibold text-gray-900">
                                 ₹{Number(opp.amount || 0).toLocaleString()}
                               </p>
@@ -277,27 +231,35 @@ const FundingOpportunities = () => {
                           </div>
 
                           <div className="flex items-start gap-2 text-sm text-gray-700">
-                            <CalendarDays className="mt-0.5 text-gray-500" size={16} />
+                            <CalendarDays
+                              className="mt-0.5 text-gray-500"
+                              size={16}
+                            />
                             <div>
                               <p className="text-xs text-gray-500">Created On</p>
-                              <p className="font-medium">{formatDate(opp.createdAt)}</p>
+                              <p className="font-medium">
+                                {formatDate(opp.createdAt)}
+                              </p>
                             </div>
                           </div>
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                           <div className="flex items-start gap-2 text-sm text-gray-700 min-w-0">
-                            <GraduationCap className="mt-0.5 text-gray-500 shrink-0" size={16} />
+                            <GraduationCap
+                              className="mt-0.5 text-gray-500 shrink-0"
+                              size={16}
+                            />
                             <div className="min-w-0">
                               <p className="text-xs text-gray-500">Batch</p>
-                              <p className="font-medium text-gray-900 truncate">{opp.batch || 'N/A'}</p>
+                              <p className="font-medium text-gray-900 truncate">
+                                {opp.batch || 'N/A'}
+                              </p>
                             </div>
                           </div>
-
-                          {/* ✅ removed email from here (now first + full width) */}
                         </div>
 
-                        {/* Project title stays here, above details */}
+                        {/* Project title */}
                         <div className="pt-2 border-t border-gray-200">
                           <p className="text-xs text-gray-500 mb-1">Project Title</p>
                           <p className="text-sm font-semibold text-gray-900 whitespace-normal break-words">
@@ -307,7 +269,9 @@ const FundingOpportunities = () => {
 
                         {opp.details ? (
                           <div className="pt-2 border-t border-gray-200">
-                            <p className="text-xs text-gray-500 mb-1">Detailed Description</p>
+                            <p className="text-xs text-gray-500 mb-1">
+                              Detailed Description
+                            </p>
                             <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
                               {opp.details}
                             </p>
@@ -333,8 +297,11 @@ const FundingOpportunities = () => {
                               },
                             })
                           }
-                          className={`w-full sm:w-auto inline-flex items-center justify-center text-white text-sm px-4 py-2 rounded-lg transition ${isLocked ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'
-                            }`}
+                          className={`w-full sm:w-auto inline-flex items-center justify-center text-white text-sm px-4 py-2 rounded-lg transition ${
+                            isLocked
+                              ? 'bg-gray-400 cursor-not-allowed'
+                              : 'bg-green-600 hover:bg-green-700'
+                          }`}
                         >
                           {isLocked ? 'Locked' : 'Contribute'}
                         </button>
@@ -342,6 +309,114 @@ const FundingOpportunities = () => {
                     </div>
                   );
                 })}
+              </div>
+            )}
+          </section>
+        )}
+
+        {/* Alumni Contributions section
+            - For non‑students: shown when selectedTab === 'alumni'
+            - For students: always shown (only tab) */}
+        {((!isStudent && selectedTab === 'alumni') || isStudent) && (
+          <section className="space-y-4">
+            <h2 className="text-2xl font-semibold text-gray-900">
+              Alumni Contributions
+            </h2>
+            {visibleDonations.length === 0 ? (
+              <p className="text-gray-600 text-center">
+                No alumni donations available at the moment.
+              </p>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {visibleDonations.map((donation) => (
+                  <div
+                    key={donation._id}
+                    className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all p-5 sm:p-6 flex flex-col"
+                  >
+                    {/* Header */}
+                    <div className="flex items-start justify-between gap-3 mb-4">
+                      <div className="min-w-0">
+                        <h3 className="text-lg sm:text-xl font-semibold text-gray-900 truncate">
+                          {donation.userName ||
+                            donation.email ||
+                            'Unknown Alumni'}
+                        </h3>
+                      </div>
+                    </div>
+
+                    {/* Purpose badge */}
+                    <div className="mb-4">
+                      <span className="inline-flex items-center rounded-full bg-blue-50 text-blue-700 px-3 py-1 text-xs font-semibold">
+                        {donation.purpose || 'general'}
+                      </span>
+                    </div>
+
+                    {/* Details box */}
+                    <div className="rounded-xl bg-gray-50 border border-gray-100 p-4 space-y-3 mb-4">
+                      {/* Email FIRST and FULL WIDTH */}
+                      <div className="flex items-start gap-2 text-sm text-gray-700 min-w-0">
+                        <Mail className="mt-0.5 text-gray-500 shrink-0" size={16} />
+                        <div className="min-w-0 w-full">
+                          <p className="text-xs text-gray-500">Email</p>
+                          <p className="font-medium break-all">
+                            {donation.email || donation.userEmail || 'N/A'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div className="flex items-start gap-2 text-sm text-gray-700">
+                          <Wallet className="mt-0.5 text-gray-500" size={16} />
+                          <div>
+                            <p className="text-xs text-gray-500">Amount</p>
+                            <p className="font-semibold text-gray-900">
+                              ₹{Number(donation.amount || 0).toLocaleString()}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-start gap-2 text-sm text-gray-700">
+                          <CalendarDays
+                            className="mt-0.5 text-gray-500"
+                            size={16}
+                          />
+                          <div>
+                            <p className="text-xs text-gray-500">Payment Date</p>
+                            <p className="font-medium">
+                              {formatDate(donation.paymentDate)}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div className="flex items-start gap-2 text-sm text-gray-700 min-w-0">
+                          <GraduationCap
+                            className="mt-0.5 text-gray-500 shrink-0"
+                            size={16}
+                          />
+                          <div className="min-w-0">
+                            <p className="text-xs text-gray-500">Batch</p>
+                            <p className="font-medium text-gray-900 truncate">
+                              {donation.batch || 'N/A'}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {donation.comments ? (
+                        <div className="pt-2 border-t border-gray-200">
+                          <p className="text-xs text-gray-500 mb-1">Comments</p>
+                          <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+                            {donation.comments}
+                          </p>
+                        </div>
+                      ) : null}
+                    </div>
+
+                    {/* No Contribute button in Alumni Contributions */}
+                  </div>
+                ))}
               </div>
             )}
           </section>
