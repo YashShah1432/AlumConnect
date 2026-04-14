@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Layout from '../../components/common/Layout';
-import { ArrowRight, Calendar, MapPin, PlusCircle } from 'lucide-react';
+import {Calendar, MapPin, PlusCircle } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSidebarLayout } from '../../hooks/useSidebarLayout';
 
@@ -16,39 +16,40 @@ const Announcement = () => {
   // Alumni ke liye 'Add Achievement' button dikhane ka state
   const [isAlumni, setIsAlumni] = useState(false);
 
+  // Tabs: 'events' | 'achievements'  — default is events
+  const [selectedTab, setSelectedTab] = useState('events');
+
   useSidebarLayout(true);
 
 useEffect(() => {
   const fetchAnnouncements = async () => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_backend_URL}/api/announcements`);
-      console.log("API Response:", response.data);
+      const response = await axios.get(
+        `${import.meta.env.VITE_backend_URL}/api/announcements`
+      );
 
-      if (!response.data || !Array.isArray(response.data)) {
-        throw new Error('Invalid response from server');
-      }
+      const items = response.data || [];
 
-      // Separate events & achievements
-      const allEvents = response.data.filter(item => item.type === 'event');
-      const achievementItems = response.data.filter(item => item.type === 'achievement');
+      // Separate events and achievements
+      const eventAnnouncements = items.filter((item) => item.type === 'event');
+      const achievementItems = items.filter(
+        (item) => item.type === 'achievement'
+      );
 
-      // Keep only today's and upcoming events
-      const today = new Date();
-      today.setHours(0, 0, 0, 0); // normalize
+      // Keep only today + upcoming events (like AllEvents.jsx)
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
 
-      const upcomingEvents = allEvents.filter(evt => {
-        if (!evt.eventDateTime) return false;
-        const eventDate = new Date(evt.eventDateTime);
+      const upcomingEvents = eventAnnouncements.filter((event) => {
+        if (!event.eventDateTime) return false;
+        const eventDate = new Date(event.eventDateTime);
         eventDate.setHours(0, 0, 0, 0);
-        return eventDate >= today; // today or future
+        return eventDate >= now;
       });
 
-      console.log("Upcoming Events (for homepage):", upcomingEvents);
-      console.log("Achievements:", achievementItems);
-
-      // Show only first 3 upcoming events for homepage
-      setAnnouncements(upcomingEvents.slice(0, 3));
-      setAchievements(achievementItems.slice(0, 4));
+      // Store ALL of them for tabs
+      setAnnouncements(upcomingEvents);
+      setAchievements(achievementItems);
     } catch (err) {
       console.error('Error fetching announcements:', err.message);
       setError('Failed to load announcements');
@@ -58,7 +59,17 @@ useEffect(() => {
   };
 
   const fetchUserRole = async () => {
-    // ...existing code unchanged...
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_backend_URL}/auth/profile`,
+        { withCredentials: true }
+      );
+      const role = res.data?.role?.toLowerCase?.() || '';
+      setIsAlumni(role === 'alumni');
+    } catch (err) {
+      console.error('Error fetching user role for announcements:', err);
+      setIsAlumni(false);
+    }
   };
 
   fetchAnnouncements();
@@ -87,156 +98,153 @@ useEffect(() => {
 
   return (
     <Layout>
-      <div className="max-w-7xl mx-auto px-4 py-12">
-        {/* Announcements Section */}
-        <div className="mb-16">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-bold text-gray-900">Latest Events</h2>
-            <Link
-              to="/announcements/all-events"
-              className="flex items-center gap-2 text-blue-600 font-medium hover:text-blue-700 transition-colors"
+      <div className="max-w-7xl mx-auto px-4 py-12 space-y-8">
+        {/* Tabs Header */}
+        <div className="border-b border-gray-200">
+          <nav className="-mb-px flex space-x-6" aria-label="Tabs">
+            <button
+              type="button"
+              onClick={() => setSelectedTab('events')}
+              className={`whitespace-nowrap py-2 px-1 border-b-2 text-sm sm:text-base font-medium
+                ${
+                  selectedTab === 'events'
+                    ? 'border-blue-600 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
             >
-              View all events <ArrowRight size={18} />
-            </Link>
-          </div>
+              Events
+            </button>
 
-          {announcements.length === 0 ? (
-            <div className="bg-white rounded-xl shadow-sm p-8 text-center text-gray-500">
-              No events available at the moment.
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {announcements.map((announcement) => (
-                <div
-                  key={announcement._id}
-                  className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all duration-300 group"
-                >
-                  {/* If there's an imageUrl, show the image */}
-                  {announcement.imageUrl && (
-                    <div className="h-52 overflow-hidden">
-                      <img
-                        src={announcement.imageUrl}
-                        alt={announcement.title}
-                        className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-500"
-                      />
-                    </div>
-                  )}
-                  <div className="p-6">
-                    <div className="mb-3">
-                      <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-xs font-medium">
-                        Event
-                      </span>
-                    </div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                      {announcement.title}
-                    </h3>
-                    <p className="text-gray-600 font-normal leading-relaxed mb-4">
-                      {announcement.description}
-                    </p>
-
-                    {/* Dynamic DateTime */}
-                    <div className="flex items-center text-gray-500 text-sm">
-                      <Calendar size={16} className="mr-2" />
-                      <span>
-                        {announcement.eventDateTime
-                          ? new Date(announcement.eventDateTime).toLocaleString('en-GB')
-                          : "No date/time provided"}
-                      </span>
-                    </div>
-
-                    {/* Dynamic Venue or fallback */}
-                    <div className="flex items-center text-gray-500 text-sm mt-2">
-                      <MapPin size={16} className="mr-2" />
-                      <span>
-                        {announcement.venue || "No venue provided"}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+            <button
+              type="button"
+              onClick={() => setSelectedTab('achievements')}
+              className={`whitespace-nowrap py-2 px-1 border-b-2 text-sm sm:text-base font-medium
+                ${
+                  selectedTab === 'achievements'
+                    ? 'border-blue-600 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+            >
+              Achievements
+            </button>
+          </nav>
         </div>
 
-        {/* Achievements Section */}
-        <div>
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-bold text-gray-900">Recent Achievements</h2>
-            <div className="flex gap-4">
-              {/* Show "Add Achievement" button only to alumni */}
-              {isAlumni && (
+        {/* ====== Events Tab Panel ====== */}
+        {selectedTab === 'events' && (
+          <section className="space-y-8">
+            {announcements.length === 0 ? (
+              <div className="bg-white rounded-xl shadow-sm p-8 text-center text-gray-500">
+                No events available at the moment.
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {announcements.map((announcement) => (
+                  <div
+                    key={announcement._id}
+                    className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all duration-300 group"
+                  >
+                    {announcement.imageUrl && (
+                      <div className="h-52 overflow-hidden">
+                        <img
+                          src={announcement.imageUrl}
+                          alt={announcement.title}
+                          className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-500"
+                        />
+                      </div>
+                    )}
+                    <div className="p-6">
+                      <div className="mb-3">
+                        <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-xs font-medium">
+                          Event
+                        </span>
+                      </div>
+                      <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                        {announcement.title}
+                      </h3>
+                      <p className="text-gray-600 font-normal leading-relaxed mb-4">
+                        {announcement.description}
+                      </p>
+
+                      <div className="flex items-center text-gray-500 text-sm">
+                        <Calendar size={16} className="mr-2" />
+                        <span>
+                          {announcement.eventDateTime
+                            ? new Date(announcement.eventDateTime).toLocaleString('en-GB')
+                            : 'No date/time provided'}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center text-gray-500 text-sm mt-2">
+                        <MapPin size={16} className="mr-2" />
+                        <span>{announcement.venue || 'No venue provided'}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+        )}
+
+        {/* ====== Achievements Tab Panel ====== */}
+        {selectedTab === 'achievements' && (
+          <section className="space-y-6">
+            {/* Alumni‑only button just below tabs, above cards (mobile + desktop) */}
+            {isAlumni && (
+              <div className="flex justify-start">
                 <Link
                   to="/create-achievement"
-                  className="hidden min-[550px]:inline-flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm font-medium shadow-md"
+                  className="inline-flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm font-medium shadow-md"
                 >
                   <PlusCircle size={18} /> Add Achievement
                 </Link>
-              )}
-              <Link
-                to="/announcements/all-achievements"
-                className="flex items-center gap-2 text-purple-600 font-medium hover:text-purple-700 transition-colors"
-              >
-                View all achievements <ArrowRight size={18} />
-              </Link>
-            </div>
-          </div>
+              </div>
+            )}
 
-          {achievements.length === 0 ? (
-            <div className="bg-white rounded-xl shadow-sm p-8 text-center text-gray-500">
-              No achievements to display.
-            </div>
-          ) : (
-            <>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {achievements.map((achievement) => (
-                <div
-                  key={achievement._id}
-                  className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-all duration-300 border border-gray-50"
-                >
-                  <div className="flex items-center gap-5">
-                    {achievement.imageUrl ? (
-                      <img
-                        src={achievement.imageUrl}
-                        alt={achievement.name}
-                        className="w-20 h-20 rounded-full object-cover border-2 border-purple-100"
-                      />
-                    ) : (
-                      <div className="w-20 h-20 rounded-full bg-purple-100 flex items-center justify-center text-purple-500 font-bold text-2xl">
-                        {achievement.name?.charAt(0) || "A"}
+            {achievements.length === 0 ? (
+              <div className="bg-white rounded-xl shadow-sm p-8 text-center text-gray-500">
+                No achievements to display.
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {achievements.map((achievement) => (
+                  <div
+                    key={achievement._id}
+                    className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-all duration-300 border border-gray-50"
+                  >
+                    <div className="flex items-center gap-5">
+                      {achievement.imageUrl ? (
+                        <img
+                          src={achievement.imageUrl}
+                          alt={achievement.name}
+                          className="w-20 h-20 rounded-full object-cover border-2 border-purple-100"
+                        />
+                      ) : (
+                        <div className="w-20 h-20 rounded-full bg-purple-100 flex items-center justify-center text-purple-500 font-bold text-2xl">
+                          {achievement.name?.charAt(0) || 'A'}
+                        </div>
+                      )}
+                      <div>
+                        <div className="mb-2">
+                          <span className="px-3 py-1 bg-purple-50 text-purple-600 rounded-full text-xs font-medium">
+                            Achievement
+                          </span>
+                        </div>
+                        <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                          {achievement.name}
+                        </h3>
+                        <p className="text-gray-600 font-normal leading-relaxed">
+                          {achievement.description}
+                        </p>
                       </div>
-                    )}
-                    <div>
-                      <div className="mb-2">
-                        <span className="px-3 py-1 bg-purple-50 text-purple-600 rounded-full text-xs font-medium">
-                          Achievement
-                        </span>
-                      </div>
-                      <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                        {achievement.name}
-                      </h3>
-                      <p className="text-gray-600 font-normal leading-relaxed">
-                        {achievement.description}
-                      </p>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Mobile / <550px: Add Achievement below cards, centered */}
-              {isAlumni && (
-                <div className="mt-8 flex justify-center min-[550px]:hidden">
-                  <Link
-                    to="/create-achievement"
-                    className="inline-flex items-center gap-2 bg-green-600 text-white px-16 py-3 rounded-lg hover:bg-green-700 transition-colors text-sm font-medium shadow-md"
-                  >
-                    <PlusCircle size={18} /> Add Achievement
-                  </Link>
-                </div>
-              )}
-            </>
-          )}
-        </div>
+                ))}
+              </div>
+            )}
+          </section>
+        )}
       </div>
     </Layout>
   );
