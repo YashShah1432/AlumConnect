@@ -1,3 +1,4 @@
+//// filepath: d:\Major Project Changes\12-04-2026\server\routes\opportunityRoutes.js
 // server/routes/opportunityRoutes.js
 const express = require('express');
 const router = express.Router();
@@ -25,9 +26,9 @@ router.get('/', async (req, res) => {
   try {
     const filter = {};
 
-    // ✅ Only show requests that are NOT fulfilled
+    // Only show requests that are NOT fulfilled
     filter.donationState = { $ne: 'fulfilled' };
-    
+
     if (req.query.category) {
       filter.category = req.query.category;
     }
@@ -57,7 +58,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Create new opportunity (NOW: multipart/form-data with file)
+// Create new opportunity (multipart/form-data with file)
 router.post(
   '/createOpportunity',
   isAuthenticated,
@@ -141,6 +142,28 @@ router.get('/author/:email', async (req, res) => {
     res.json(opportunities);
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+});
+
+// Get logged-in student's own funding requests
+router.get('/me', isAuthenticated, async (req, res) => {
+  try {
+    if (req.user.role !== 'student') {
+      return res.status(403).json({ message: 'Only students can view their funding requests.' });
+    }
+
+    const email = String(req.user.email || '').toLowerCase().trim();
+
+    const myOpportunities = await Opportunity.find({
+      authorEmail: email
+    })
+      .sort({ createdAt: -1 })
+      .lean();
+
+    res.json(myOpportunities);
+  } catch (error) {
+    console.error('Error fetching my opportunities:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 });
 

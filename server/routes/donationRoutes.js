@@ -1,3 +1,4 @@
+//// filepath: d:\Major Project Changes\12-04-2026\server\routes\donationRoutes.js
 // server/routes/donationRoutes.js
 const express = require('express');
 const router = express.Router();
@@ -21,12 +22,28 @@ const uploadProof = multer({
   }
 });
 
+// Get IDs of opportunities that have at least one accepted donation
+router.get('/funded-opportunities', isAuthenticated, async (req, res) => {
+  try {
+    const funded = await Donation.aggregate([
+      { $match: { status: 'accepted', opportunityId: { $ne: null } } },
+      { $group: { _id: '$opportunityId' } }
+    ]);
+
+    const fundedIds = funded.map((d) => d._id);
+
+    res.json({ fundedOpportunityIds: fundedIds });
+  } catch (error) {
+    console.error('Error fetching funded opportunities:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // POST /api/donations
 // Create donation with default status "pending" + upload proof image to Cloudinary
 router.post('/', isAuthenticated, uploadProof.single('paymentProof'), async (req, res) => {
   try {
     const {
-      // name, batch, email,  // ❌ don't trust these from client for identity
       amount,
       purpose,
       comments,
@@ -35,17 +52,16 @@ router.post('/', isAuthenticated, uploadProof.single('paymentProof'), async (req
       opportunityId
     } = req.body;
 
-    // ✅ ensure only alumni can create donations
+    // ensure only alumni can create donations
     if (req.user?.role !== 'alumni') {
       return res.status(403).json({ message: 'Only alumni can create donations.' });
     }
 
-    // ✅ take identity from session user
+    // take identity from session user
     const name = req.user?.name || '';
     const batch = req.user?.batch || '';
     const email = String(req.user?.email || '').toLowerCase().trim();
 
-    // Basic validations
     const missing = [];
     if (!name) missing.push('name');
     if (!batch) missing.push('batch');
@@ -75,9 +91,7 @@ router.post('/', isAuthenticated, uploadProof.single('paymentProof'), async (req
       return res.status(400).json({ message: 'Payment proof image is required' });
     }
 
-    // ✅ Atomic lock (prevents race conditions)
-    // NOTE: we lock first, then create donation. If something fails after lock,
-    // we unlock in the catch block.
+    // Atomic lock
     let lockedOpportunity = null;
 
     if (opportunityId) {
@@ -127,7 +141,7 @@ router.post('/', isAuthenticated, uploadProof.single('paymentProof'), async (req
     const donation = new Donation(donationData);
     await donation.save();
 
-    // ✅ Attach donation id to the lock
+    // Attach donation id to the lock
     if (lockedOpportunity) {
       await Opportunity.findByIdAndUpdate(lockedOpportunity._id, {
         lockedByDonationId: donation._id
@@ -181,15 +195,13 @@ router.get('/', async (req, res) => {
   }
 });
 
-// ✅ GET /api/donations/me
-// Alumni-only: return logged-in user's donations (pending + accepted + rejected)
+// GET /api/donations/me
 router.get('/me', isAuthenticated, async (req, res) => {
   try {
     if (req.user?.role !== 'alumni') {
       return res.status(403).json({ message: 'Only alumni can view donation transactions.' });
     }
 
-    // Prefer userId if you store it; fallback to email
     const userId = req.user?._id;
     const email = String(req.user?.email || '').toLowerCase().trim();
 
@@ -206,8 +218,7 @@ router.get('/me', isAuthenticated, async (req, res) => {
   }
 });
 
-// ✅ GET /api/donations/:id/certificate
-// Returns a Cloudinary forced-download URL (no redirect; frontend navigates to it)
+// GET /api/donations/:id/certificate
 router.get('/:id/certificate', isAuthenticated, async (req, res) => {
   try {
     const donationId = req.params.id;
@@ -232,12 +243,10 @@ router.get('/:id/certificate', isAuthenticated, async (req, res) => {
       }
     }
 
-    // Prefer stored Cloudinary public_id, else reconstruct it (NO extension)
     let publicIdRaw =
       donation.certificatePublicId ||
       `donations/tax-certificates/tax_certificate_${donation.certificateNo}`;
 
-    // If already encoded (%2F etc), decode it back
     try {
       if (/%2f/i.test(String(publicIdRaw)) || /%[0-9a-f]{2}/i.test(String(publicIdRaw))) {
         publicIdRaw = decodeURIComponent(String(publicIdRaw));
@@ -246,11 +255,9 @@ router.get('/:id/certificate', isAuthenticated, async (req, res) => {
       // ignore decode errors
     }
 
-    // Normalize: remove trailing ".pdf" and accidental ".pdf.pdf"
     let publicId = String(publicIdRaw).replace(/(\.pdf)+$/i, '');
     publicId = publicId.replace(/^\/+/, '');
 
-    // Keep slashes; encode only each segment
     const safePublicId = publicId
       .split('/')
       .filter(Boolean)
@@ -263,7 +270,6 @@ router.get('/:id/certificate', isAuthenticated, async (req, res) => {
       attachmentName
     )}/${safePublicId}.pdf`;
 
-    // ✅ Console logs requested
     console.log('[CERT DOWNLOAD] donationId:', donationId);
     console.log('[CERT DOWNLOAD] certificateNo:', donation.certificateNo);
     console.log('[CERT DOWNLOAD] certificatePublicId (stored):', donation.certificatePublicId);
@@ -273,26 +279,11 @@ router.get('/:id/certificate', isAuthenticated, async (req, res) => {
     console.log('[CERT DOWNLOAD] safePublicId:', safePublicId);
     console.log('[CERT DOWNLOAD] GENERATED url:', url);
 
-    // What the "correct" url should look like (example explanation)
-    // It should NOT contain "%2F" (slashes must remain as "/")
-    // It should NOT end in ".pdf.pdf" (only one ".pdf")
-    //
-    // Example correct format:
-    // https://res.cloudinary.com/<cloud>/raw/upload/fl_attachment:TaxExemptionCertificate_<CERTNO>.pdf/donations/tax-certificates/tax_certificate_<CERTNO>.pdf
-    //
-    // Your logs above will show whether safePublicId became:
-    // donations/tax-certificates/tax_certificate_<CERTNO>
-    // (this is correct)
-
     return res.json({ url });
   } catch (error) {
     console.error('Error building certificate download URL:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
-
-// router.get('/__ping', (req, res) => {
-//   res.json({ ok: true, route: 'donationRoutes' });
-// });
 
 module.exports = router;

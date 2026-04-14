@@ -1,12 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react';
+//// filepath: d:\Major Project Changes\12-04-2026\client\src\routes\donation\Donations.jsx
+// client/src/routes/donation/Donations.jsx
+import React, { useEffect, useRef, useState } from 'react';
 import Layout from '../../components/common/Layout';
 import Donation from '../../components/donations/Donation';
 import Funding from '../../components/donations/Funding';
-import { useSidebarLayout } from '../../hooks/useSidebarLayout';
 import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { showSuccessToast } from '../../utils/toast';
-import { Download, Eye } from 'lucide-react'; // ✅ CHANGED (added Eye)
+import { useSidebarLayout } from '../../hooks/useSidebarLayout';
+import { Eye, Download } from 'lucide-react';
+import { showErrorToast, showSuccessToast } from '../../utils/toast';
 
 const Donations = () => {
   useSidebarLayout(true);
@@ -21,29 +23,30 @@ const Donations = () => {
   const [loadingMyDonations, setLoadingMyDonations] = useState(false);
   const [myDonationsError, setMyDonationsError] = useState('');
 
+  const [myRequests, setMyRequests] = useState([]);
+  const [loadingMyRequests, setLoadingMyRequests] = useState(false);
+  const [myRequestsError, setMyRequestsError] = useState('');
+
+  const [fundedOpportunityIds, setFundedOpportunityIds] = useState([]);
+
   const toastShownRef = useRef(false);
 
+  // Handle toast messages after redirect from create forms
   useEffect(() => {
     const shouldShowDonationToast = Boolean(location.state?.showDonationSubmittedToast);
     const shouldShowFundingToast = Boolean(location.state?.showFundingSubmittedToast);
 
     if (!shouldShowDonationToast && !shouldShowFundingToast) return;
 
-    if (toastShownRef.current) {
-      navigate(location.pathname, { replace: true, state: null });
-      return;
-    }
-
+    if (toastShownRef.current) return;
     toastShownRef.current = true;
 
     if (shouldShowDonationToast) {
-      showSuccessToast('Donation details submitted successfully. Your payment will be verified soon.');
+      showSuccessToast('Donation details submitted successfully. It will be verified by admin.');
     }
 
     if (shouldShowFundingToast) {
-      showSuccessToast(
-        'Funding request submitted successfully. It will be visible to alumni after admin approval.'
-      );
+      showSuccessToast('Funding request submitted successfully. It will be reviewed by admin.');
     }
 
     navigate(location.pathname, { replace: true, state: null });
@@ -54,12 +57,14 @@ const Donations = () => {
     navigate
   ]);
 
+  // Fetch current user role
   useEffect(() => {
     const fetchUserRole = async () => {
       try {
-        const res = await axios.get(`${import.meta.env.VITE_backend_URL}/auth/profile`, {
-          withCredentials: true
-        });
+        const res = await axios.get(
+          `${import.meta.env.VITE_backend_URL}/auth/profile`,
+          { withCredentials: true }
+        );
         setUserRole(res.data.role || null);
       } catch (err) {
         console.error('Error fetching user profile:', err);
@@ -68,27 +73,79 @@ const Donations = () => {
         setLoadingRole(false);
       }
     };
+
     fetchUserRole();
   }, []);
 
+  // Fetch alumni's own donations
   useEffect(() => {
     const fetchMyDonations = async () => {
       setMyDonationsError('');
       setLoadingMyDonations(true);
       try {
-        const res = await axios.get(`${import.meta.env.VITE_backend_URL}/api/donations/me`, {
-          withCredentials: true
-        });
+        const res = await axios.get(
+          `${import.meta.env.VITE_backend_URL}/api/donations/me`,
+          { withCredentials: true }
+        );
         setMyDonations(Array.isArray(res.data) ? res.data : []);
       } catch (err) {
-        const msg = err.response?.data?.message || 'Unable to load your transactions.';
+        console.error('Error fetching my donations:', err);
+        const msg =
+          err.response?.data?.message || 'Unable to load your transactions.';
         setMyDonationsError(msg);
       } finally {
         setLoadingMyDonations(false);
       }
     };
 
-    if (userRole === 'alumni') fetchMyDonations();
+    if (userRole === 'alumni') {
+      fetchMyDonations();
+    }
+  }, [userRole]);
+
+  // Fetch student's own funding requests + funded opportunities
+  // Fetch student's own funding requests + funded opportunities
+  useEffect(() => {
+    const fetchMyRequests = async () => {
+      setMyRequestsError('');
+      setLoadingMyRequests(true);
+      try {
+        const [reqRes, fundedRes] = await Promise.all([
+          axios.get(
+            `${import.meta.env.VITE_backend_URL}/api/opportunities/me`,
+            { withCredentials: true }
+          ),
+          axios.get(
+            `${import.meta.env.VITE_backend_URL}/api/donations/funded-opportunities`,
+            { withCredentials: true }
+          )
+        ]);
+
+        setMyRequests(Array.isArray(reqRes.data) ? reqRes.data : []);
+
+        const fundedIds =
+          fundedRes.data?.fundedOpportunityIds?.map((id) => String(id)) || [];
+        setFundedOpportunityIds(fundedIds);
+      } catch (err) {
+        console.error('Error fetching my requests or funded opportunities:', err);
+
+        // Graceful message for 404 (route not found) or generic error
+        const status = err.response?.status;
+        const msg =
+          status === 404
+            ? 'Funding request tracking is temporarily unavailable. Please try again later.'
+            : err.response?.data?.message ||
+            'Unable to load your funding requests. Please try again later.';
+
+        setMyRequestsError(msg);
+      } finally {
+        setLoadingMyRequests(false);
+      }
+    };
+
+    if (userRole === 'student') {
+      fetchMyRequests();
+    }
   }, [userRole]);
 
   const formatDate = (value) => {
@@ -103,24 +160,24 @@ const Donations = () => {
     window.open(url, '_blank', 'noopener,noreferrer');
   };
 
-  // ✅ download via backend (fixes Cloudinary 401 + keeps privacy)
+  // Download certificate via backend
   const downloadCertificate = async (donationId) => {
     try {
-      const apiUrl = `${import.meta.env.VITE_backend_URL}/api/donations/${donationId}/certificate`;
-
-      const res = await fetch(apiUrl, { credentials: 'include' });
-      if (!res.ok) {
-        const msg = await res.json().catch(() => null);
-        throw new Error(msg?.message || 'Failed to get certificate URL');
+      const res = await axios.get(
+        `${import.meta.env.VITE_backend_URL}/api/donations/${donationId}/certificate`,
+        { withCredentials: true }
+      );
+      const url = res.data?.url;
+      if (!url) {
+        showErrorToast('Download link not available.');
+        return;
       }
-
-      const data = await res.json();
-      if (!data?.url) throw new Error('Certificate URL not available');
-
-      // ✅ trigger download via navigation (no CORS credentials problem)
-      window.location.href = data.url;
+      window.location.href = url;
     } catch (e) {
-      console.error(e);
+      console.error('Error downloading certificate:', e);
+      const msg =
+        e.response?.data?.message || 'Error downloading certificate. Please try again.';
+      showErrorToast(msg);
     }
   };
 
@@ -140,7 +197,7 @@ const Donations = () => {
   const showDonationCard = isAlumni;
   const gridCols = showDonationCard ? 'md:grid-cols-2' : 'md:grid-cols-1';
 
-  // ✅ Transactions = pending + rejected (approved are shown separately in Completed Transactions)
+  // Alumni transactions
   const txAll = isAlumni
     ? myDonations.filter((d) => d.status === 'pending' || d.status === 'rejected')
     : [];
@@ -149,14 +206,46 @@ const Donations = () => {
     ? myDonations.filter((d) => d.status === 'accepted' && d.certificateUrl)
     : [];
 
-  // ✅ show only latest 3 (backend already sorts newest-first)
   const tx = txAll.slice(0, 3);
   const completedTx = completedTxAll.slice(0, 3);
+
+  // Student funding requests
+  const reqAll = isStudent ? myRequests : [];
+
+
+  // Second card: approved requests that also have an accepted donation
+  const fundedSet = new Set(fundedOpportunityIds.map((id) => String(id)));
+
+  const myFundedRequestsAll = isStudent
+    ? reqAll.filter(
+      (r) =>
+        r.status === 'approved' &&
+        r._id &&
+        fundedSet.has(String(r._id))
+    )
+    : [];
+
+  // First card: all requests EXCEPT those already in "funded"
+  // (i.e. hide approved+funded from "My Funding Requests")
+  const myRequestsForFirstCard = isStudent
+    ? reqAll.filter(
+        (r) =>
+          !(
+            r.status === 'approved' &&
+            r._id &&
+            fundedSet.has(String(r._id))
+          )
+      )
+    : [];
+
+
+  const reqFirstSection = myRequestsForFirstCard.slice(0, 3);
+  const reqFundedSection = myFundedRequestsAll.slice(0, 3);
 
   return (
     <Layout>
       <div className="max-w-7xl mx-auto px-4 py-6">
-        {/* Role‑specific header */}
+        {/* Role-specific header */}
         <div className="text-center mt-6 mb-4">
           {isAlumni && (
             <>
@@ -200,8 +289,8 @@ const Donations = () => {
           <div className="w-12 h-1 bg-blue-600 mx-auto mt-3 rounded-full" />
         </div>
 
+        {/* Top grid: Donation or student info + Funding preview */}
         <div className={`grid grid-cols-1 ${gridCols} gap-6`}>
-          {/* Left column: alumni‑only donation card OR student‑only info card */}
           {isAlumni && (
             <div className="h-full flex flex-col">
               <Donation />
@@ -232,16 +321,15 @@ const Donations = () => {
             </div>
           )}
 
-          {/* Right column: Funding preview */}
           <div className="h-full flex flex-col">
             <Funding preview={true} />
           </div>
         </div>
 
-        {/* ✅ Alumni-only Transactions section (hidden for students) */}
+        {/* Alumni-only Transactions */}
         {isAlumni && (
           <div className="mt-10 space-y-10">
-            {/* ================= Transactions (Pending + Rejected) ================= */}
+            {/* Transactions (Pending + Rejected) */}
             <section className="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
               <div className="px-5 sm:px-6 py-4 border-b bg-gradient-to-r from-yellow-50 to-white">
                 <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Transactions</h2>
@@ -281,59 +369,63 @@ const Donations = () => {
 
                       return (
                         <li key={d._id} className="px-5 sm:px-6 py-4">
-                          {/* Mobile = card; Desktop = row */}
                           <div className="rounded-xl bg-gray-50/60 md:bg-transparent p-4 md:p-0">
                             <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-start md:items-center">
-                              {/* Sr No */}
                               <div className="md:col-span-1 md:text-center">
                                 <p className="text-sm font-semibold text-gray-900">
-                                  <span className="md:hidden text-gray-500 font-medium mr-2">Sr. No.:</span>
+                                  <span className="md:hidden text-gray-500 font-medium mr-2">
+                                    Sr. No.:
+                                  </span>
                                   {idx + 1}
                                 </p>
                               </div>
 
-                              {/* Date */}
                               <div className="md:col-span-2 md:text-center">
                                 <p className="text-sm text-gray-900 font-medium">
-                                  <span className="md:hidden text-gray-500 font-medium mr-2">Date:</span>
+                                  <span className="md:hidden text-gray-500 font-medium mr-2">
+                                    Date:
+                                  </span>
                                   {formatDate(d.paymentDate)}
                                 </p>
                               </div>
 
-                              {/* Purpose */}
                               <div className="md:col-span-2 md:text-center">
                                 <p className="text-sm text-gray-900 font-semibold capitalize">
-                                  <span className="md:hidden text-gray-500 font-medium mr-2">Purpose:</span>
+                                  <span className="md:hidden text-gray-500 font-medium mr-2">
+                                    Purpose:
+                                  </span>
                                   {d.purpose || 'general'}
                                 </p>
                               </div>
 
-                              {/* Amount */}
                               <div className="md:col-span-2 md:text-center">
                                 <p className="text-sm text-gray-900 font-semibold">
-                                  <span className="md:hidden text-gray-500 font-medium mr-2">Amount:</span>
+                                  <span className="md:hidden text-gray-500 font-medium mr-2">
+                                    Amount:
+                                  </span>
                                   ₹{Number(d.amount || 0).toLocaleString('en-IN')}
                                 </p>
                               </div>
 
-                              {/* UTR */}
                               <div className="md:col-span-2 md:text-center">
                                 <p className="text-sm text-gray-700 font-medium break-all">
-                                  <span className="md:hidden text-gray-500 font-medium mr-2">UTR No.:</span>
+                                  <span className="md:hidden text-gray-500 font-medium mr-2">
+                                    UTR No.:
+                                  </span>
                                   {d.utrNo || 'N/A'}
                                 </p>
                               </div>
 
-                              {/* Status */}
                               <div className="md:col-span-1 md:text-center">
                                 <div className="md:flex md:justify-center">
-                                  <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${chipClass}`}>
+                                  <span
+                                    className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${chipClass}`}
+                                  >
                                     {isRejected ? 'Rejected' : 'Pending'}
                                   </span>
                                 </div>
                               </div>
 
-                              {/* Payment Proof */}
                               <div className="md:col-span-2 md:text-center">
                                 <button
                                   type="button"
@@ -356,10 +448,12 @@ const Donations = () => {
               )}
             </section>
 
-            {/* ================= Completed Transactions ================= */}
+            {/* Completed Transactions */}
             <section className="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
               <div className="px-5 sm:px-6 py-4 border-b bg-gradient-to-r from-green-50 to-white">
-                <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Completed Transactions</h2>
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+                  Completed Transactions
+                </h2>
               </div>
 
               {loadingMyDonations ? (
@@ -389,35 +483,45 @@ const Donations = () => {
                           <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-start md:items-center">
                             <div className="md:col-span-1 md:text-center">
                               <p className="text-sm font-semibold text-gray-900">
-                                <span className="md:hidden text-gray-500 font-medium mr-2">Sr. No.:</span>
+                                <span className="md:hidden text-gray-500 font-medium mr-2">
+                                  Sr. No.:
+                                </span>
                                 {idx + 1}
                               </p>
                             </div>
 
                             <div className="md:col-span-2 md:text-center">
                               <p className="text-sm text-gray-900 font-medium">
-                                <span className="md:hidden text-gray-500 font-medium mr-2">Date:</span>
+                                <span className="md:hidden text-gray-500 font-medium mr-2">
+                                  Date:
+                                </span>
                                 {formatDate(d.paymentDate)}
                               </p>
                             </div>
 
                             <div className="md:col-span-2 md:text-center">
                               <p className="text-sm text-gray-900 font-semibold capitalize">
-                                <span className="md:hidden text-gray-500 font-medium mr-2">Purpose:</span>
+                                <span className="md:hidden text-gray-500 font-medium mr-2">
+                                  Purpose:
+                                </span>
                                 {d.purpose || 'general'}
                               </p>
                             </div>
 
                             <div className="md:col-span-2 md:text-center">
                               <p className="text-sm text-gray-900 font-semibold">
-                                <span className="md:hidden text-gray-500 font-medium mr-2">Amount:</span>
+                                <span className="md:hidden text-gray-500 font-medium mr-2">
+                                  Amount:
+                                </span>
                                 ₹{Number(d.amount || 0).toLocaleString('en-IN')}
                               </p>
                             </div>
 
                             <div className="md:col-span-2 md:text-center">
                               <p className="text-sm text-gray-700 font-medium break-all">
-                                <span className="md:hidden text-gray-500 font-medium mr-2">Certificate No.:</span>
+                                <span className="md:hidden text-gray-500 font-medium mr-2">
+                                  Certificate No.:
+                                </span>
                                 {d.certificateNo || '—'}
                               </p>
                             </div>
@@ -443,6 +547,252 @@ const Donations = () => {
                               </button>
                             </div>
                           </div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
+            </section>
+          </div>
+        )}
+
+        {/* Student-only Funding Request Transactions */}
+        {isStudent && (
+          <div className="mt-10 space-y-10">
+            {/* My Funding Requests (all statuses) */}
+            <section className="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
+              <div className="px-5 sm:px-6 py-4 border-b bg-gradient-to-r from-yellow-50 to-white">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+                  My Funding Requests
+                </h2>
+              </div>
+
+              {loadingMyRequests ? (
+                <div className="p-6">
+                  <p className="text-gray-600">Loading your funding requests...</p>
+                </div>
+              ) : myRequestsError ? (
+                <div className="p-6">
+                  <p className="text-red-600">{myRequestsError}</p>
+                </div>
+              ) : reqFirstSection.length === 0 ? (
+                <div className="p-6">
+                  <p className="text-gray-600">
+                    You have not created any funding requests yet.
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-3 bg-gray-50 border-b text-xs font-semibold text-gray-600">
+                    <div className="col-span-1 text-center">Sr. No.</div>
+                    <div className="col-span-2 text-center">Created On</div>
+                    <div className="col-span-3 text-center">Project Title</div>
+                    <div className="col-span-2 text-center">Category</div>
+                    <div className="col-span-2 text-center">Amount</div>
+                    <div className="col-span-2 text-center">Status</div>
+                  </div>
+
+                  <ul className="divide-y">
+                    {reqFirstSection.map((r, idx) => {
+                      const isRejected = r.status === 'rejected';
+                      const isApproved = r.status === 'approved';
+
+                      let chipClass =
+                        'bg-yellow-50 text-yellow-800 border border-yellow-200';
+                      let chipLabel = 'Pending';
+
+                      if (isRejected) {
+                        chipClass =
+                          'bg-red-50 text-red-700 border border-red-200';
+                        chipLabel = 'Rejected';
+                      } else if (isApproved) {
+                        chipClass =
+                          'bg-green-50 text-green-800 border border-green-200';
+                        chipLabel = 'Approved';
+                      }
+
+                      return (
+                        <li key={r._id} className="px-5 sm:px-6 py-4">
+                          <div className="rounded-xl bg-gray-50/60 md:bg-transparent p-4 md:p-0">
+                            <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-start md:items-center">
+                              <div className="md:col-span-1 md:text-center">
+                                <p className="text-sm font-semibold text-gray-900">
+                                  <span className="md:hidden text-gray-500 font-medium mr-2">
+                                    Sr. No.:
+                                  </span>
+                                  {idx + 1}
+                                </p>
+                              </div>
+
+                              <div className="md:col-span-2 md:text-center">
+                                <p className="text-sm text-gray-900 font-medium">
+                                  <span className="md:hidden text-gray-500 font-medium mr-2">
+                                    Created On:
+                                  </span>
+                                  {formatDate(r.createdAt)}
+                                </p>
+                              </div>
+
+                              <div className="md:col-span-3 md:text-center">
+                                <p className="text-sm text-gray-900 font-semibold break-words">
+                                  <span className="md:hidden text-gray-500 font-medium mr-2">
+                                    Project Title:
+                                  </span>
+                                  {r.title || 'Untitled Project'}
+                                </p>
+                              </div>
+
+                              <div className="md:col-span-2 md:text-center">
+                                <p className="text-sm text-gray-900 font-semibold capitalize">
+                                  <span className="md:hidden text-gray-500 font-medium mr-2">
+                                    Category:
+                                  </span>
+                                  {r.category || 'general'}
+                                </p>
+                              </div>
+
+                              <div className="md:col-span-2 md:text-center">
+                                <p className="text-sm text-gray-900 font-semibold">
+                                  <span className="md:hidden text-gray-500 font-medium mr-2">
+                                    Amount:
+                                  </span>
+                                  ₹{Number(r.amount || 0).toLocaleString('en-IN')}
+                                </p>
+                              </div>
+
+                              <div className="md:col-span-2 md:text-center">
+                                <div className="md:flex md:justify-center">
+                                  <span
+                                    className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${chipClass}`}
+                                  >
+                                    {chipLabel}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+
+                            {r.details && (
+                              <div className="mt-3 md:hidden">
+                                <p className="text-xs text-gray-500 mb-1">
+                                  Description:
+                                </p>
+                                <p className="text-sm text-gray-700 line-clamp-3">
+                                  {r.details}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </>
+              )}
+            </section>
+
+            {/* Funded Requests (Donation Received) */}
+            <section className="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
+              <div className="px-5 sm:px-6 py-4 border-b bg-gradient-to-r from-green-50 to-white">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+                  Funded Requests (Donation Received)
+                </h2>
+              </div>
+
+              {loadingMyRequests ? (
+                <div className="p-6">
+                  <p className="text-gray-600">Loading your funding requests...</p>
+                </div>
+              ) : myRequestsError ? (
+                <div className="p-6">
+                  <p className="text-red-600">{myRequestsError}</p>
+                </div>
+              ) : reqFundedSection.length === 0 ? (
+                <div className="p-6">
+                  <p className="text-gray-600">
+                    No funding request has received an approved donation yet.
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-3 bg-gray-50 border-b text-xs font-semibold text-gray-600">
+                    <div className="col-span-1 text-center">Sr. No.</div>
+                    <div className="col-span-2 text-center">Created On</div>
+                    <div className="col-span-3 text-center">Project Title</div>
+                    <div className="col-span-2 text-center">Category</div>
+                    <div className="col-span-2 text-center">Amount</div>
+                    <div className="col-span-2 text-center">Status</div>
+                  </div>
+
+                  <ul className="divide-y">
+                    {reqFundedSection.map((r, idx) => (
+                      <li key={r._id} className="px-5 sm:px-6 py-4">
+                        <div className="rounded-xl bg-gray-50/60 md:bg-transparent p-4 md:p-0">
+                          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-start md:items-center">
+                            <div className="md:col-span-1 md:text-center">
+                              <p className="text-sm font-semibold text-gray-900">
+                                <span className="md:hidden text-gray-500 font-medium mr-2">
+                                  Sr. No.:
+                                </span>
+                                {idx + 1}
+                              </p>
+                            </div>
+
+                            <div className="md:col-span-2 md:text-center">
+                              <p className="text-sm text-gray-900 font-medium">
+                                <span className="md:hidden text-gray-500 font-medium mr-2">
+                                  Created On:
+                                </span>
+                                {formatDate(r.createdAt)}
+                              </p>
+                            </div>
+
+                            <div className="md:col-span-3 md:text-center">
+                              <p className="text-sm text-gray-900 font-semibold break-words">
+                                <span className="md:hidden text-gray-500 font-medium mr-2">
+                                  Project Title:
+                                </span>
+                                {r.title || 'Untitled Project'}
+                              </p>
+                            </div>
+
+                            <div className="md:col-span-2 md:text-center">
+                              <p className="text-sm text-gray-900 font-semibold capitalize">
+                                <span className="md:hidden text-gray-500 font-medium mr-2">
+                                  Category:
+                                </span>
+                                {r.category || 'general'}
+                              </p>
+                            </div>
+
+                            <div className="md:col-span-2 md:text-center">
+                              <p className="text-sm text-gray-900 font-semibold">
+                                <span className="md:hidden text-gray-500 font-medium mr-2">
+                                  Amount:
+                                </span>
+                                ₹{Number(r.amount || 0).toLocaleString('en-IN')}
+                              </p>
+                            </div>
+
+                            <div className="md:col-span-2 md:text-center">
+                              <div className="md:flex md:justify-center">
+                                <span className="inline-flex items-center rounded-full bg-green-50 text-green-800 border border-green-200 px-3 py-1 text-xs font-semibold">
+                                  Funded
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {r.details && (
+                            <div className="mt-3 md:hidden">
+                              <p className="text-xs text-gray-500 mb-1">
+                                Description:
+                              </p>
+                              <p className="text-sm text-gray-700 line-clamp-3">
+                                {r.details}
+                              </p>
+                            </div>
+                          )}
                         </div>
                       </li>
                     ))}
