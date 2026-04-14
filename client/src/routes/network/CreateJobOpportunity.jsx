@@ -85,6 +85,7 @@ const CreateJobOpportunity = () => {
       <div className="bg-white rounded-lg shadow-md p-6">
         <h2 className="text-2xl font-bold text-gray-800 mb-6">Create Job Opportunity</h2>
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Job Title */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Job Title</label>
             <input
@@ -95,7 +96,8 @@ const CreateJobOpportunity = () => {
               required
             />
           </div>
-          {/* Display the logged-in user's email as uneditable */}
+
+          {/* Email (readonly) */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Your Email</label>
             <input
@@ -105,6 +107,8 @@ const CreateJobOpportunity = () => {
               readOnly
             />
           </div>
+
+          {/* Company */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Company</label>
             <input
@@ -115,6 +119,38 @@ const CreateJobOpportunity = () => {
               required
             />
           </div>
+
+          {/* Salary + Employment Type in one row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Salary</label>
+              <input
+                type="text"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                value={jobData.salary}
+                onChange={(e) => setJobData({ ...jobData, salary: e.target.value })}
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Employment Type</label>
+              <select
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                value={jobData.employmentType}
+                onChange={(e) => setJobData({ ...jobData, employmentType: e.target.value })}
+                required
+              >
+                <option value="">Select Type</option>
+                <option value="full-time">Full-time</option>
+                <option value="part-time">Part-time</option>
+                <option value="contract">Contract</option>
+                <option value="internship">Internship</option>
+                <option value="freelance">Freelance</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Job Description */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Job Description</label>
             <textarea
@@ -125,41 +161,32 @@ const CreateJobOpportunity = () => {
               required
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
-            <input
-              type="text"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              value={jobData.location}
-              onChange={(e) => setJobData({ ...jobData, location: e.target.value })}
-              required
-            />
+
+          {/* Location + Application Deadline in one row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+              <input
+                type="text"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                value={jobData.location}
+                onChange={(e) => setJobData({ ...jobData, location: e.target.value })}
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Application Deadline</label>
+              <input
+                type="date"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                value={jobData.applicationDeadline}
+                onChange={(e) => setJobData({ ...jobData, applicationDeadline: e.target.value })}
+              />
+            </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Salary</label>
-            <input
-              type="text"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              value={jobData.salary}
-              onChange={(e) => setJobData({ ...jobData, salary: e.target.value })}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Employment Type</label>
-            <select
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              value={jobData.employmentType}
-              onChange={(e) => setJobData({ ...jobData, employmentType: e.target.value })}
-              required
-            >
-              <option value="">Select Type</option>
-              <option value="full-time">Full-time</option>
-              <option value="part-time">Part-time</option>
-              <option value="contract">Contract</option>
-              <option value="internship">Internship</option>
-              <option value="freelance">Freelance</option>
-            </select>
-          </div>
+
+          {/* Requirements */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Requirements</label>
             <textarea
@@ -170,6 +197,8 @@ const CreateJobOpportunity = () => {
               required
             />
           </div>
+
+          {/* Responsibilities */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Responsibilities</label>
             <textarea
@@ -180,6 +209,8 @@ const CreateJobOpportunity = () => {
               required
             />
           </div>
+
+          {/* Application URL (full width) */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Application URL</label>
             <input
@@ -189,15 +220,7 @@ const CreateJobOpportunity = () => {
               onChange={(e) => setJobData({ ...jobData, applicationUrl: e.target.value })}
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Application Deadline</label>
-            <input
-              type="date"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              value={jobData.applicationDeadline}
-              onChange={(e) => setJobData({ ...jobData, applicationDeadline: e.target.value })}
-            />
-          </div>
+
           {error && <div className="text-red-600 mb-4">{error}</div>}
           {success && <div className="text-green-600 mb-4">{success}</div>}
           <button
