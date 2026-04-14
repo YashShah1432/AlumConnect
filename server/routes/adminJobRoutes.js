@@ -11,7 +11,23 @@ router.get('/', verifyAdmin, async (req, res) => {
     req.user ? req.user.email : 'unknown'
   );
   try {
-    const jobs = await Job.find().sort({ createdAt: -1 });
+    // 🔹 Build dynamic filter from query params (used by AdminNetwork.jsx)
+    const filter = {};
+
+    if (req.query.status) {
+      filter.status = req.query.status;
+    }
+
+    if (req.query.location) {
+      // case-insensitive partial match
+      filter.location = { $regex: req.query.location, $options: 'i' };
+    }
+
+    if (req.query.employmentType) {
+      filter.employmentType = req.query.employmentType;
+    }
+
+    const jobs = await Job.find(filter).sort({ createdAt: -1 });
     res.json(jobs);
   } catch (error) {
     console.error('Error fetching jobs:', error);

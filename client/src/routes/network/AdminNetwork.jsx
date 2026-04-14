@@ -1,34 +1,167 @@
-// client/src/routes/AdminNetwork.jsx
 import React, { useState, useEffect } from 'react';
 import Layout from '../../components/common/Layout';
 import axios from 'axios';
-import { CheckCircle2, XCircle, Trash2 } from 'lucide-react';
+import {
+  CheckCircle2,
+  XCircle,
+  Trash2,
+  ExternalLink,
+  Copy,
+  Check,
+  Wallet,
+  CalendarDays,
+  Mail,
+} from 'lucide-react';
 import { useSidebarLayout } from '../../hooks/useSidebarLayout';
 
 const AdminNetwork = () => {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [copiedJobId, setCopiedJobId] = useState(null);
+
+  // 🔹 Filters
+  const [statusFilter, setStatusFilter] = useState('');
+  const [locationFilter, setLocationFilter] = useState('');
+  const [typeFilter, setTypeFilter] = useState(''); // employmentType
+  const [deadlineRange, setDeadlineRange] = useState(''); // '', today, week, month, year
+
   useSidebarLayout(true);
-  // Fetch all jobs from the admin endpoint
-  useEffect(() => {
-    const fetchJobs = async () => {
-      try {
-        const res = await axios.get(
-          `${import.meta.env.VITE_backend_URL}/api/jobs/admin`,
-          { withCredentials: true }
+
+  // Small helper to handle date range filter on applicationDeadline
+  const isWithinDeadlineRange = (dateValue, range) => {
+    if (!range || !dateValue) return true;
+
+    const d = new Date(dateValue);
+    if (Number.isNaN(d.getTime())) return false;
+
+    const now = new Date();
+    const start = new Date(now);
+
+    switch (range) {
+      case 'today':
+        return (
+          d.getDate() === now.getDate() &&
+          d.getMonth() === now.getMonth() &&
+          d.getFullYear() === now.getFullYear()
         );
-        console.log("Admin jobs fetched:", res.data);
-        setJobs(res.data);
-      } catch (err) {
-        console.error('Error fetching admin jobs:', err);
-        setError('Failed to load admin network data');
-      } finally {
-        setLoading(false);
+      case 'week': {
+        const day = now.getDay(); // 0 = Sun
+        const diff = now.getDate() - day + (day === 0 ? -6 : 1); // Monday as start
+        start.setDate(diff);
+        start.setHours(0, 0, 0, 0);
+        return d >= start && d <= now;
       }
-    };
+      case 'month':
+        start.setDate(1);
+        start.setHours(0, 0, 0, 0);
+        return (
+          d.getMonth() === now.getMonth() &&
+          d.getFullYear() === now.getFullYear() &&
+          d >= start &&
+          d <= now
+        );
+      case 'year':
+        start.setMonth(0, 1);
+        start.setHours(0, 0, 0, 0);
+        return d.getFullYear() === now.getFullYear() && d >= start && d <= now;
+      default:
+        return true;
+    }
+  };
+
+  // Fetch all jobs from the admin endpoint (with optional filters)
+  const fetchJobs = async ({
+    status = statusFilter,
+    location = locationFilter,
+    type = typeFilter,
+    deadline = deadlineRange,
+  } = {}) => {
+    try {
+      setLoading(true);
+      setError('');
+
+      const params = new URLSearchParams();
+      if (status) params.append('status', status);
+      if (location) params.append('location', location);
+      if (type) params.append('employmentType', type);
+      // We’ll keep deadlineRange as a purely frontend filter (no need to change backend).
+      const query = params.toString();
+      const url =
+        `${import.meta.env.VITE_backend_URL}/api/jobs/admin` +
+        (query ? `?${query}` : '');
+
+      const res = await axios.get(url, { withCredentials: true });
+
+      // Apply deadline range filtering on the client
+      const allJobs = Array.isArray(res.data) ? res.data : [];
+      const filtered = allJobs.filter((job) =>
+        isWithinDeadlineRange(job.applicationDeadline, deadline)
+      );
+
+      setJobs(filtered);
+    } catch (err) {
+      console.error('Error fetching admin jobs:', err);
+      setError('Failed to load admin network data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchJobs();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Handle filter form submit
+  const handleFilterSubmit = (e) => {
+    e.preventDefault();
+    fetchJobs({
+      status: statusFilter,
+      location: locationFilter,
+      type: typeFilter,
+      deadline: deadlineRange,
+    });
+  };
+
+  const handleClearFilters = () => {
+    setStatusFilter('');
+    setLocationFilter('');
+    setTypeFilter('');
+    setDeadlineRange('');
+    fetchJobs({
+      status: '',
+      location: '',
+      type: '',
+      deadline: '',
+    });
+  };
+
+  // Copy Application URL to clipboard
+  const copyToClipboard = async (value, id) => {
+    try {
+      if (!value) return;
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(value);
+      } else {
+        const textarea = document.createElement('textarea');
+        textarea.value = value;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+      }
+
+      setCopiedJobId(id);
+      setTimeout(() => setCopiedJobId(null), 1500);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  };
 
   // Accept: update job status to "active"
   const handleAccept = async (jobId) => {
@@ -65,7 +198,9 @@ const AdminNetwork = () => {
     return (
       <Layout>
         <div className="flex justify-center items-center h-64">
-          <p className="text-blue-600 font-medium">Loading Admin Network data...</p>
+          <p className="text-blue-600 font-medium">
+            Loading Admin Network data...
+          </p>
         </div>
       </Layout>
     );
@@ -81,69 +216,261 @@ const AdminNetwork = () => {
 
   return (
     <Layout>
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-10 space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2 mb-2">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+            Admin Job Opportunities
+          </h1>
           <span className="text-gray-500 text-sm">
             {jobs.length} {jobs.length === 1 ? 'job' : 'jobs'} found
           </span>
         </div>
 
+        {/* 🔹 Filters (responsive, similar to AdminDonations) */}
+        <section className="space-y-4">
+          <div className="flex flex-col md:flex-row md:items-center gap-3">
+            <h2 className="text-xl font-bold text-gray-900">Filter:</h2>
+
+            <form
+              onSubmit={handleFilterSubmit}
+              className="flex flex-wrap gap-2 md:gap-3 text-xs sm:text-sm"
+            >
+              {/* Status */}
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="px-3 py-2 border border-gray-300 rounded-lg w-full sm:w-40"
+              >
+                <option value="">All Status</option>
+                <option value="pending">Pending</option>
+                <option value="active">Active</option>
+                <option value="filled">Filled</option>
+                <option value="expired">Expired</option>
+              </select>
+
+              {/* Location */}
+              <input
+                type="text"
+                value={locationFilter}
+                onChange={(e) => setLocationFilter(e.target.value)}
+                placeholder="Filter by location"
+                className="px-3 py-2 border border-gray-300 rounded-lg w-full sm:w-40"
+              />
+
+              {/* Job Type / Employment Type */}
+              <select
+                value={typeFilter}
+                onChange={(e) => setTypeFilter(e.target.value)}
+                className="px-3 py-2 border border-gray-300 rounded-lg w-full sm:w-40"
+              >
+                <option value="">All Job Types</option>
+                <option value="full-time">Full-time</option>
+                <option value="part-time">Part-time</option>
+                <option value="contract">Contract</option>
+                <option value="internship">Internship</option>
+                <option value="freelance">Freelance</option>
+              </select>
+
+              {/* Application Deadline Range */}
+              <select
+                value={deadlineRange}
+                onChange={(e) => setDeadlineRange(e.target.value)}
+                className="px-3 py-2 border border-gray-300 rounded-lg w-full sm:w-44"
+              >
+                <option value="">All Deadlines</option>
+                <option value="today">Today</option>
+                <option value="week">This Week</option>
+                <option value="month">This Month</option>
+                <option value="year">This Year</option>
+              </select>
+
+              {/* 🔹 Always show Apply / Clear buttons (keeps it usable) */}
+              <button
+                type="submit"
+                className="px-3 py-2 text-[11px] sm:text-xs font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700"
+              >
+                Apply
+              </button>
+              <button
+                type="button"
+                onClick={handleClearFilters}
+                className="px-3 py-2 text-[11px] sm:text-xs font-semibold rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200"
+              >
+                Clear
+              </button>
+            </form>
+          </div>
+        </section>
+
         {jobs.length === 0 ? (
           <p className="text-gray-600 text-center">No job opportunities found.</p>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {jobs.map((job) => (
               <div
                 key={job._id}
-                className="bg-white rounded-xl shadow-md hover:shadow-xl transition-transform duration-300 transform hover:scale-105 p-6 flex flex-col justify-between"
+                className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all p-5 sm:p-6 flex flex-col"
               >
-                {/* Job Info */}
-                <div>
-                  <div className="mb-4 h-12 w-12 bg-gray-100 rounded-full flex items-center justify-center">
-                    <span className="text-gray-400 text-sm">Logo</span>
-                  </div>
-                  <h2 className="text-lg font-semibold text-gray-900 mb-1">
-                    {job.title}
-                  </h2>
-                  <p className="text-sm text-gray-600">
-                    {job.company} • {job.location}
-                  </p>
-                  <div className="mt-2 text-sm text-gray-500 space-y-1">
-                    <p>
-                      Type: <span className="font-medium">{job.employmentType}</span>
-                    </p>
-                    {job.salary && (
-                      <p>
-                        Salary: <span className="font-medium">{job.salary}</span>
+                {/* Header: Job Title + Status */}
+                <div className="flex items-start justify-between gap-3 mb-4">
+                  <div className="min-w-0">
+                    <h2 className="text-lg sm:text-xl font-semibold text-gray-900 truncate">
+                      {job.title || 'Untitled Job'}
+                    </h2>
+                    {job.company && (
+                      <p className="mt-1 text-sm text-gray-600 truncate">
+                        {job.company}
+                        {job.location ? ` • ${job.location}` : ''}
                       </p>
                     )}
                   </div>
-                  <p className="mt-2 text-sm text-gray-500 line-clamp-3">
-                    {job.description}
-                  </p>
+
+                  <div className="shrink-0">
+                    <JobStatusPill status={job.status} />
+                  </div>
                 </div>
 
-                {/* Job Status Badge */}
-                <div className="mt-4">
-                  <StatusBadge status={job.status} />
+                {/* Tag / Employment Type */}
+                <div className="mb-4 flex flex-wrap gap-2">
+                  {job.employmentType && (
+                    <span className="inline-flex items-center rounded-full bg-blue-50 text-blue-700 px-3 py-1 text-xs font-semibold">
+                      {job.employmentType}
+                    </span>
+                  )}
+                  {job.tag && (
+                    <span className="inline-flex items-center rounded-full bg-gray-100 text-gray-700 px-3 py-1 text-xs font-semibold">
+                      {job.tag}
+                    </span>
+                  )}
                 </div>
 
-                {/* Action Buttons */}
-                <div className="mt-4 flex items-center gap-3">
+                {/* Details Box (like donation cards) */}
+                <div className="rounded-xl bg-gray-50 border border-gray-100 p-4 space-y-3 mb-4">
+                  {/* Contact / Email (if present) */}
+                  {job.contactEmail && (
+                    <div className="flex items-start gap-2 text-sm text-gray-700">
+                      <Mail className="mt-0.5 text-gray-500" size={16} />
+                      <div className="min-w-0">
+                        <p className="text-xs text-gray-500">Contact Email</p>
+                        <p className="font-medium break-all">
+                          {job.contactEmail}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Amount / Salary + Deadline */}
+                  <div className="grid grid-cols-1 sm:grid-cols-[1.2fr_1fr] gap-3">
+                    {job.salary && (
+                      <div className="flex items-start gap-2 text-sm text-gray-700">
+                        <Wallet className="mt-0.5 text-gray-500" size={16} />
+                        <div>
+                          <p className="text-xs text-gray-500">
+                            Salary / Stipend
+                          </p>
+                          <p className="font-semibold text-gray-900">
+                            {job.salary}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {job.applicationDeadline && (
+                      <div className="flex items-start gap-2 text-sm text-gray-700">
+                        <CalendarDays
+                          className="mt-0.5 text-gray-500"
+                          size={16}
+                        />
+                        <div>
+                          <p className="text-xs text-gray-500">
+                            Application Deadline
+                          </p>
+                          <p className="font-medium">
+                            {new Date(
+                              job.applicationDeadline
+                            ).toLocaleDateString('en-GB')}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Application URL */}
+                  {job.applicationUrl && (
+                    <div className="pt-2 border-t border-gray-200">
+                      <p className="text-xs text-gray-500 mb-1">
+                        Application URL
+                      </p>
+                      <div className="flex items-center gap-2 min-w-0">
+                        <p className="text-sm text-blue-700 underline break-all">
+                          {job.applicationUrl}
+                        </p>
+                        <a
+                          href={job.applicationUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="shrink-0 inline-flex items-center justify-center rounded-md p-1.5 border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 text-xs"
+                          title="Open application link"
+                        >
+                          <ExternalLink size={14} />
+                        </a>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            copyToClipboard(job.applicationUrl, job._id)
+                          }
+                          className={`shrink-0 inline-flex items-center justify-center rounded-md p-1.5 border text-xs transition ${
+                            copiedJobId === job._id
+                              ? 'border-green-200 bg-green-50 text-green-700'
+                              : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+                          }`}
+                          title={
+                            copiedJobId === job._id
+                              ? 'Copied'
+                              : 'Copy application URL'
+                          }
+                          aria-label={
+                            copiedJobId === job._id
+                              ? 'Copied'
+                              : 'Copy application URL'
+                          }
+                        >
+                          {copiedJobId === job._id ? (
+                            <Check size={14} />
+                          ) : (
+                            <Copy size={14} />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Description */}
+                  {job.description && (
+                    <div className="pt-2 border-t border-gray-200">
+                      <p className="text-xs text-gray-500 mb-1">Description</p>
+                      <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap line-clamp-4">
+                        {job.description}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Actions */}
+                <div className="mt-auto flex flex-wrap gap-2">
                   {job.status === 'pending' ? (
                     <>
                       <button
                         onClick={() => handleAccept(job._id)}
-                        className="flex items-center gap-1 px-3 py-1 rounded-md bg-green-600 text-white hover:bg-green-700 text-sm"
+                        className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-green-600 text-white hover:bg-green-700 transition flex-1"
                       >
                         <CheckCircle2 size={16} />
                         Accept
                       </button>
                       <button
                         onClick={() => handleReject(job._id)}
-                        className="flex items-center gap-1 px-3 py-1 rounded-md bg-red-600 text-white hover:bg-red-700 text-sm"
+                        className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-red-600 text-white hover:bg-red-700 transition flex-1"
                       >
                         <XCircle size={16} />
                         Reject
@@ -152,7 +479,7 @@ const AdminNetwork = () => {
                   ) : (
                     <button
                       onClick={() => handleReject(job._id)}
-                      className="flex items-center gap-1 px-3 py-1 rounded-md bg-gray-600 text-white hover:bg-gray-700 text-sm"
+                      className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-gray-700 text-white hover:bg-gray-800 transition w-full"
                     >
                       <Trash2 size={16} />
                       Delete
@@ -168,34 +495,41 @@ const AdminNetwork = () => {
   );
 };
 
-const StatusBadge = ({ status }) => {
-  let bgColor = '';
-  let textColor = '';
+// Status pill styled similar to AdminDonations
+const JobStatusPill = ({ status }) => {
+  let bgClass = '';
+  let textClass = '';
+  let displayStatus = status || 'unknown';
+
   switch (status) {
     case 'pending':
-      bgColor = 'bg-yellow-100';
-      textColor = 'text-yellow-800';
+      bgClass = 'bg-yellow-100';
+      textClass = 'text-yellow-800';
       break;
     case 'active':
-      bgColor = 'bg-green-100';
-      textColor = 'text-green-800';
+      bgClass = 'bg-green-100';
+      textClass = 'text-green-800';
       break;
     case 'filled':
-      bgColor = 'bg-blue-100';
-      textColor = 'text-blue-800';
+      bgClass = 'bg-blue-100';
+      textClass = 'text-blue-800';
       break;
     case 'expired':
-      bgColor = 'bg-red-100';
-      textColor = 'text-red-800';
+      bgClass = 'bg-red-100';
+      textClass = 'text-red-800';
       break;
     default:
-      bgColor = 'bg-gray-100';
-      textColor = 'text-gray-800';
+      bgClass = 'bg-gray-100';
+      textClass = 'text-gray-800';
+      displayStatus = 'unknown';
       break;
   }
+
   return (
-    <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${bgColor} ${textColor}`}>
-      {status.toUpperCase()}
+    <span
+      className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${bgClass} ${textClass}`}
+    >
+      {displayStatus}
     </span>
   );
 };

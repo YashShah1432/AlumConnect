@@ -37,7 +37,7 @@ const AdminJobs = () => {
   const updateJobStatus = async (id, newStatus) => {
     try {
       const res = await axios.patch(
-        `${import.meta.env.VITE_backend_URL}/api/jobs/${id}/status`,
+        `${import.meta.env.VITE_backend_URL}/api/jobs/admin/${id}/status`,
         { status: newStatus },
         { withCredentials: true }
       );
@@ -52,7 +52,7 @@ const AdminJobs = () => {
   const deleteJob = async (id) => {
     try {
       await axios.delete(
-        `${import.meta.env.VITE_backend_URL}/api/jobs/${id}`,
+        `${import.meta.env.VITE_backend_URL}/api/jobs/admin/${id}`,
         { withCredentials: true }
       );
       setJobs(prev => prev.filter(job => job._id !== id));
