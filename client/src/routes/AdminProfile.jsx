@@ -20,6 +20,9 @@ const AdminProfile = () => {
   const [alumniBatchFilter, setAlumniBatchFilter] = useState('');
   const [alumniBranchFilter, setAlumniBranchFilter] = useState('');
 
+  const [studentNameFilter, setStudentNameFilter] = useState('');
+  const [alumniNameFilter, setAlumniNameFilter] = useState('');
+
   useSidebarLayout(true);
 
   // Fetch all users from /api/users
@@ -66,23 +69,29 @@ const AdminProfile = () => {
 
   // 🔹 Derived filtered lists
   const filteredStudents = students.filter((u) => {
+    const nameMatch = studentNameFilter
+      ? (u.name || '').toLowerCase().includes(studentNameFilter.toLowerCase())
+      : true;
     const batchMatch = studentBatchFilter
       ? (u.batch || '').toLowerCase().includes(studentBatchFilter.toLowerCase())
       : true;
     const branchMatch = studentBranchFilter
       ? (u.branch || '').toLowerCase().includes(studentBranchFilter.toLowerCase())
       : true;
-    return batchMatch && branchMatch;
+    return nameMatch && batchMatch && branchMatch;
   });
 
   const filteredAlumni = alumni.filter((u) => {
+    const nameMatch = alumniNameFilter
+      ? (u.name || '').toLowerCase().includes(alumniNameFilter.toLowerCase())
+      : true;
     const batchMatch = alumniBatchFilter
       ? (u.batch || '').toLowerCase().includes(alumniBatchFilter.toLowerCase())
       : true;
     const branchMatch = alumniBranchFilter
       ? (u.branch || '').toLowerCase().includes(alumniBranchFilter.toLowerCase())
       : true;
-    return batchMatch && branchMatch;
+    return nameMatch && batchMatch && branchMatch;
   });
 
   if (loading) {
@@ -154,6 +163,13 @@ const AdminProfile = () => {
               >
                 <input
                   type="text"
+                  value={studentNameFilter}
+                  onChange={(e) => setStudentNameFilter(e.target.value)}
+                  placeholder="Search by name"
+                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm w-full sm:w-40"
+                />
+                <input
+                  type="text"
                   value={studentBatchFilter}
                   onChange={(e) => setStudentBatchFilter(e.target.value)}
                   placeholder="Filter by batch"
@@ -166,10 +182,11 @@ const AdminProfile = () => {
                   placeholder="Filter by branch"
                   className="px-3 py-2 border border-gray-300 rounded-lg text-sm w-full sm:w-40"
                 />
-                {(studentBatchFilter || studentBranchFilter) && (
+                {(studentNameFilter || studentBatchFilter || studentBranchFilter) && (
                   <button
                     type="button"
                     onClick={() => {
+                      setStudentNameFilter('');
                       setStudentBatchFilter('');
                       setStudentBranchFilter('');
                     }}
@@ -300,6 +317,13 @@ const AdminProfile = () => {
               >
                 <input
                   type="text"
+                  value={alumniNameFilter}
+                  onChange={(e) => setAlumniNameFilter(e.target.value)}
+                  placeholder="Search by name"
+                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm w-full sm:w-40"
+                />
+                <input
+                  type="text"
                   value={alumniBatchFilter}
                   onChange={(e) => setAlumniBatchFilter(e.target.value)}
                   placeholder="Filter by batch"
@@ -312,10 +336,11 @@ const AdminProfile = () => {
                   placeholder="Filter by branch"
                   className="px-3 py-2 border border-gray-300 rounded-lg text-sm w-full sm:w-40"
                 />
-                {(alumniBatchFilter || alumniBranchFilter) && (
+                {(alumniNameFilter || alumniBatchFilter || alumniBranchFilter) && (
                   <button
                     type="button"
                     onClick={() => {
+                      setAlumniNameFilter('');
                       setAlumniBatchFilter('');
                       setAlumniBranchFilter('');
                     }}
