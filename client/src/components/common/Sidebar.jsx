@@ -5,7 +5,6 @@ import { useUser } from '../../context/UserContext';
 
 // Component for sidebar menu item
 const SidebarItem = ({ icon: Icon, label, path, active, collapsed, onClick }) => {
-  // Use a direct function that only passes the path
   const handleClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -13,43 +12,53 @@ const SidebarItem = ({ icon: Icon, label, path, active, collapsed, onClick }) =>
   };
 
   return (
-    <button
-      onClick={handleClick}
-      className={`flex items-center w-full py-4 px-5 rounded-xl text-base font-medium transition-all duration-200 group relative cursor-pointer ${
-        active 
-          ? "bg-blue-500 text-white" 
-          : "text-gray-600 hover:bg-gray-100 hover:text-gray-800"
-      }`}
-    >
-      <div className="flex items-center justify-center">
-        <Icon size={collapsed ? 26 : 22} className={`transition-all ${!active && "text-gray-500 group-hover:text-gray-800"}`} />
-      </div>
-      
-      {!collapsed && (
-        <span className="ml-4 transition-opacity duration-200">
-          {label}
-        </span>
-      )}
-      
-      {/* Active indicator dot */}
-      {active && (
-        <div className={`absolute ${collapsed ? "right-2.5" : "right-4"} top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-white`} />
-      )}
-
-      {/* Arrow on hover (for non-collapsed state) */}
-      {!collapsed && !active && (
-        <div className="absolute right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-          <ArrowRight size={16} className="text-gray-400" />
+    // ⬇️ make wrapper the group
+    <div className="relative group">
+      <button
+        onClick={handleClick}
+        className={`flex items-center w-full py-4 px-5 rounded-xl text-base font-medium transition-all duration-200 relative cursor-pointer ${
+          active
+            ? 'bg-blue-500 text-white'
+            : 'text-gray-600 hover:bg-gray-100 hover:text-gray-800'
+        }`}
+      >
+        <div className="flex items-center justify-center">
+          <Icon
+            size={collapsed ? 26 : 22}
+            className={`transition-all ${
+              !active && 'text-gray-500 group-hover:text-gray-800'
+            }`}
+          />
         </div>
-      )}
 
-      {/* Tooltip for collapsed state */}
+        {!collapsed && (
+          <span className="ml-4 transition-opacity duration-200">
+            {label}
+          </span>
+        )}
+
+        {active && (
+          <div
+            className={`absolute ${
+              collapsed ? 'right-2.5' : 'right-4'
+            } top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-white`}
+          />
+        )}
+
+        {!collapsed && !active && (
+          <div className="absolute right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+            <ArrowRight size={16} className="text-gray-400" />
+          </div>
+        )}
+      </button>
+
+      {/* Tooltip when sidebar is collapsed */}
       {collapsed && (
-        <div className="absolute left-full ml-3 px-3 py-1.5 bg-gray-800 text-white text-sm rounded opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-20">
+        <div className="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-3 px-3 py-1.5 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20">
           {label}
         </div>
       )}
-    </button>
+    </div>
   );
 };
 

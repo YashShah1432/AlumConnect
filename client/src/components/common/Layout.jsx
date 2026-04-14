@@ -52,13 +52,7 @@ const Layout = ({ children, hasSidebar = true }) => {
       <Navbar userProfile={user} />
       {hasSidebar && <Sidebar />}
       <main 
-        id="main-content" 
-        style={{
-          marginLeft: hasSidebar 
-            ? (sidebarCollapsed ? '100px' : '320px') 
-            : '0',
-          transition: 'margin-left 0.3s ease'
-        }}
+        id="main-content"
         className="pt-20 pb-8"
       >
         {children}
