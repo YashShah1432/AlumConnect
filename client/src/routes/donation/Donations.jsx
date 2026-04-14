@@ -671,17 +671,6 @@ const Donations = () => {
                                 </div>
                               </div>
                             </div>
-
-                            {r.details && (
-                              <div className="mt-3 md:hidden">
-                                <p className="text-xs text-gray-500 mb-1">
-                                  Description:
-                                </p>
-                                <p className="text-sm text-gray-700 line-clamp-3">
-                                  {r.details}
-                                </p>
-                              </div>
-                            )}
                           </div>
                         </li>
                       );
@@ -782,17 +771,6 @@ const Donations = () => {
                               </div>
                             </div>
                           </div>
-
-                          {r.details && (
-                            <div className="mt-3 md:hidden">
-                              <p className="text-xs text-gray-500 mb-1">
-                                Description:
-                              </p>
-                              <p className="text-sm text-gray-700 line-clamp-3">
-                                {r.details}
-                              </p>
-                            </div>
-                          )}
                         </div>
                       </li>
                     ))}
