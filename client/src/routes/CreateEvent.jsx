@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Layout from '../components/common/Layout';
-import { PlusCircle, ArrowLeft } from 'lucide-react';
+import { PlusCircle} from 'lucide-react';
 import { useToast } from '../components/Toast';
 import { useSidebarLayout } from '../hooks/useSidebarLayout'; 
 
@@ -19,6 +19,22 @@ const CreateEvent = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
+
+  // Minimum datetime = now (no past date/time)
+  const minDateTime = React.useMemo(() => {
+    const now = new Date();
+    // set to start of today in local time
+    now.setHours(0, 0, 0, 0);
+
+    // format as "YYYY-MM-DDTHH:MM" in local time
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  }, []);
 
   // Check if user is actually admin on page load
   useEffect(() => {
@@ -106,15 +122,20 @@ const CreateEvent = () => {
     <Layout>
       <div className="max-w-4xl mx-auto px-4 py-6 bg-gray-50 min-h-screen">
         {/* Page Header */}
-        <div className="mb-8 flex items-center">
-          <button 
+        <div className="flex justify-start mb-4">
+          <button
+            type="button"
             onClick={handleCancel}
-            className="mr-4 text-gray-500 hover:text-gray-700"
+            className="px-5 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg shadow-lg hover:bg-blue-700 transition"
           >
-            <ArrowLeft size={24} />
+            ← Back
           </button>
-          <h1 className="text-2xl font-semibold text-gray-800">Create New Event</h1>
         </div>
+
+        {/* Page Title */}
+        <h1 className="text-2xl font-semibold text-gray-800 mb-6">
+          Create New Event
+        </h1>
 
         {error && (
           <div className="bg-red-50 text-red-500 p-4 rounded-lg mb-6 shadow-sm border border-red-100">
@@ -179,6 +200,7 @@ const CreateEvent = () => {
                   className="w-full border border-gray-200 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   value={eventDateTime}
                   onChange={e => setEventDateTime(e.target.value)}
+                  min={minDateTime}
                   required
                 />
               </div>
