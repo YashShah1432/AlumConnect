@@ -25,6 +25,11 @@ const AdminDiscussion = () => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [postIdToDelete, setPostIdToDelete] = useState(null);
 
+  const updatePostInState = (updatedPost) => {
+    setPosts((prev) => prev.map((p) => (p._id === updatedPost._id ? updatedPost : p)));
+    setFilteredPosts((prev) => prev.map((p) => (p._id === updatedPost._id ? updatedPost : p)));
+  };
+
   const navigate = useNavigate();
   useSidebarLayout(true);
 
@@ -125,20 +130,25 @@ const AdminDiscussion = () => {
   const handleConfirmDelete = async () => {
     if (!postIdToDelete) return;
     try {
-      await axios.delete(
+      const res = await axios.delete(
         `${import.meta.env.VITE_backend_URL}/api/forum/posts/${postIdToDelete}`,
         { withCredentials: true }
       );
+
+      // Remove from both posts and filteredPosts so UI updates immediately
       setPosts((prev) => prev.filter((p) => p._id !== postIdToDelete));
       setFilteredPosts((prev) => prev.filter((p) => p._id !== postIdToDelete));
 
-      // Show success toast
-      toast.success("Post deleted successfully!");
+      toast.success(res.data?.message || "Post deleted successfully!");
     } catch (error) {
       console.error("❌ Error deleting post:", error);
-      toast.error("Failed to delete post.");
+      const msg =
+        error.response?.data?.message ||
+        (error.response?.status === 403
+          ? "You are not authorized to delete this post."
+          : "Failed to delete post.");
+      toast.error(msg);
     } finally {
-      // Close modal and reset
       setShowConfirmModal(false);
       setPostIdToDelete(null);
     }
@@ -190,14 +200,22 @@ const AdminDiscussion = () => {
               </div>
             ) : (
               <PostList
-                posts={filteredPosts}
-                user={user}
-                setPosts={setPosts}
-                adminMode={true} 
-                // Pass our custom request function 
-                // so PostItem can open the modal
-                onDeletePost={handleDeletePostRequest}
-              />
+              posts={filteredPosts}
+              user={user}
+              setPosts={(updater) => {
+                // if updater is a function, apply it to both lists in the same way
+                if (typeof updater === "function") {
+                  setPosts((prev) => updater(prev));
+                  setFilteredPosts((prev) => updater(prev));
+                } else {
+                  // if it's a direct array, set both
+                  setPosts(updater);
+                  setFilteredPosts(updater);
+                }
+              }}
+              adminMode={true}
+              onDeletePost={handleDeletePostRequest}
+            />
             )}
           </div>
         {/* </main> */}

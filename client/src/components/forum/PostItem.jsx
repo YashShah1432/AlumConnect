@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import VoteButtons from "./VoteButtons";
 import ReplyForm from "./ReplyForm";
 import ReplyList from "./ReplyList";
@@ -12,21 +13,56 @@ const PostItem = ({ post, user, setPosts, adminMode, onDeletePost }) => {
   const [editContent, setEditContent] = useState(post.content);
   const [localVoteCount, setLocalVoteCount] = useState(post.voteCount || 0);
 
+  // ✅ Normalize IDs to strings before comparison
+  const currentUserId = user?.id || user?._id;
+  const postAuthorId =
+    typeof post.authorId === "object" && post.authorId !== null
+      ? post.authorId._id || post.authorId.id || post.authorId.toString()
+      : post.authorId;
+
+  const isAuthor =
+    currentUserId && postAuthorId
+      ? String(currentUserId) === String(postAuthorId)
+      : false;
+
   // Determine if the user can modify or delete the post
-  const canModifyPost = user && (user.id === post.authorId && user.role !== 'admin');
-  const canDeletePost = user && (user.id === post.authorId || user.role === 'admin');
+  const canModifyPost = user && isAuthor && user.role !== "admin";
+  const canDeletePost = user && (isAuthor || user.role === "admin");
 
   useEffect(() => {
     const fetchReplies = async () => {
       setIsLoadingReplies(true);
       try {
-        const response = await fetch(`${import.meta.env.VITE_backend_URL}/api/forum/posts/${post._id}/replies`, {
-          credentials: "include"
-        });
+        const response = await fetch(
+          `${import.meta.env.VITE_backend_URL}/api/forum/posts/${post._id}/replies`,
+          { credentials: "include" }
+        );
+
+        if (!response.ok) {
+          // Log the error but don't crash UI
+          console.error(
+            "Error fetching replies:",
+            response.status,
+            response.statusText
+          );
+          setReplies([]); // fallback to empty list
+          return;
+        }
+
         const data = await response.json();
-        setReplies(data);
+
+        // Ensure we always store an array
+        if (Array.isArray(data)) {
+          setReplies(data);
+        } else if (data && Array.isArray(data.replies)) {
+          setReplies(data.replies);
+        } else {
+          console.warn("Replies API returned unexpected shape:", data);
+          setReplies([]);
+        }
       } catch (error) {
         console.error("Error fetching replies:", error);
+        setReplies([]); // fallback to empty list on error
       } finally {
         setIsLoadingReplies(false);
       }
@@ -58,10 +94,32 @@ const PostItem = ({ post, user, setPosts, adminMode, onDeletePost }) => {
     }
   };
 
-  // Remove window.confirm: simply call the passed onDeletePost callback
-  const handleDelete = () => {
+  // Remove window.confirm: call admin callback if in adminMode,
+  // otherwise delete directly via API if the author
+  const handleDelete = async () => {
     if (adminMode && onDeletePost) {
+      // Admin flow handled in AdminDiscussion via modal
       onDeletePost(post._id);
+      return;
+    }
+
+    // Normal user deleting their own post
+    if (!canDeletePost) return;
+
+    try {
+      await axios.delete(
+        `${import.meta.env.VITE_backend_URL}/api/forum/posts/${post._id}`,
+        { withCredentials: true }
+      );
+
+      // Optimistically remove from list
+      setPosts((prev) => prev.filter((p) => p._id !== post._id));
+    } catch (error) {
+      console.error("❌ Error deleting post:", error);
+      alert(
+        error.response?.data?.message ||
+          "Failed to delete post. Please try again."
+      );
     }
   };
 

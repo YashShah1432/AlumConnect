@@ -20,7 +20,7 @@ router.get("/posts", async (req, res) => {
     const postsWithVotes = posts.map(post => ({
       ...post.toObject(),
       voteCount: post.votes.filter(vote => vote.voteType === "upvote").length -
-                 post.votes.filter(vote => vote.voteType === "downvote").length
+        post.votes.filter(vote => vote.voteType === "downvote").length
     }));
 
     res.json(postsWithVotes);
@@ -117,29 +117,29 @@ router.post("/posts/:postId/vote", isAuthenticated, async (req, res) => {
 
 router.post("/posts/:postId/replies", isAuthenticated, async (req, res) => {
   try {
-      const { postId } = req.params;
-      const { content, parentReplyId } = req.body;
-      const user = req.user;
-  
-      if (!content || !user) {
+    const { postId } = req.params;
+    const { content, parentReplyId } = req.body;
+    const user = req.user;
+
+    if (!content || !user) {
       return res.status(400).json({ message: "Reply content is required" });
-      }
-  
-      const post = await ForumPost.findById(postId);
-      if (!post) {
+    }
+
+    const post = await ForumPost.findById(postId);
+    if (!post) {
       return res.status(404).json({ message: "Post not found" });
-      }
-  
-      // Determine reply level
-      let level = 0;
-      if (parentReplyId) {
+    }
+
+    // Determine reply level
+    let level = 0;
+    if (parentReplyId) {
       const parentReply = post.replies.id(parentReplyId);
       if (parentReply) {
-          level = parentReply.level + 1;
+        level = parentReply.level + 1;
       }
-      }
-  
-      const reply = {
+    }
+
+    const reply = {
       userId: user._id,
       username: user.name,
       content,
@@ -148,59 +148,59 @@ router.post("/posts/:postId/replies", isAuthenticated, async (req, res) => {
       postId: postId,
       parentReplyId: parentReplyId || null,
       level: level
-      };
-  
-      post.replies.push(reply);
-      await post.save();
-  
-      // Return organized threaded replies
-      // First, convert replies to plain objects with calculated properties
-      const allReplies = post.replies.map(reply => ({
+    };
+
+    post.replies.push(reply);
+    await post.save();
+
+    // Return organized threaded replies
+    // First, convert replies to plain objects with calculated properties
+    const allReplies = post.replies.map(reply => ({
       ...reply.toObject(),
       voteCount: reply.voteCount,
       postId: post._id,
       childReplies: []
-      }));
-  
-      // Organize into threads
-      const threadsMap = new Map();
-      const rootReplies = [];
-  
-      // First pass: create a map of all replies
-      allReplies.forEach(reply => {
+    }));
+
+    // Organize into threads
+    const threadsMap = new Map();
+    const rootReplies = [];
+
+    // First pass: create a map of all replies
+    allReplies.forEach(reply => {
       threadsMap.set(reply._id.toString(), reply);
-      });
-  
-      // Second pass: build the hierarchy
-      allReplies.forEach(reply => {
+    });
+
+    // Second pass: build the hierarchy
+    allReplies.forEach(reply => {
       if (!reply.parentReplyId) {
-          rootReplies.push(reply);
+        rootReplies.push(reply);
       } else {
-          const parentId = reply.parentReplyId.toString();
-          const parent = threadsMap.get(parentId);
-          if (parent) {
+        const parentId = reply.parentReplyId.toString();
+        const parent = threadsMap.get(parentId);
+        if (parent) {
           parent.childReplies.push(reply);
-          } else {
+        } else {
           rootReplies.push(reply);
-          }
+        }
       }
-      });
-  
-      // Sort replies by newest first
-      rootReplies.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-      
-      // Sort children
-      rootReplies.forEach(function sortChildren(reply) {
+    });
+
+    // Sort replies by newest first
+    rootReplies.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    // Sort children
+    rootReplies.forEach(function sortChildren(reply) {
       reply.childReplies.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       reply.childReplies.forEach(sortChildren);
-      });
-  
-      res.status(201).json(rootReplies);
+    });
+
+    res.status(201).json(rootReplies);
   } catch (error) {
-      console.error("❌ Error saving reply:", error);
-      res.status(500).json({ message: "Internal Server Error" });
+    console.error("❌ Error saving reply:", error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
-  });
+});
 
 router.post("/posts/:postId/replies/:replyId/vote", isAuthenticated, async (req, res) => {
   try {
@@ -242,8 +242,8 @@ router.post("/posts/:postId/replies/:replyId/vote", isAuthenticated, async (req,
     // Calculate vote count for the specific reply
     const voteCount = reply.voteCount;
 
-    res.json({ 
-      message: "Reply vote updated successfully", 
+    res.json({
+      message: "Reply vote updated successfully",
       voteCount,
       replyId
     });
@@ -309,7 +309,7 @@ router.get("/posts/:postId/replies", async (req, res) => {
 
     res.json(rootReplies);
   } catch (error) {
-    console.error("❌ Error fetching replies:", error);
+    console.error("❌ Error fetching replies for post:", req.params.postId, error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
@@ -318,7 +318,7 @@ router.get("/posts/:postId/replies", async (req, res) => {
 const checkPostPermissions = async (req, res, next) => {
   try {
     const post = await ForumPost.findById(req.params.postId);
-    
+
     if (!post) {
       return res.status(404).json({ message: 'Post not found' });
     }
@@ -360,12 +360,12 @@ router.put("/posts/:postId", authenticateUser, checkPostPermissions, async (req,
 
     // Update logic remains the same, but now guaranteed to be authorized
     const updatedPost = await ForumPost.findByIdAndUpdate(
-      req.params.postId, 
-      { 
-        title, 
-        content, 
-        updatedAt: new Date() 
-      }, 
+      req.params.postId,
+      {
+        title,
+        content,
+        updatedAt: new Date()
+      },
       { new: true }
     );
 
@@ -391,13 +391,13 @@ router.delete("/posts/:postId", authenticateUser, checkPostPermissions, async (r
 const checkReplyPermissions = async (req, res, next) => {
   try {
     const post = await ForumPost.findById(req.params.postId);
-    
+
     if (!post) {
       return res.status(404).json({ message: 'Post not found' });
     }
 
     const reply = post.replies.id(req.params.replyId);
-    
+
     if (!reply) {
       return res.status(404).json({ message: 'Reply not found' });
     }
@@ -437,137 +437,137 @@ const checkReplyPermissions = async (req, res, next) => {
 // Update the existing reply update route to maintain threading
 router.put('/posts/:postId/replies/:replyId', authenticateUser, checkReplyPermissions, async (req, res) => {
   try {
-      const { content } = req.body;
-  
-      // Find the post and update the specific reply
-      const post = await ForumPost.findById(req.params.postId);
-      const reply = post.replies.id(req.params.replyId);
-      
-      reply.content = content;
-      reply.updatedAt = new Date();
-      
-      await post.save();
-  
-      // Return threaded replies
-      // Use the same approach as the GET route to organize replies into threads
-      const allReplies = post.replies.map(reply => ({
+    const { content } = req.body;
+
+    // Find the post and update the specific reply
+    const post = await ForumPost.findById(req.params.postId);
+    const reply = post.replies.id(req.params.replyId);
+
+    reply.content = content;
+    reply.updatedAt = new Date();
+
+    await post.save();
+
+    // Return threaded replies
+    // Use the same approach as the GET route to organize replies into threads
+    const allReplies = post.replies.map(reply => ({
       ...reply.toObject(),
       voteCount: reply.voteCount,
       postId: post._id,
       childReplies: []
-      }));
-  
-      const threadsMap = new Map();
-      const rootReplies = [];
-  
-      allReplies.forEach(reply => {
+    }));
+
+    const threadsMap = new Map();
+    const rootReplies = [];
+
+    allReplies.forEach(reply => {
       threadsMap.set(reply._id.toString(), reply);
-      });
-  
-      allReplies.forEach(reply => {
+    });
+
+    allReplies.forEach(reply => {
       if (!reply.parentReplyId) {
-          rootReplies.push(reply);
+        rootReplies.push(reply);
       } else {
-          const parentId = reply.parentReplyId.toString();
-          const parent = threadsMap.get(parentId);
-          if (parent) {
+        const parentId = reply.parentReplyId.toString();
+        const parent = threadsMap.get(parentId);
+        if (parent) {
           parent.childReplies.push(reply);
-          } else {
+        } else {
           rootReplies.push(reply);
-          }
+        }
       }
-      });
-  
-      rootReplies.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-      rootReplies.forEach(function sortChildren(reply) {
+    });
+
+    rootReplies.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    rootReplies.forEach(function sortChildren(reply) {
       reply.childReplies.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       reply.childReplies.forEach(sortChildren);
-      });
-  
-      res.json(rootReplies);
+    });
+
+    res.json(rootReplies);
   } catch (error) {
-      res.status(500).json({ message: 'Error updating reply', error: error.message });
+    res.status(500).json({ message: 'Error updating reply', error: error.message });
   }
-  });
+});
 
 
 // Update the existing reply delete route to maintain threading
 router.delete('/posts/:postId/replies/:replyId', authenticateUser, checkReplyPermissions, async (req, res) => {
   try {
-      const post = await ForumPost.findById(req.params.postId);
-      
-      // Find the reply to be deleted
-      const replyToDelete = post.replies.id(req.params.replyId);
-      
-      if (replyToDelete) {
+    const post = await ForumPost.findById(req.params.postId);
+
+    // Find the reply to be deleted
+    const replyToDelete = post.replies.id(req.params.replyId);
+
+    if (replyToDelete) {
       // Option 1: Delete the reply and all its children
       const deleteReplyAndChildren = (replyId) => {
-          // Get all direct children
-          const childIds = post.replies
+        // Get all direct children
+        const childIds = post.replies
           .filter(r => r.parentReplyId && r.parentReplyId.toString() === replyId.toString())
           .map(r => r._id);
-          
-          // Recursively delete all children
-          childIds.forEach(childId => deleteReplyAndChildren(childId));
-          
-          // Delete the reply itself
-          post.replies.pull(replyId);
+
+        // Recursively delete all children
+        childIds.forEach(childId => deleteReplyAndChildren(childId));
+
+        // Delete the reply itself
+        post.replies.pull(replyId);
       };
-      
+
       // Start deletion from the target reply
       deleteReplyAndChildren(req.params.replyId);
-      
+
       await post.save();
-  
+
       // Return threaded replies using the same approach as other routes
       const allReplies = post.replies.map(reply => ({
-          ...reply.toObject(),
-          voteCount: reply.voteCount,
-          postId: post._id,
-          childReplies: []
+        ...reply.toObject(),
+        voteCount: reply.voteCount,
+        postId: post._id,
+        childReplies: []
       }));
-  
+
       const threadsMap = new Map();
       const rootReplies = [];
-  
+
       allReplies.forEach(reply => {
-          threadsMap.set(reply._id.toString(), reply);
+        threadsMap.set(reply._id.toString(), reply);
       });
-  
+
       allReplies.forEach(reply => {
-          if (!reply.parentReplyId) {
+        if (!reply.parentReplyId) {
           rootReplies.push(reply);
-          } else {
+        } else {
           const parentId = reply.parentReplyId.toString();
           const parent = threadsMap.get(parentId);
           if (parent) {
-              parent.childReplies.push(reply);
+            parent.childReplies.push(reply);
           } else {
-              rootReplies.push(reply);
+            rootReplies.push(reply);
           }
-          }
+        }
       });
-  
+
       rootReplies.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       rootReplies.forEach(function sortChildren(reply) {
-          reply.childReplies.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-          reply.childReplies.forEach(sortChildren);
+        reply.childReplies.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        reply.childReplies.forEach(sortChildren);
       });
-  
+
       res.json(rootReplies);
-      } else {
+    } else {
       res.status(404).json({ message: 'Reply not found' });
-      }
+    }
   } catch (error) {
-      res.status(500).json({ message: 'Error deleting reply', error: error.message });
+    res.status(500).json({ message: 'Error deleting reply', error: error.message });
   }
-  });
+});
 
 // Add search route to your Express router
 router.get("/search", async (req, res) => {
   try {
     const { q } = req.query;
-    
+
     if (!q) {
       const posts = await ForumPost.find().sort({ createdAt: -1 });
       return res.json(posts);
@@ -578,7 +578,7 @@ router.get("/search", async (req, res) => {
       { $text: { $search: q } },
       { score: { $meta: "textScore" } }
     )
-    .sort({ score: { $meta: "textScore" } });
+      .sort({ score: { $meta: "textScore" } });
 
     // Regex search for more flexible matching
     const regexSearch = new RegExp(q, "i");
@@ -594,7 +594,7 @@ router.get("/search", async (req, res) => {
 
     // Combine and deduplicate results
     const combinedResults = [...textSearchResults];
-    
+
     // Add regex results that aren't already in the text search results
     regexResults.forEach(post => {
       if (!combinedResults.some(p => p._id.toString() === post._id.toString())) {
@@ -606,7 +606,7 @@ router.get("/search", async (req, res) => {
     const postsWithVotes = combinedResults.map(post => ({
       ...post.toObject(),
       voteCount: post.votes.filter(vote => vote.voteType === "upvote").length -
-                post.votes.filter(vote => vote.voteType === "downvote").length
+        post.votes.filter(vote => vote.voteType === "downvote").length
     }));
 
     res.json(postsWithVotes);
@@ -619,7 +619,7 @@ router.get("/search", async (req, res) => {
 // You can extend the search route to support filtering by:
 router.get("/advanced-search", async (req, res) => {
   try {
-    const { 
+    const {
       q, // basic search term
       author, // filter by author
       dateFrom, // filter by date range
@@ -627,10 +627,10 @@ router.get("/advanced-search", async (req, res) => {
       hasReplies, // filter posts with/without replies
       sortBy // sort results (newest, oldest, most voted)
     } = req.query;
-    
+
     // Build the query object
     const query = {};
-    
+
     // Add text search if provided
     if (q) {
       query.$or = [
@@ -641,49 +641,49 @@ router.get("/advanced-search", async (req, res) => {
         { "replies.username": new RegExp(q, "i") }
       ];
     }
-    
+
     // Add author filter
     if (author) {
       query.author = new RegExp(author, "i");
     }
-    
+
     // Add date range filter
     if (dateFrom || dateTo) {
       query.createdAt = {};
       if (dateFrom) query.createdAt.$gte = new Date(dateFrom);
       if (dateTo) query.createdAt.$lte = new Date(dateTo);
     }
-    
+
     // Add replies filter
     if (hasReplies === "true") {
       query["replies.0"] = { $exists: true };
     } else if (hasReplies === "false") {
       query["replies.0"] = { $exists: false };
     }
-    
+
     // Determine sort order
     let sortOption = { createdAt: -1 }; // Default: newest first
-    
+
     if (sortBy === "oldest") {
       sortOption = { createdAt: 1 };
     } else if (sortBy === "most_voted") {
       // We'll need to sort after fetching results since voteCount is a virtual
     }
-    
+
     // Execute query
     let results = await ForumPost.find(query).sort(sortOption);
-    
+
     // Handle special sorting case
     if (sortBy === "most_voted") {
       results.sort((a, b) => b.voteCount - a.voteCount);
     }
-    
+
     // Format results
     const postsWithVotes = results.map(post => ({
       ...post.toObject(),
       voteCount: post.voteCount
     }));
-    
+
     res.json(postsWithVotes);
   } catch (error) {
     console.error("❌ Advanced search error:", error);

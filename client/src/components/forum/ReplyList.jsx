@@ -300,20 +300,23 @@ const Reply = ({
 const ReplyList = ({ replies, user, postId, setReplies }) => {
   const [isVoting, setIsVoting] = useState(false);
 
+  // ✅ Normalize replies so we always work with an array
+  const safeReplies = Array.isArray(replies) ? replies : [];
+
   return (
     <div className="mt-6 border-t border-gray-100 pt-4">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-gray-800">
-          Replies {replies.length > 0 && `(${replies.length})`}
+          Replies {safeReplies.length > 0 && `(${safeReplies.length})`}
         </h3>
       </div>
-      {replies.length === 0 ? (
+      {safeReplies.length === 0 ? (
         <div className="py-4 text-center rounded-md bg-gray-50 border border-gray-100">
           <p className="text-gray-500">No replies yet. Be the first to respond!</p>
         </div>
       ) : (
         <div className="space-y-3">
-          {replies.map((reply) => (
+          {safeReplies.map((reply) => (
             <Reply
               key={reply._id}
               reply={reply}

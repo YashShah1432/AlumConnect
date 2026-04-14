@@ -137,7 +137,7 @@ const Discussion = () => {
             <div className="mb-6">
               <SearchBar 
                 onSearch={handleServerSearch} 
-                placeholder="Search discussions by title, content, or author..."
+                placeholder="Search discussions by title, content, or author"
               />
               {searchQuery && (
                 <div className="mt-2 text-sm text-gray-600">
@@ -164,7 +164,19 @@ const Discussion = () => {
 
             {user && (
               <section className="mb-8">
-                <CreatePostForm user={user} setPosts={setPosts} />
+                <CreatePostForm
+                  user={user}
+                  setPosts={(updater) => {
+                    // keep posts and filteredPosts in sync
+                    if (typeof updater === "function") {
+                      setPosts((prev) => updater(prev));
+                      setFilteredPosts((prev) => updater(prev));
+                    } else {
+                      setPosts(updater);
+                      setFilteredPosts(updater);
+                    }
+                  }}
+                />
               </section>
             )}
 
@@ -177,7 +189,16 @@ const Discussion = () => {
                 <PostList 
                   posts={filteredPosts} 
                   user={user} 
-                  setPosts={setPosts} 
+                  setPosts={(updater) => {
+                    // keep posts and filteredPosts in sync
+                    if (typeof updater === "function") {
+                      setPosts((prev) => updater(prev));
+                      setFilteredPosts((prev) => updater(prev));
+                    } else {
+                      setPosts(updater);
+                      setFilteredPosts(updater);
+                    }
+                  }}
                 />
               )}
             </section>
