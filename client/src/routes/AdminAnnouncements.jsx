@@ -1,3 +1,4 @@
+//// filepath: d:\Major Project Changes\12-04-2026\client\src\routes\AdminAnnouncements.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -28,7 +29,10 @@ const AdminAnnouncements = () => {
   const countInRange = (items, predicate, start, end) => {
     return items.filter(a => {
       if (!predicate(a)) return false;
-      const created = new Date(a.createdAt || a.updatedAt || a.eventDateTime);
+      const rawDate = a.createdAt || a.updatedAt || a.eventDateTime;
+      if (!rawDate) return false;
+      const created = new Date(rawDate);
+      if (Number.isNaN(created.getTime())) return false;
       return created >= start && created < end;
     }).length;
   };
@@ -407,9 +411,44 @@ const AdminAnnouncements = () => {
                     {/* Show Venue & DateTime if event */}
                     {item.type === 'event' && (
                       <div className="mt-2 text-sm text-gray-500 flex flex-wrap gap-x-4">
-                        <span><span className="font-medium">Venue:</span> {item.venue}</span>
-                        <span><span className="font-medium">Date:</span> {new Date(item.eventDateTime).toLocaleDateString('en-GB')}</span>
-                        <span><span className="font-medium">Time:</span> {new Date(item.eventDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                        <span>
+                          <span className="font-medium">Venue:</span> {item.venue}
+                        </span>
+                        <span>
+                          <span className="font-medium">Date:</span>{' '}
+                          {new Date(item.eventDateTime).toLocaleDateString('en-GB')}
+                        </span>
+                        <span>
+                          <span className="font-medium">Time:</span>{' '}
+                          {new Date(item.eventDateTime).toLocaleTimeString([], {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Show Name, Batch, Branch & Date if achievement */}
+                    {item.type === 'achievement' && (
+                      <div className="mt-2 text-sm text-gray-500 flex flex-col sm:flex-row sm:flex-wrap gap-y-1 gap-x-4">
+                        <span>
+                          <span className="font-medium">Name:</span>{' '}
+                          {item.name || 'N/A'}
+                        </span>
+                        <span>
+                          <span className="font-medium">Batch:</span>{' '}
+                          {item.batch || item.batchYear || 'N/A'}
+                        </span>
+                        <span>
+                          <span className="font-medium">Branch:</span>{' '}
+                          {item.branch || item.branchCode || 'N/A'}
+                        </span>
+                        <span>
+                          <span className="font-medium">Date:</span>{' '}
+                          {item.createdAt
+                            ? new Date(item.createdAt).toLocaleDateString('en-GB')
+                            : 'N/A'}
+                        </span>
                       </div>
                     )}
                   </div>

@@ -167,3 +167,14 @@ body {
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
   background-color: #4b5563;
 }
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

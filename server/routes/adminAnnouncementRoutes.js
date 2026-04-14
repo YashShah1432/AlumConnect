@@ -1,3 +1,4 @@
+//// filepath: d:\Major Project Changes\12-04-2026\server\routes\adminAnnouncementRoutes.js
 // server/routes/adminAnnouncementRoutes.js
 const express = require('express');
 const router = express.Router();
@@ -69,7 +70,11 @@ router.get('/all', verifyAdmin, async (req, res) => {
     const announcements = await Announcement.find().sort({ createdAt: -1 });
     res.json(announcements);
   } catch (error) {
-    console.error("❌ Error fetching all announcements:", error);
+    // ...existing code...
+    console.error("❌ Error fetching all announcements:", {
+      message: error.message,
+      stack: error.stack,
+    });
     res.status(500).json({ error: 'Server error' });
   }
 });

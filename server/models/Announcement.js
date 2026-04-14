@@ -1,3 +1,4 @@
+//// filepath: d:\Major Project Changes\12-04-2026\server\models\Announcement.js
 // server/models/Announcement.js
 
 const mongoose = require('mongoose');
@@ -25,6 +26,16 @@ const announcementSchema = new mongoose.Schema({
 
   // Fields for achievements
   name: {
+    type: String,
+    required: function () { return this.type === 'achievement'; }
+  },
+
+  batch: {
+    type: String,
+    required: function () { return this.type === 'achievement'; }
+  },
+  
+  branch: {
     type: String,
     required: function () { return this.type === 'achievement'; }
   },

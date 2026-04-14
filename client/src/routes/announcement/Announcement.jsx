@@ -1,3 +1,4 @@
+//// filepath: d:\Major Project Changes\12-04-2026\client\src\routes\announcement\Announcement.jsx
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Layout from '../../components/common/Layout';
@@ -139,13 +140,18 @@ useEffect(() => {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {announcements.map((announcement) => (
+                {announcements.map((announcement, index) => (
                   <div
                     key={announcement._id}
-                    className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all duration-300 group"
+                    className="relative bg-white rounded-2xl shadow-sm border border-blue-100 overflow-hidden
+                               hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group"
+                    style={{
+                      animation: `fadeInUp 0.4s ease-out ${index * 80}ms both`,
+                    }}
                   >
+
                     {announcement.imageUrl && (
-                      <div className="h-52 overflow-hidden">
+                      <div className="w-full h-52 overflow-hidden">
                         <img
                           src={announcement.imageUrl}
                           alt={announcement.title}
@@ -153,33 +159,41 @@ useEffect(() => {
                         />
                       </div>
                     )}
-                    <div className="p-6">
-                      <div className="mb-3">
-                        <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-xs font-medium">
-                          Event
-                        </span>
+
+                    <div className="p-5 sm:p-6 flex flex-col gap-4">
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-2">
+                          <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[11px] font-semibold tracking-wide uppercase">
+                            Event
+                          </span>
+                        </div>
                       </div>
-                      <h3 className="text-xl font-semibold text-gray-900 mb-3">
+
+                      <h3 className="text-lg sm:text-xl font-semibold text-gray-900">
                         {announcement.title}
                       </h3>
-                      <p className="text-gray-600 font-normal leading-relaxed mb-4">
+
+                      <p className="text-gray-600 text-sm leading-relaxed line-clamp-3">
                         {announcement.description}
                       </p>
 
-                      <div className="flex items-center text-gray-500 text-sm">
-                        <Calendar size={16} className="mr-2" />
+                      {/* Extra info: date/time and venue, styled similar to fields */}
+                      <div className="mt-1 text-xs sm:text-sm text-gray-500 grid grid-cols-1 sm:grid-cols-2 gap-y-1 gap-x-4">
                         <span>
+                          <span className="font-medium text-gray-700">Date & Time:</span>{' '}
                           {announcement.eventDateTime
                             ? new Date(announcement.eventDateTime).toLocaleString('en-GB')
                             : 'No date/time provided'}
                         </span>
-                      </div>
-
-                      <div className="flex items-center text-gray-500 text-sm mt-2">
-                        <MapPin size={16} className="mr-2" />
-                        <span>{announcement.venue || 'No venue provided'}</span>
+                        <span>
+                          <span className="font-medium text-gray-700">Venue:</span>{' '}
+                          {announcement.venue || 'No venue provided'}
+                        </span>
                       </div>
                     </div>
+
+                    {/* Subtle gradient hover overlay */}
+                    <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-t from-blue-50/60 via-transparent to-transparent" />
                   </div>
                 ))}
               </div>
@@ -207,38 +221,79 @@ useEffect(() => {
                 No achievements to display.
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {achievements.map((achievement) => (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {achievements.map((achievement, index) => (
                   <div
                     key={achievement._id}
-                    className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-all duration-300 border border-gray-50"
+                    className="relative bg-white rounded-2xl shadow-sm border border-purple-100 overflow-hidden
+                               hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group"
+                    style={{
+                      animation: `fadeInUp 0.4s ease-out ${index * 80}ms both`,
+                    }}
                   >
-                    <div className="flex items-center gap-5">
-                      {achievement.imageUrl ? (
-                        <img
-                          src={achievement.imageUrl}
-                          alt={achievement.name}
-                          className="w-20 h-20 rounded-full object-cover border-2 border-purple-100"
-                        />
-                      ) : (
-                        <div className="w-20 h-20 rounded-full bg-purple-100 flex items-center justify-center text-purple-500 font-bold text-2xl">
-                          {achievement.name?.charAt(0) || 'A'}
+
+                    <div className="p-5 sm:p-6 flex flex-col gap-4">
+                      <div className="flex items-center gap-4">
+                        {/* Avatar / image */}
+                        {achievement.imageUrl ? (
+                          <div className="relative">
+                            <img
+                              src={achievement.imageUrl}
+                              alt={achievement.name}
+                              className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-2 border-purple-200
+                                         transition-transform duration-300 group-hover:scale-105"
+                            />
+                          </div>
+                        ) : (
+                          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 
+                                          flex items-center justify-center text-white font-bold text-xl sm:text-2xl shadow-inner">
+                            {achievement.name?.charAt(0) || 'A'}
+                          </div>
+                        )}
+
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-wrap items-center gap-2 mb-1">
+                            <span className="px-3 py-1 bg-purple-50 text-purple-600 rounded-full text-[11px] font-semibold tracking-wide uppercase">
+                              Achievement
+                            </span>
+                          </div>
+
+                          <h3 className="text-lg sm:text-xl font-semibold text-gray-900 truncate">
+                            {achievement.name || 'Achievement'}
+                          </h3>
                         </div>
-                      )}
-                      <div>
-                        <div className="mb-2">
-                          <span className="px-3 py-1 bg-purple-50 text-purple-600 rounded-full text-xs font-medium">
-                            Achievement
-                          </span>
-                        </div>
-                        <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                          {achievement.name}
-                        </h3>
-                        <p className="text-gray-600 font-normal leading-relaxed">
-                          {achievement.description}
-                        </p>
+                      </div>
+
+                      {/* Description */}
+                      <p className="text-gray-600 text-sm leading-relaxed line-clamp-3">
+                        {achievement.description}
+                      </p>
+
+                      {/* Extra info: name, batch, branch, date */}
+                      <div className="mt-1 text-xs sm:text-sm text-gray-500 grid grid-cols-1 sm:grid-cols-2 gap-y-1 gap-x-4">
+                        <span>
+                          <span className="font-medium text-gray-700">Name:</span>{' '}
+                          {achievement.name || 'N/A'}
+                        </span>
+                        <span>
+                          <span className="font-medium text-gray-700">Batch:</span>{' '}
+                          {achievement.batch || 'N/A'}
+                        </span>
+                        <span>
+                          <span className="font-medium text-gray-700">Branch:</span>{' '}
+                          {achievement.branch || 'N/A'}
+                        </span>
+                        <span>
+                          <span className="font-medium text-gray-700">Date:</span>{' '}
+                          {achievement.createdAt
+                            ? new Date(achievement.createdAt).toLocaleDateString('en-GB')
+                            : 'N/A'}
+                        </span>
                       </div>
                     </div>
+
+                    {/* Subtle gradient hover overlay */}
+                    <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-t from-purple-50/60 via-transparent to-transparent" />
                   </div>
                 ))}
               </div>

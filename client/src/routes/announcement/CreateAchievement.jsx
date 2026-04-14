@@ -1,3 +1,4 @@
+//// filepath: d:\Major Project Changes\12-04-2026\client\src\routes\announcement\CreateAchievement.jsx
 import React, { useState, useEffect } from 'react';
 import Layout from '../../components/common/Layout';
 import { useNavigate } from 'react-router-dom';
@@ -49,13 +50,22 @@ const CreateAchievement = () => {
       formData.append('description', description);
       formData.append('name', user?.name || 'Anonymous'); // Logged-in user's name
 
+      // NEW: send batch and branch from user profile
+      if (user) {
+        if (user.batch || user.batchYear) {
+          formData.append('batch', user.batch || user.batchYear);
+        }
+        if (user.branch || user.branchCode) {
+          formData.append('branch', user.branch || user.branchCode);
+        }
+      }
+
       if (image) {
         formData.append('image', image);
       }
 
       console.log('🟢 Form Data Before Sending:', Object.fromEntries(formData.entries()));
 
-      // ✅ Changed URL from "/add" to "/achievement"
       const response = await axios.post(
         `${import.meta.env.VITE_backend_URL}/api/announcements/achievement`,
         formData,

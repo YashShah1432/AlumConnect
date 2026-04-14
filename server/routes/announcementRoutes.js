@@ -1,3 +1,4 @@
+//// filepath: d:\Major Project Changes\12-04-2026\server\routes\announcementRoutes.js
 // server/routes/announcementRoutes.js
 const express = require('express');
 const router = express.Router();
@@ -23,7 +24,7 @@ const upload = multer({
 // Alumni can create an achievement; status defaults to 'pending'
 router.post('/achievement', isAlumni, upload.single('image'), async (req, res) => {
   try {
-    const { title, description, name } = req.body;
+    const { title, description, name, batch, branch } = req.body;
     let imageUrl = '';
     if (req.file) {
       const uploadResult = await new Promise((resolve, reject) => {
@@ -44,7 +45,9 @@ router.post('/achievement', isAlumni, upload.single('image'), async (req, res) =
       title,
       description,
       imageUrl,
-      name, // Alumni's name should be provided by frontend
+      name,   // Alumni's name from frontend
+      batch,  // Alumni's batch from frontend
+      branch, // Alumni's branch from frontend
       // status defaults to 'pending' as per the model definition
     });
     
