@@ -5,7 +5,7 @@ import SocialLinks from '../profile/SocialLinks';
 
 const ProfileCard = ({ profile, onMessageClick }) => {
   return (
-    <div className="bg-white shadow rounded-lg overflow-hidden">
+    <div className="bg-white dark:bg-gray-800 shadow-sm dark:shadow-lg rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700">
       {/* Top Section: Avatar + Basic Info */}
       <div className="flex p-4 items-center">
         <div className="w-16 h-16 flex-shrink-0">
@@ -16,7 +16,7 @@ const ProfileCard = ({ profile, onMessageClick }) => {
           />
         </div>
         <div className="ml-4">
-          <h2 className="text-xl font-semibold text-gray-800">
+          <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
             {profile.name}
           </h2>
           <p className="text-gray-500">
@@ -27,11 +27,11 @@ const ProfileCard = ({ profile, onMessageClick }) => {
 
       {/* Bottom Section: Location, Work, Socials, and "Message" Button */}
       <div className="px-4 pb-4">
-        <p className="text-gray-600 mb-1">
-          <span className="font-medium">Location:</span> {profile.location}
+        <p className="text-gray-600 dark:text-gray-300 mb-1">
+          <span className="font-medium text-gray-800 dark:text-gray-100">Location:</span> {profile.location}
         </p>
-        <p className="text-gray-600 mb-1">
-          <span className="font-medium">Current Work:</span>{' '}
+        <p className="text-gray-600 dark:text-gray-300 mb-1">
+          <span className="font-medium text-gray-800 dark:text-gray-100">Current Work:</span>{' '}
           {profile.currentCompanyRole
             ? `${profile.currentCompanyRole} at ${profile.currentCompany}`
             : profile.currentCompany}
@@ -40,7 +40,7 @@ const ProfileCard = ({ profile, onMessageClick }) => {
           <SocialLinks socialLinks={profile.socialLinks} />
         </div>
         <button
-          className="mt-4 inline-flex items-center text-blue-600 hover:underline cursor-pointer"
+          className="mt-4 inline-flex items-center text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
           onClick={() => onMessageClick && onMessageClick(profile)}
         >
           <FaCommentDots className="mr-1" />

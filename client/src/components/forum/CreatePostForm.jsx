@@ -83,11 +83,12 @@ const CreatePostForm = ({ user, setPosts }) => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-200">
-      <h2 className="text-xl font-bold mb-4 text-gray-800">Create a New Post</h2>
+    <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md dark:shadow-lg mb-8 border border-gray-200 dark:border-gray-700">
+      <h2 className="text-xl font-bold mb-2 text-gray-800 dark:text-white">Create a New Post</h2>
+      <p className="mb-4 text-sm text-gray-600 dark:text-gray-300">Start a new thread, ask for help, or share something useful with the community.</p>
       
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-md mb-4 flex items-start">
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-400 px-4 py-3 rounded-md mb-4 flex items-start">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
             <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
           </svg>
@@ -96,7 +97,7 @@ const CreatePostForm = ({ user, setPosts }) => {
       )}
       
       {successMessage && (
-        <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-md mb-4 flex items-start">
+        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-400 px-4 py-3 rounded-md mb-4 flex items-start">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
           </svg>
@@ -112,9 +113,9 @@ const CreatePostForm = ({ user, setPosts }) => {
             value={title} 
             onChange={(e) => setTitle(e.target.value)}
             maxLength={100}
-            className="border border-gray-300 p-3 w-full rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+            className="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white p-3 w-full rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent" 
           />
-          <p className="text-xs text-gray-500 mt-1">{title.length}/100 characters</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{title.length}/100 characters</p>
         </div>
         
         <div>
@@ -123,16 +124,16 @@ const CreatePostForm = ({ user, setPosts }) => {
             value={content} 
             onChange={(e) => setContent(e.target.value)}
             maxLength={1000}
-            className="border border-gray-300 p-3 w-full rounded-md h-32 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white p-3 w-full rounded-xl h-32 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
           ></textarea>
-          <p className="text-xs text-gray-500 mt-1">{content.length}/1000 characters</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{content.length}/1000 characters</p>
         </div>
         
         <div>
           <button 
             onClick={handleCreatePost} 
             disabled={isSubmitting}
-            className={`px-5 py-3 rounded-md font-medium transition-colors duration-200 ${
+            className={`px-5 py-3 rounded-xl font-medium transition-colors duration-200 shadow-sm ${
               isSubmitting 
                 ? "bg-blue-400 text-white cursor-not-allowed" 
                 : "bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"

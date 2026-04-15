@@ -66,32 +66,32 @@ const PostItem = ({ post, user, setPosts, adminMode, onDeletePost }) => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md mb-6 border border-gray-200 transition-shadow hover:shadow-lg">
+    <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md dark:shadow-lg mb-6 border border-gray-200 dark:border-gray-700 transition-shadow hover:shadow-lg dark:hover:shadow-xl">
       {isEditing ? (
         <div className="space-y-4">
           <input
             type="text"
             value={editTitle}
             onChange={(e) => setEditTitle(e.target.value)}
-            className="w-full p-2 border rounded-md"
+            className="w-full p-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl"
             placeholder="Edit post title"
           />
           <textarea
             value={editContent}
             onChange={(e) => setEditContent(e.target.value)}
-            className="w-full p-2 border rounded-md h-32"
+            className="w-full p-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl h-32"
             placeholder="Edit post content"
           />
           <div className="flex space-x-2">
             <button 
               onClick={handleEdit}
-              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+              className="bg-blue-600 dark:bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 dark:hover:bg-blue-700"
             >
               Save Changes
             </button>
             <button 
               onClick={() => setIsEditing(false)}
-              className="bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300"
+              className="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600"
             >
               Cancel
             </button>
@@ -100,13 +100,13 @@ const PostItem = ({ post, user, setPosts, adminMode, onDeletePost }) => {
       ) : (
         <>
           <div className="mb-4">
-            <h3 className="text-xl font-bold text-gray-800 mb-2">{post.title}</h3>
-            <p className="text-gray-700 whitespace-pre-line">{post.content}</p>
+            <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">{post.title}</h3>
+            <p className="text-gray-700 dark:text-gray-300 whitespace-pre-line">{post.content}</p>
           </div>
           
-          <div className="flex justify-between items-center text-sm text-gray-500 mt-4 pb-4 border-b border-gray-100">
+          <div className="flex justify-between items-center text-sm text-gray-500 dark:text-gray-400 mt-4 pb-4 border-b border-gray-100 dark:border-gray-700">
             <div className="flex items-center">
-              <span className="font-medium text-gray-600">
+              <span className="font-medium text-gray-600 dark:text-gray-300">
                 {post.author || "Anonymous"}
               </span>
               <span className="mx-2">•</span>
@@ -117,7 +117,7 @@ const PostItem = ({ post, user, setPosts, adminMode, onDeletePost }) => {
                 {timeAgo(post.createdAt)}
               </span>
               {post.updatedAt && post.updatedAt !== post.createdAt && (
-                <span className="ml-2 text-xs italic text-gray-400" 
+                <span className="ml-2 text-xs italic text-gray-400 dark:text-gray-600" 
                   title={`Last updated: ${formatDateTime(post.updatedAt)}`}
                 >
                   (edited)
@@ -134,7 +134,7 @@ const PostItem = ({ post, user, setPosts, adminMode, onDeletePost }) => {
               {canModifyPost && (
                 <button 
                   onClick={() => setIsEditing(true)}
-                  className="text-blue-600 hover:text-blue-800 transition-colors"
+                  className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
                   title="Edit post"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -146,7 +146,7 @@ const PostItem = ({ post, user, setPosts, adminMode, onDeletePost }) => {
               {canDeletePost && (
                 <button 
                   onClick={handleDelete}
-                  className="text-red-600 hover:text-red-800 transition-colors"
+                  className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 transition-colors"
                   title="Delete post"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -160,7 +160,7 @@ const PostItem = ({ post, user, setPosts, adminMode, onDeletePost }) => {
           <div className="mt-4 space-y-4">
             <ReplyForm postId={post._id} setReplies={setReplies} user={user} />
             {isLoadingReplies ? (
-              <div className="text-center py-3 text-gray-500">Loading replies...</div>
+              <div className="text-center py-3 text-gray-500 dark:text-gray-400">Loading replies...</div>
             ) : (
               <ReplyList 
                 replies={replies} 

@@ -20,6 +20,28 @@
   --sidebar-width-collapsed: 70px;
 }
 
+/* Dark mode theme variables */
+:root.dark {
+  --background: 222.2 84% 4.9%;
+  --foreground: 210 40% 98%;
+  --primary: 217.2 91.2% 59.8%;
+  --primary-foreground: 222.2 47.4% 11.2%;
+  --secondary: 217.2 91.2% 59.8%;
+  --secondary-foreground: 222.2 84% 4.9%;
+  --border: 217.2 32.6% 17.5%;
+  --input: 217.2 32.6% 17.5%;
+  --ring: 217.2 91.2% 59.8%;
+}
+
+/* Ensure color-scheme is set for form elements */
+:root.dark {
+  color-scheme: dark;
+}
+
+:root {
+  color-scheme: light dark;
+}
+
 html,
 body {
   margin: 0;
@@ -27,6 +49,28 @@ body {
   overflow-x: hidden;
   min-width: 320px;
   min-height: 100vh;
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body {
+  font-synthesis-weight: none;
+  text-rendering: optimizeLegibility;
+}
+
+a,
+button,
+input,
+textarea,
+select {
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease,
+    transform 0.2s ease;
 }
 
 /* Swiper Custom Styles */
@@ -42,6 +86,13 @@ body {
   background: white !important;
   border-radius: 50% !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+:root.dark .swiper-button-prev,
+:root.dark .swiper-button-next {
+  background: #374151 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+  color: white !important;
 }
 
 .swiper-button-prev::after,
@@ -166,4 +217,131 @@ body {
 
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
   background-color: #4b5563;
+}
+
+/* Dark mode scrollbar */
+:root.dark .scrollbar-thin {
+  scrollbar-color: #4b5563 #1f2937;
+}
+
+:root.dark .scrollbar-thin::-webkit-scrollbar-track {
+  background: #1f2937;
+  border-radius: 9999px;
+}
+
+:root.dark .scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: #4b5563;
+  border-radius: 9999px;
+}
+
+:root.dark .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background-color: #9ca3af;
+}
+
+/* Global dark mode form and input styles */
+:root.dark input,
+:root.dark textarea,
+:root.dark select {
+  background-color: #1f2937;
+  color: #f3f4f6;
+  border-color: #374151;
+}
+
+:root.dark input::placeholder,
+:root.dark textarea::placeholder {
+  color: #9ca3af;
+}
+
+:root.dark input:focus,
+:root.dark textarea:focus,
+:root.dark select:focus {
+  background-color: #111827;
+  border-color: #60a5fa;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
+}
+
+/* Card and component styles */
+:root.dark .card,
+:root.dark [class*="card"],
+:root.dark .bg-white {
+  background-color: #1f2937;
+  color: #f3f4f6;
+}
+
+:root.dark .bg-gray-50 {
+  background-color: #111827;
+}
+
+:root.dark .bg-gray-100 {
+  background-color: #1f2937;
+}
+
+:root.dark .bg-gray-200 {
+  background-color: #374151;
+}
+
+:root.dark .text-gray-900 {
+  color: #f9fafb;
+}
+
+:root.dark .text-gray-800 {
+  color: #f3f4f6;
+}
+
+:root.dark .text-gray-700 {
+  color: #e5e7eb;
+}
+
+:root.dark .text-gray-600 {
+  color: #d1d5db;
+}
+
+:root.dark .text-gray-500 {
+  color: #9ca3af;
+}
+
+:root.dark .border-gray-100 {
+  border-color: #374151;
+}
+
+:root.dark .border-gray-200 {
+  border-color: #374151;
+}
+
+:root.dark .border-gray-300 {
+  border-color: #4b5563;
+}
+
+/* Badge and label styles */
+:root.dark .badge,
+:root.dark .label {
+  background-color: #374151;
+  color: #f3f4f6;
+}
+
+/* Select option styles for dark mode */
+:root.dark select option {
+  background-color: #1f2937;
+  color: #f3f4f6;
+}
+
+:root.dark select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%236b7280'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'/%3E%3C/svg%3E");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+}
+
+:root.dark .prose {
+  color: #d1d5db;
+}
+
+:root.dark .prose :where(h1, h2, h3, h4, h5, h6) {
+  color: #f9fafb;
+}
+
+:root.dark .prose :where(p, li, strong, em, blockquote) {
+  color: inherit;
 }

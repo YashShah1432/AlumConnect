@@ -98,7 +98,7 @@ const DonationProcess = () => {
     return (
       <Layout>
         <div className="max-w-3xl mx-auto py-6 px-4">
-          <p className="text-center text-gray-600">Loading...</p>
+          <p className="text-center text-gray-600 dark:text-gray-400">Loading...</p>
         </div>
       </Layout>
     );
@@ -239,13 +239,13 @@ const DonationProcess = () => {
           <button
             type="button"
             onClick={() => navigate('/donation')}
-            className="px-5 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg shadow-lg hover:bg-blue-700 transition"
+            className="px-5 py-2 text-sm font-medium text-white bg-blue-600 rounded-xl shadow-lg hover:bg-blue-700 transition"
           >
             ← Back
           </button>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md py-6 px-4">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-md dark:shadow-lg py-6 px-4">
           {userRole === 'student' ? (
             <p className="text-center text-red-600">
               Only alumni can make donations. Redirecting...
@@ -253,14 +253,14 @@ const DonationProcess = () => {
           ) : (
             <>
               {/* Bank Account Info (Exam Fees Details) + QR */}
-              <div className="mb-8 p-4 bg-blue-50 rounded-lg">
+              <div className="mb-8 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-2xl border border-blue-100 dark:border-blue-900/40">
                 <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                   <div className="min-w-0">
-                    <h3 className="text-lg font-semibold text-blue-800 mb-3">
+                    <h3 className="text-lg font-semibold text-blue-800 dark:text-blue-300 mb-3">
                       Bank Account Details
                     </h3>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-800 dark:text-gray-200">
                       <div className="sm:col-span-2">
                         <p className="font-medium">Bank Account:</p>
                         <p>Walchand Institute of Technology, Exam Section</p>
@@ -289,7 +289,7 @@ const DonationProcess = () => {
                   </div>
 
                   <div className="shrink-0">
-                    <p className="text-sm font-medium text-blue-800 mb-2 md:text-center">
+                    <p className="text-sm font-medium text-blue-800 dark:text-blue-300 mb-2 md:text-center">
                       Scan to Pay
                     </p>
                     <div className="bg-white rounded-lg p-2 shadow-sm inline-block">
@@ -306,12 +306,12 @@ const DonationProcess = () => {
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Full Name
                   </label>
                   <input
                     type="text"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-xl bg-gray-100 dark:bg-gray-700 dark:text-white"
                     value={formData.name}
                     readOnly
                     disabled
@@ -319,12 +319,12 @@ const DonationProcess = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Email
                   </label>
                   <input
                     type="email"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-xl bg-gray-100 dark:bg-gray-700 dark:text-white"
                     value={formData.email}
                     readOnly
                     disabled
@@ -333,12 +333,12 @@ const DonationProcess = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Batch Year
                     </label>
                     <input
                       type="text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-xl bg-gray-100 dark:bg-gray-700 dark:text-white"
                       value={formData.batch}
                       readOnly
                       disabled
@@ -346,12 +346,12 @@ const DonationProcess = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Amount Donated
                     </label>
                     <input
                       type="number"
-                      className={`w-full px-3 py-2 border border-gray-300 rounded-md ${isPrefilledFromOpportunity ? 'bg-gray-100' : ''
+                      className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl ${isPrefilledFromOpportunity ? 'bg-gray-100 dark:bg-gray-700' : ''
                         }`}
                       value={formData.amount}
                       onChange={(e) =>
@@ -368,7 +368,7 @@ const DonationProcess = () => {
                 {/* UTR + Payment Date */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       UTR No. (12 digits)
                     </label>
                     <input
@@ -376,7 +376,7 @@ const DonationProcess = () => {
                       inputMode="numeric"
                       pattern="\d{12}"
                       maxLength={12}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl"
                       value={formData.utrNo}
                       onChange={(e) => {
                         const digitsOnly = e.target.value.replace(/\D/g, '').slice(0, 12);
@@ -389,32 +389,32 @@ const DonationProcess = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Payment Date
                     </label>
                     <input
                       type="date"
                       max={todayStr}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl"
                       value={formData.paymentDate}
                       onChange={(e) =>
                         setFormData({ ...formData, paymentDate: e.target.value })
                       }
                       required
                     />
-                    <p className="mt-1 text-xs text-gray-500">
+                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                       Future dates are not allowed.
                     </p>
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Purpose of Donation
                   </label>
 
                   <select
-                    className={`w-full px-3 py-2 border border-gray-300 rounded-md ${isPrefilledFromOpportunity ? 'bg-gray-100' : ''
+                    className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl ${isPrefilledFromOpportunity ? 'bg-gray-100 dark:bg-gray-700' : ''
                       }`}
                     value={formData.purpose}
                     onChange={(e) =>
@@ -434,13 +434,13 @@ const DonationProcess = () => {
 
                 {/* Upload Payment Proof */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Upload Payment Proof (Image, max 512KB)
                   </label>
                   <input
                     type="file"
                     accept="image/*"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 dark:text-white"
                     onChange={(e) => {
                       const file = e.target.files?.[0] || null;
                       setError('');
@@ -469,18 +469,18 @@ const DonationProcess = () => {
                     required
                   />
                   {paymentProof && (
-                    <p className="mt-1 text-xs text-gray-600">
+                    <p className="mt-1 text-xs text-gray-600 dark:text-gray-400">
                       Selected: {paymentProof.name} ({Math.ceil(paymentProof.size / 1024)} KB)
                     </p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Additional Comments
                   </label>
                   <textarea
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl"
                     rows="4"
                     value={formData.comments}
                     onChange={(e) =>
@@ -492,15 +492,15 @@ const DonationProcess = () => {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className={`w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
+                  className={`w-full bg-blue-600 text-white py-3 px-6 rounded-xl hover:bg-blue-700 transition shadow-sm ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
                     }`}
                 >
                   {isSubmitting ? 'Submitting...' : 'Submit Details'}
                 </button>
               </form>
 
-              <div className="mt-6 p-4 bg-yellow-50 rounded-lg">
-                <p className="text-sm text-yellow-800">
+              <div className="mt-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-2xl border border-yellow-100 dark:border-yellow-900/40">
+                <p className="text-sm text-yellow-800 dark:text-yellow-300">
                   Note: You will receive the tax exemption document via email once your donation is verified.
                 </p>
               </div>

@@ -61,7 +61,7 @@ const CreateFundingRequest = () => {
     return (
       <Layout>
         <div className="max-w-3xl mx-auto p-6">
-          <p>Loading...</p>
+          <p className="text-gray-600 dark:text-gray-400">Loading...</p>
         </div>
       </Layout>
     );
@@ -176,23 +176,26 @@ const CreateFundingRequest = () => {
           <button
             type="button"
             onClick={() => navigate('/donation')}
-            className="px-5 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg shadow-lg hover:bg-blue-700 transition"
+            className="px-5 py-2 text-sm font-medium text-white bg-blue-600 rounded-xl shadow-lg hover:bg-blue-700 transition"
           >
             ← Back
           </button>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 mt-2">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">Create Funding Request</h2>
+        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-md dark:shadow-lg p-4 sm:p-6 mt-2">
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">Create Funding Request</h2>
+          <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">
+            Submit a clear, approval-backed request so alumni can understand the need and support the right campus initiative.
+          </p>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* name, email, batch */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Full Name</label>
                 <input
                   type="text"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-xl bg-gray-100 dark:bg-gray-700 dark:text-white"
                   value={requestData.studentName}
                   readOnly
                   disabled
@@ -200,10 +203,10 @@ const CreateFundingRequest = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
                 <input
                   type="email"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-xl bg-gray-100 dark:bg-gray-700 dark:text-white"
                   value={requestData.authorEmail}
                   readOnly
                   disabled
@@ -211,10 +214,10 @@ const CreateFundingRequest = () => {
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Batch Year</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Batch Year</label>
                 <input
                   type="text"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-xl bg-gray-100 dark:bg-gray-700 dark:text-white"
                   value={requestData.batch}
                   readOnly
                   disabled
@@ -225,10 +228,10 @@ const CreateFundingRequest = () => {
             {/* project title, category, amount */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Project Title</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Project Title</label>
                 <input
                   type="text"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl"
                   value={requestData.title}
                   onChange={(e) => setRequestData({ ...requestData, title: e.target.value })}
                   required
@@ -236,9 +239,9 @@ const CreateFundingRequest = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Category</label>
                 <select
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl"
                   value={requestData.category}
                   onChange={(e) => setRequestData({ ...requestData, category: e.target.value })}
                   required
@@ -253,11 +256,11 @@ const CreateFundingRequest = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Funding Amount Required</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Funding Amount Required</label>
                 <input
                   type="number"
                   min="0"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl"
                   value={requestData.amount}
                   onChange={(e) => setRequestData({ ...requestData, amount: e.target.value })}
                   required
@@ -267,9 +270,9 @@ const CreateFundingRequest = () => {
 
             {/* Detailed Description */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Detailed Description</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Detailed Description</label>
               <textarea
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl"
                 rows="5"
                 value={requestData.details}
                 onChange={(e) => setRequestData({ ...requestData, details: e.target.value })}
@@ -279,13 +282,13 @@ const CreateFundingRequest = () => {
 
             {/* Upload Approval Certificate (last) */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Upload Approval Certificate (PNG/JPG/PDF, max 512KB)
               </label>
               <input
                 type="file"
                 accept=".png,.jpg,.jpeg,.pdf,image/png,image/jpeg,application/pdf"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 dark:text-white"
                 onChange={(e) => {
                   const file = e.target.files?.[0] || null;
                   setError('');
@@ -316,20 +319,20 @@ const CreateFundingRequest = () => {
                 required
               />
               {approvalCertificate && (
-                <p className="mt-1 text-xs text-gray-600">
+                <p className="mt-1 text-xs text-gray-600 dark:text-gray-400">
                   Selected: {approvalCertificate.name} ({Math.ceil(approvalCertificate.size / 1024)} KB)
                 </p>
               )}
             </div>
 
             {/* error / success */}
-            {error && <div className="text-red-600">{error}</div>}
-            {success && <div className="text-green-600">{success}</div>}
+            {error && <div className="text-red-600 dark:text-red-400">{error}</div>}
+            {success && <div className="text-green-600 dark:text-green-400">{success}</div>}
 
             <button
               type="submit"
               disabled={submitting}
-              className={`w-full bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 transition ${
+              className={`w-full bg-green-600 text-white py-3 px-6 rounded-xl hover:bg-green-700 transition shadow-sm ${
                 submitting ? 'opacity-70 cursor-not-allowed' : ''
               }`}
             >

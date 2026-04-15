@@ -258,11 +258,11 @@ const AdminAnnouncements = () => {
 
   return (
     <Layout>
-      <div className="max-w-7xl mx-auto px-4 py-6 bg-gray-50 min-h-screen">
+      <div className="max-w-7xl mx-auto px-4 py-6 bg-gray-50 dark:bg-gray-900 min-h-screen">
         {/* Dashboard Header */}
 
         {error && (
-          <div className="bg-red-50 text-red-500 p-4 rounded-lg mb-6 shadow-sm border border-red-100">
+          <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-4 rounded-lg mb-6 shadow-sm border border-red-200 dark:border-red-800">
             {error}
           </div>
         )}
@@ -270,11 +270,11 @@ const AdminAnnouncements = () => {
         {/* Dashboard Cards */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           {/* Total Announcements Card */}
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm dark:shadow-lg p-6 border border-gray-100 dark:border-gray-700">
             <div className="flex justify-between items-start mb-4">
               <div>
-                <p className="text-gray-500 text-sm">Total Announcements</p>
-                <h2 className="text-3xl font-bold text-gray-800 mt-1">{announcements.length}</h2>
+                <p className="text-gray-500 dark:text-gray-400 text-sm">Total Announcements</p>
+                <h2 className="text-3xl font-bold text-gray-800 dark:text-white mt-1">{announcements.length}</h2>
               </div>
               <div className="bg-blue-100 rounded-full p-2">
                 <CheckCircle2 size={20} className="text-blue-600" />
@@ -296,11 +296,11 @@ const AdminAnnouncements = () => {
           </div>
 
           {/* Pending Approvals Card */}
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm dark:shadow-lg p-6 border border-gray-100 dark:border-gray-700">
             <div className="flex justify-between items-start mb-4">
               <div>
-                <p className="text-gray-500 text-sm">Pending Approvals</p>
-                <h2 className="text-3xl font-bold text-gray-800 mt-1">
+                <p className="text-gray-500 dark:text-gray-400 text-sm">Pending Approvals</p>
+                <h2 className="text-3xl font-bold text-gray-800 dark:text-white mt-1">
                   {announcements.filter(a => a.status === 'pending').length}
                 </h2>
               </div>
@@ -359,12 +359,12 @@ const AdminAnnouncements = () => {
         </div>
 
         {/* Announcements List */}
-        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm dark:shadow-lg p-6 border border-gray-100 dark:border-gray-700">
           <div className="mb-6 flex justify-between items-center">
-            <h2 className="text-xl font-semibold text-gray-800">All Announcements</h2>
+            <h2 className="text-xl font-semibold text-gray-800 dark:text-white">All Announcements</h2>
             <button
               onClick={navigateToCreateEvent}
-              className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition text-sm font-medium"
+              className="flex items-center gap-2 bg-blue-600 dark:bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition text-sm font-medium"
             >
               <PlusCircle size={16} />
               Create Event
@@ -373,10 +373,10 @@ const AdminAnnouncements = () => {
 
           {announcements.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-gray-500">No announcements found.</p>
+              <p className="text-gray-500 dark:text-gray-400">No announcements found.</p>
               <button
                 onClick={navigateToCreateEvent}
-                className="mt-4 text-blue-600 font-medium"
+                className="mt-4 text-blue-600 dark:text-blue-400 font-medium hover:text-blue-700 dark:hover:text-blue-300"
               >
                 Create your first announcement
               </button>
@@ -386,27 +386,34 @@ const AdminAnnouncements = () => {
               {currentAnnouncements.map((item) => (
                 <div
                   key={item._id}
-                  className="p-4 border border-gray-100 rounded-lg hover:shadow-md transition flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+                  className="p-4 border border-gray-100 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-700/50 hover:shadow-md dark:hover:shadow-lg transition flex flex-col md:flex-row md:items-center md:justify-between gap-4"
                 >
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${item.type === 'event' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'
-                        }`}>
+                      <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                        item.type === 'event' 
+                          ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300' 
+                          : 'bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300'
+                      }`}>
                         {item.type === 'event' ? 'Event' : 'Achievement'}
                       </span>
-                      <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${item.status === 'approved' ? 'bg-green-100 text-green-700' :
-                        item.status === 'pending' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'
-                        }`}>
+                      <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                        item.status === 'approved' 
+                          ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300' 
+                          : item.status === 'pending' 
+                          ? 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300' 
+                          : 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300'
+                      }`}>
                         {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
                       </span>
                     </div>
 
-                    <h3 className="text-lg font-semibold text-gray-800">{item.title}</h3>
-                    <p className="text-gray-600 text-sm mt-1 line-clamp-2">{item.description}</p>
+                    <h3 className="text-lg font-semibold text-gray-800 dark:text-white">{item.title}</h3>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm mt-1 line-clamp-2">{item.description}</p>
 
                     {/* Show Venue & DateTime if event */}
                     {item.type === 'event' && (
-                      <div className="mt-2 text-sm text-gray-500 flex flex-wrap gap-x-4">
+                      <div className="mt-2 text-sm text-gray-600 dark:text-gray-400 flex flex-wrap gap-x-4">
                         <span><span className="font-medium">Venue:</span> {item.venue}</span>
                         <span><span className="font-medium">Date:</span> {new Date(item.eventDateTime).toLocaleDateString('en-GB')}</span>
                         <span><span className="font-medium">Time:</span> {new Date(item.eventDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
@@ -420,14 +427,14 @@ const AdminAnnouncements = () => {
                       <>
                         <button
                           onClick={() => handleApprove(item._id)}
-                          className="flex items-center gap-1 text-white bg-green-600 px-3 py-1.5 rounded-lg hover:bg-green-700 text-sm"
+                          className="flex items-center gap-1 text-white bg-green-600 dark:bg-green-700 px-3 py-1.5 rounded-lg hover:bg-green-700 dark:hover:bg-green-800 text-sm transition"
                         >
                           <CheckCircle2 size={16} />
                           Approve
                         </button>
                         <button
                           onClick={() => handleReject(item._id)}
-                          className="flex items-center gap-1 text-white bg-red-600 px-3 py-1.5 rounded-lg hover:bg-red-700 text-sm"
+                          className="flex items-center gap-1 text-white bg-red-600 dark:bg-red-700 px-3 py-1.5 rounded-lg hover:bg-red-700 dark:hover:bg-red-800 text-sm transition"
                         >
                           <XCircle size={16} />
                           Reject
@@ -438,7 +445,7 @@ const AdminAnnouncements = () => {
                     {/* Delete button for all */}
                     <button
                       onClick={() => handleDelete(item._id)}
-                      className="flex items-center gap-1 text-white bg-gray-500 px-3 py-1.5 rounded-lg hover:bg-gray-600 text-sm"
+                      className="flex items-center gap-1 text-white bg-gray-500 dark:bg-gray-700 px-3 py-1.5 rounded-lg hover:bg-gray-600 dark:hover:bg-gray-600 text-sm transition"
                     >
                       <Trash2 size={16} />
                       Remove
@@ -451,7 +458,7 @@ const AdminAnnouncements = () => {
 
           {announcements.length > 0 && (
             <div className="mt-6 flex justify-between items-center">
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
                 Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1}-
                 {Math.min(currentPage * ITEMS_PER_PAGE, announcements.length)} of {announcements.length} announcements
               </p>
@@ -459,9 +466,9 @@ const AdminAnnouncements = () => {
                 <button
                   onClick={handlePreviousPage}
                   disabled={currentPage === 1}
-                  className={`flex items-center gap-1 px-3 py-1 border border-gray-200 rounded-lg text-sm ${currentPage === 1
-                    ? 'text-gray-400 cursor-not-allowed'
-                    : 'hover:bg-gray-50 text-gray-700'
+                  className={`flex items-center gap-1 px-3 py-1 border border-gray-200 dark:border-gray-700 rounded-lg text-sm ${currentPage === 1
+                    ? 'text-gray-400 dark:text-gray-600 cursor-not-allowed'
+                    : 'hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
                     }`}
                 >
                   <ChevronLeft size={16} />
@@ -471,8 +478,8 @@ const AdminAnnouncements = () => {
                   onClick={handleNextPage}
                   disabled={currentPage === totalPages}
                   className={`flex items-center gap-1 px-3 py-1 rounded-lg text-sm ${currentPage === totalPages
-                    ? 'bg-blue-400 text-white cursor-not-allowed'
-                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                    ? 'bg-blue-400 dark:bg-blue-700 text-white cursor-not-allowed'
+                    : 'bg-blue-600 dark:bg-blue-600 text-white hover:bg-blue-700 dark:hover:bg-blue-700'
                     }`}
                 >
                   Next

@@ -138,21 +138,21 @@ const AllJobs = () => {
 
   return (
     <Layout>
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-8 bg-transparent min-h-screen">
         {/* Back Button */}
         <div className="flex justify-start mb-4">
           <button
             type="button"
             onClick={() => navigate('/network')}
-            className="px-5 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg shadow-lg hover:bg-blue-700 transition"
+            className="px-5 py-2 text-sm font-medium text-white bg-blue-600 dark:bg-blue-700 rounded-xl shadow-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition"
           >
             ← Back
           </button>
         </div>
 
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-4">All Job Opportunities</h1>
-          <p className="text-gray-600">Explore all available job opportunities.</p>
+          <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-4">All Job Opportunities</h1>
+          <p className="text-gray-600 dark:text-gray-400">Explore all available job opportunities.</p>
         </div>
 
         {/* Filter Form */}
@@ -160,7 +160,7 @@ const AllJobs = () => {
           <select
             value={employmentType}
             onChange={(e) => setEmploymentType(e.target.value)}
-            className="px-3 py-2 border rounded"
+            className="px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl"
           >
             <option value="">All Types</option>
             <option value="full-time">Full-time</option>
@@ -174,41 +174,41 @@ const AllJobs = () => {
             value={location}
             onChange={(e) => setLocation(e.target.value)}
             placeholder="Location"
-            className="px-3 py-2 border rounded"
+            className="px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl"
           />
           <input
             type="text"
             value={tag}
             onChange={(e) => setTag(e.target.value)}
             placeholder="Tag"
-            className="px-3 py-2 border rounded"
+            className="px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl"
           />
           <input
             type="text"
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
             placeholder="Search keyword"
-            className="px-3 py-2 border rounded"
+            className="px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl"
           />
-          <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
+          <button type="submit" className="bg-blue-600 dark:bg-blue-700 text-white px-4 py-2 rounded-xl hover:bg-blue-700 dark:hover:bg-blue-800 transition shadow-sm">
             Filter
           </button>
           <button
             type="button"
             onClick={handleClearFilters}
-            className="bg-gray-500 text-white px-4 py-2 rounded"
+            className="bg-gray-500 dark:bg-gray-700 text-white px-4 py-2 rounded-xl hover:bg-gray-600 dark:hover:bg-gray-600 transition shadow-sm"
           >
             Clear All Filters
           </button>
         </form>
 
         {loading ? (
-          <div>Loading...</div>
+          <div className="dark:text-gray-400">Loading...</div>
         ) : error ? (
-          <div className="text-red-600">{error}</div>
+          <div className="text-red-600 dark:text-red-400">{error}</div>
         ) : jobs.length === 0 ? (
           <div className="text-center py-8">
-            <p className="text-lg text-gray-600">No jobs found matching your criteria.</p>
+            <p className="text-lg text-gray-600 dark:text-gray-400">No jobs found matching your criteria.</p>
           </div>
         ) : (
           <>

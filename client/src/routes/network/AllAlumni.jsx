@@ -158,24 +158,24 @@ const AllAlumni = () => {
 
   return (
     <Layout>
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-8 bg-transparent min-h-screen">
         {/* Back Button */}
         <div className="flex justify-start mb-4">
           <button
             type="button"
             onClick={() => navigate('/network')}
-            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded shadow hover:bg-blue-700 transition"
+            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 dark:bg-blue-700 rounded-xl shadow hover:bg-blue-700 dark:hover:bg-blue-800 transition"
           >
             ← Back
           </button>
         </div>
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-4">All Alumni</h1>
-          <p className="text-gray-600 mb-4">Explore all our distinguished alumni profiles.</p>
+          <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-4">All Alumni</h1>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">Explore all our distinguished alumni profiles.</p>
           
           {/* Name Search Bar with live suggestions and clear cross button - auto */}
-          <div className="relative mb-4 w-64">
-            <label className="block text-gray-700 text-sm">Search by Name:</label>
+          <div className="relative mb-4 w-full max-w-xs">
+            <label className="block text-gray-700 dark:text-gray-300 text-sm">Search by Name:</label>
             <div className="relative">
               <input 
                 type="text"
@@ -185,25 +185,25 @@ const AllAlumni = () => {
                 onKeyDown={handleKeyDown}
                 onBlur={handleBlur}
                 placeholder="Enter name"
-                className="border border-gray-300 px-2 py-1 rounded w-full text-sm pr-10"
+                className="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-xl w-full text-sm pr-10"
               />
               {name && (
                 <button 
                   type="button"
                   onClick={handleClearSearch}
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white border border-gray-300 rounded-full text-gray-600 hover:text-gray-800 text-lg px-2 py-0"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-full text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 text-lg px-2 py-0"
                 >
                   ×
                 </button>
               )}
             </div>
             {suggestions.length > 0 && (
-              <ul className="absolute top-full left-0 w-full bg-white border border-gray-200 mt-1 rounded shadow z-10">
+              <ul className="absolute top-full left-0 w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 mt-1 rounded shadow dark:shadow-lg z-10">
                 {suggestions.map((suggestion) => (
                   <li 
                     key={suggestion._id}
                     onMouseDown={() => handleSuggestionClick(suggestion.name)}
-                    className="px-2 py-1 hover:bg-gray-100 cursor-pointer text-sm"
+                    className="px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer text-sm dark:text-gray-300"
                   >
                     {suggestion.name}
                   </li>
@@ -215,21 +215,21 @@ const AllAlumni = () => {
           {/* Original Filters for Batch, Branch, Current Company, and Location */}
           <form onSubmit={handleFilterSubmit} className="flex flex-wrap gap-4 mb-6">
             <div className="w-40">
-              <label className="block text-gray-700 text-sm">Batch Year:</label>
+              <label className="block text-gray-700 dark:text-gray-300 text-sm">Batch Year:</label>
               <input 
                 type="text" 
                 value={batch} 
                 onChange={(e) => setBatch(e.target.value)} 
                 placeholder="e.g. 2022"
-                className="border border-gray-300 px-2 py-1 rounded w-full text-sm"
+                className="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-xl w-full text-sm"
               />
             </div>
             <div className="w-40">
-              <label className="block text-gray-700 text-sm">Branch:</label>
+              <label className="block text-gray-700 dark:text-gray-300 text-sm">Branch:</label>
               <select 
                 value={branch}
                 onChange={(e) => setBranch(e.target.value)}
-                className="border border-gray-300 px-2 py-1 rounded w-full text-sm"
+                className="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-xl w-full text-sm"
               >
                 <option value="">All</option>
                 <option value="CSE">CSE</option>
@@ -241,36 +241,36 @@ const AllAlumni = () => {
               </select>
             </div>
             <div className="w-40">
-              <label className="block text-gray-700 text-sm">Current Company:</label>
+              <label className="block text-gray-700 dark:text-gray-300 text-sm">Current Company:</label>
               <input 
                 type="text"
                 value={currentCompany}
                 onChange={(e) => setCurrentCompany(e.target.value)}
                 placeholder="Company name"
-                className="border border-gray-300 px-2 py-1 rounded w-full text-sm"
+                className="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-xl w-full text-sm"
               />
             </div>
             <div className="w-40">
-              <label className="block text-gray-700 text-sm">Location:</label>
+              <label className="block text-gray-700 dark:text-gray-300 text-sm">Location:</label>
               <input 
                 type="text"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 placeholder="Location"
-                className="border border-gray-300 px-2 py-1 rounded w-full text-sm"
+                className="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-xl w-full text-sm"
               />
             </div>
             <div className="flex gap-2 items-end">
               <button
                 type="submit"
-                className="px-4 py-2 bg-blue-600 text-white rounded shadow hover:bg-blue-700 transition text-sm"
+                className="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-xl shadow hover:bg-blue-700 dark:hover:bg-blue-800 transition text-sm"
               >
                 Apply Filters
               </button>
               <button
                 type="button"
                 onClick={handleClearFilters}
-                className="px-4 py-2 bg-gray-500 text-white rounded shadow hover:bg-gray-600 transition text-sm"
+                className="px-4 py-2 bg-gray-500 dark:bg-gray-700 text-white rounded-xl shadow hover:bg-gray-600 dark:hover:bg-gray-600 transition text-sm"
               >
                 Clear Filters
               </button>

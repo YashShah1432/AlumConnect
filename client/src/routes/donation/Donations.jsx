@@ -128,7 +128,7 @@ const Donations = () => {
     return (
       <Layout>
         <div className="max-w-7xl mx-auto px-4 py-6">
-          <p className="text-center text-gray-600">Loading...</p>
+          <p className="text-center text-gray-600 dark:text-gray-400">Loading...</p>
         </div>
       </Layout>
     );
@@ -160,10 +160,10 @@ const Donations = () => {
         <div className="text-center mt-6 mb-4">
           {isAlumni && (
             <>
-              <h1 className="text-3xl font-bold text-gray-900">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
                 Support Innovation at Your Alma Mater
               </h1>
-              <p className="text-lg text-gray-700 max-w-3xl mx-auto mt-2">
+              <p className="text-lg text-gray-700 dark:text-gray-300 max-w-3xl mx-auto mt-2">
                 As an alumnus of our college, your contribution directly powers student
                 startups, research prototypes, hackathons and social impact projects.
                 Help the next generation of engineers and innovators build what you
@@ -174,10 +174,10 @@ const Donations = () => {
 
           {isStudent && (
             <>
-              <h1 className="text-3xl font-bold text-gray-900">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
                 Turn Your Idea Into a Campus Reality
               </h1>
-              <p className="text-lg text-gray-700 max-w-3xl mx-auto mt-2">
+              <p className="text-lg text-gray-700 dark:text-gray-300 max-w-3xl mx-auto mt-2">
                 Use the Alum‑Connect funding platform to raise support for your
                 startup, research, innovation or patent work. Alumni across the
                 globe are ready to back strong ideas coming out of our campus.
@@ -187,10 +187,10 @@ const Donations = () => {
 
           {!isAlumni && !isStudent && (
             <>
-              <h1 className="text-3xl font-bold text-gray-900">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
                 Support Our Institution
               </h1>
-              <p className="text-lg text-gray-700 max-w-3xl mx-auto mt-2">
+              <p className="text-lg text-gray-700 dark:text-gray-300 max-w-3xl mx-auto mt-2">
                 Join our community of supporters in strengthening innovation,
                 entrepreneurship and research culture at our college.
               </p>
@@ -210,20 +210,20 @@ const Donations = () => {
 
           {isStudent && (
             <div className="h-full flex flex-col">
-              <div className="h-full bg-white rounded-lg shadow-md p-6 flex flex-col">
-                <h2 className="text-2xl font-bold text-gray-800 mb-4">
+              <div className="h-full bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-md dark:shadow-lg p-6 flex flex-col">
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
                   How Alumni Funding Helps Your Project
                 </h2>
-                <p className="text-gray-700 mb-3">
+                <p className="text-gray-700 dark:text-gray-300 mb-3">
                   Alum‑Connect links your ideas with alumni who care about the
                   institute&apos;s startup and research culture. Use this space to:
                 </p>
-                <ul className="list-disc list-inside text-gray-700 space-y-2 mb-4 text-sm">
+                <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2 mb-4 text-sm">
                   <li>Raise seed support for your student startup or product prototype.</li>
                   <li>Get backing for research projects, conference travel or proof‑of‑concepts.</li>
                   <li>Seek funding for innovation challenges, hackathons or patent filing.</li>
                 </ul>
-                <p className="text-gray-700 text-sm">
+                <p className="text-gray-700 dark:text-gray-300 text-sm">
                   Create a clear funding request explaining your problem, solution,
                   impact on campus and estimated budget. Approved requests will be
                   visible to alumni under Funding Opportunities.
@@ -242,27 +242,27 @@ const Donations = () => {
         {isAlumni && (
           <div className="mt-10 space-y-10">
             {/* ================= Transactions (Pending + Rejected) ================= */}
-            <section className="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
-              <div className="px-5 sm:px-6 py-4 border-b bg-gradient-to-r from-yellow-50 to-white">
-                <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Transactions</h2>
+            <section className="bg-white dark:bg-gray-800 rounded-2xl shadow-md dark:shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden">
+              <div className="px-5 sm:px-6 py-4 border-b dark:border-gray-700 bg-gradient-to-r from-yellow-50 to-white dark:from-yellow-900/20 dark:to-gray-800">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Transactions</h2>
               </div>
 
               {loadingMyDonations ? (
                 <div className="p-6">
-                  <p className="text-gray-600">Loading your transactions...</p>
+                  <p className="text-gray-600 dark:text-gray-400">Loading your transactions...</p>
                 </div>
               ) : myDonationsError ? (
                 <div className="p-6">
-                  <p className="text-red-600">{myDonationsError}</p>
+                  <p className="text-red-600 dark:text-red-400">{myDonationsError}</p>
                 </div>
               ) : tx.length === 0 ? (
                 <div className="p-6">
-                  <p className="text-gray-600">No transactions.</p>
+                  <p className="text-gray-600 dark:text-gray-400">No transactions.</p>
                 </div>
               ) : (
                 <>
                   {/* Desktop header */}
-                  <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-3 bg-gray-50 border-b text-xs font-semibold text-gray-600">
+                  <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-3 bg-gray-50 dark:bg-gray-700 border-b dark:border-gray-600 text-xs font-semibold text-gray-600 dark:text-gray-300">
                     <div className="col-span-1 text-center">Sr. No.</div>
                     <div className="col-span-2 text-center">Date</div>
                     <div className="col-span-2 text-center">Purpose</div>
@@ -272,54 +272,54 @@ const Donations = () => {
                     <div className="col-span-2 text-center">Payment Proof</div>
                   </div>
 
-                  <ul className="divide-y">
+                  <ul className="divide-y dark:divide-gray-700">
                     {tx.map((d, idx) => {
                       const isRejected = d.status === 'rejected';
                       const chipClass = isRejected
-                        ? 'bg-red-50 text-red-700 border border-red-200'
-                        : 'bg-yellow-50 text-yellow-800 border border-yellow-200';
+                        ? 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800'
+                        : 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-300 border border-yellow-200 dark:border-yellow-800';
 
                       return (
                         <li key={d._id} className="px-5 sm:px-6 py-4">
                           {/* Mobile = card; Desktop = row */}
-                          <div className="rounded-xl bg-gray-50/60 md:bg-transparent p-4 md:p-0">
+                          <div className="rounded-xl bg-gray-50/60 dark:bg-gray-700/40 md:bg-transparent p-4 md:p-0">
                             <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-start md:items-center">
                               {/* Sr No */}
                               <div className="md:col-span-1 md:text-center">
-                                <p className="text-sm font-semibold text-gray-900">
-                                  <span className="md:hidden text-gray-500 font-medium mr-2">Sr. No.:</span>
+                                <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                                  <span className="md:hidden text-gray-500 dark:text-gray-400 font-medium mr-2">Sr. No.:</span>
                                   {idx + 1}
                                 </p>
                               </div>
 
                               {/* Date */}
                               <div className="md:col-span-2 md:text-center">
-                                <p className="text-sm text-gray-900 font-medium">
-                                  <span className="md:hidden text-gray-500 font-medium mr-2">Date:</span>
+                                <p className="text-sm text-gray-900 dark:text-white font-medium">
+                                  <span className="md:hidden text-gray-500 dark:text-gray-400 font-medium mr-2">Date:</span>
                                   {formatDate(d.paymentDate)}
                                 </p>
                               </div>
 
                               {/* Purpose */}
                               <div className="md:col-span-2 md:text-center">
-                                <p className="text-sm text-gray-900 font-semibold capitalize">
-                                  <span className="md:hidden text-gray-500 font-medium mr-2">Purpose:</span>
+                                <p className="text-sm text-gray-900 dark:text-white font-semibold capitalize">
+                                  <span className="md:hidden text-gray-500 dark:text-gray-400 font-medium mr-2">Purpose:</span>
                                   {d.purpose || 'general'}
                                 </p>
                               </div>
 
                               {/* Amount */}
                               <div className="md:col-span-2 md:text-center">
-                                <p className="text-sm text-gray-900 font-semibold">
-                                  <span className="md:hidden text-gray-500 font-medium mr-2">Amount:</span>
+                                <p className="text-sm text-gray-900 dark:text-white font-semibold">
+                                  <span className="md:hidden text-gray-500 dark:text-gray-400 font-medium mr-2">Amount:</span>
                                   ₹{Number(d.amount || 0).toLocaleString('en-IN')}
                                 </p>
                               </div>
 
                               {/* UTR */}
                               <div className="md:col-span-2 md:text-center">
-                                <p className="text-sm text-gray-700 font-medium break-all">
-                                  <span className="md:hidden text-gray-500 font-medium mr-2">UTR No.:</span>
+                                <p className="text-sm text-gray-700 dark:text-gray-300 font-medium break-all">
+                                  <span className="md:hidden text-gray-500 dark:text-gray-400 font-medium mr-2">UTR No.:</span>
                                   {d.utrNo || 'N/A'}
                                 </p>
                               </div>
@@ -338,7 +338,7 @@ const Donations = () => {
                                 <button
                                   type="button"
                                   onClick={() => openInNewTab(d.paymentProofUrl)}
-                                  className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white text-gray-800 hover:bg-gray-50 transition px-3 py-2 text-sm font-semibold w-full md:w-auto md:min-w-[110px]"
+                                  className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 transition px-3 py-2 text-sm font-semibold w-full md:w-auto md:min-w-[110px]"
                                   title="View payment proof"
                                   disabled={!d.paymentProofUrl}
                                 >
@@ -357,9 +357,9 @@ const Donations = () => {
             </section>
 
             {/* ================= Completed Transactions ================= */}
-            <section className="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
-              <div className="px-5 sm:px-6 py-4 border-b bg-gradient-to-r from-green-50 to-white">
-                <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Completed Transactions</h2>
+            <section className="bg-white dark:bg-gray-800 rounded-2xl shadow-md dark:shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden">
+              <div className="px-5 sm:px-6 py-4 border-b dark:border-gray-700 bg-gradient-to-r from-green-50 to-white dark:from-green-900/20 dark:to-gray-800">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Completed Transactions</h2>
               </div>
 
               {loadingMyDonations ? (

@@ -5,7 +5,7 @@ const Contact = () => {
   const { ref, revealed } = useRevealOnScroll({ threshold: 0.15 });
 
   return (
-    <section id="contact" className="py-16 bg-white scroll-mt-24 relative overflow-hidden">
+    <section id="contact" className="py-16 bg-white dark:bg-gray-950 scroll-mt-24 relative overflow-hidden">
       {/* Decorative background */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -top-24 -right-24 h-72 w-72 sm:h-96 sm:w-96 rounded-full blur-3xl opacity-15 bg-gradient-to-br from-blue-300 to-indigo-300 animate-gradient" />
@@ -17,8 +17,8 @@ const Contact = () => {
         className={`reveal ${revealed ? "reveal-in" : ""} relative w-full px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto`}
       >
         <div className="text-center mb-10">
-          <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">Contact Us</h2>
-          <p className="mt-3 text-base text-gray-600 sm:text-lg max-w-2xl mx-auto">
+          <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white sm:text-4xl">Contact Us</h2>
+          <p className="mt-3 text-base text-gray-600 dark:text-gray-300 sm:text-lg max-w-2xl mx-auto">
             Get in touch for guidance, collaboration, or general inquiries.
           </p>
           <div className="w-14 h-1 bg-blue-600 mx-auto mt-4 rounded-full" />
@@ -27,9 +27,9 @@ const Contact = () => {
         <div className="grid gap-10 lg:grid-cols-[2fr,3fr] items-start">
           {/* Left */}
           <div className="space-y-6">
-            <div className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 shadow-sm">
-              <h3 className="text-lg font-semibold text-gray-900">Core Team</h3>
-              <p className="mt-2 text-sm sm:text-base text-gray-600">
+            <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900/85 p-5 sm:p-6 shadow-sm dark:shadow-xl">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Core Team</h3>
+              <p className="mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-300">
                 We are committed to building a strong community connecting alumni and students.
               </p>
 
@@ -59,13 +59,13 @@ const Contact = () => {
                 ].map((p) => (
                   <div
                     key={p.name}
-                    className="group rounded-2xl border border-gray-200 bg-gray-50/60 p-4 sm:p-5 hover:bg-white hover:shadow-md transition-all"
+                    className="group rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50/60 dark:bg-gray-800/70 p-4 sm:p-5 hover:bg-white dark:hover:bg-gray-800 hover:shadow-md dark:hover:shadow-lg transition-all"
                   >
-                    <p className="text-sm sm:text-base text-gray-900 font-semibold">
+                    <p className="text-sm sm:text-base text-gray-900 dark:text-white font-semibold">
                       {p.name}
                     </p>
 
-                    <p className="mt-2 text-sm text-gray-600">
+                    <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
                       <a
                         href={p.linkedin}
                         className="relative inline-flex text-blue-600 transition-colors hover:text-blue-700
@@ -98,13 +98,13 @@ const Contact = () => {
 
           {/* Right */}
           <div className="space-y-6">
-            <div className="rounded-2xl border border-gray-200 bg-gray-50 p-6 sm:p-8 shadow-sm hover:shadow-md transition-shadow">
-              <h3 className="text-lg font-semibold text-gray-900">General Inquiries</h3>
-              <p className="mt-3 text-sm sm:text-base text-gray-600">
+            <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/85 p-6 sm:p-8 shadow-sm dark:shadow-xl hover:shadow-md dark:hover:shadow-xl transition-shadow">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">General Inquiries</h3>
+              <p className="mt-3 text-sm sm:text-base text-gray-600 dark:text-gray-300">
                 For general inquiries or to learn more about contributing to the alumni community, reach out:
               </p>
 
-              <div className="mt-4 text-sm sm:text-base text-gray-700 space-y-1">
+              <div className="mt-4 text-sm sm:text-base text-gray-700 dark:text-gray-300 space-y-1">
                 <p>
                   <span className="font-semibold">Email:</span>{" "}
                   <a href="mailto:principal@witsolapur.org" className="text-blue-600 hover:underline">
@@ -139,7 +139,7 @@ const Contact = () => {
               </div>
             </div>
 
-            <p className="text-sm sm:text-base text-gray-600">
+            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">
               We believe in the power of community and look forward to connecting with you.
             </p>
           </div>

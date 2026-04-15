@@ -167,7 +167,7 @@ const AdminDiscussion = () => {
                 placeholder="Search discussions by title, content, or author..."
               />
               {searchQuery && (
-                <div className="mt-2 text-sm text-gray-600">
+                <div className="mt-2 text-sm text-gray-600 dark:text-gray-300">
                   {filteredPosts.length === 0
                     ? `No results found for "${searchQuery}"`
                     : `Showing ${filteredPosts.length} result${
@@ -185,8 +185,8 @@ const AdminDiscussion = () => {
             )}
 
             {isLoading && filteredPosts.length === 0 ? (
-              <div className="bg-white p-8 rounded-lg shadow-sm text-center">
-                <p className="text-gray-500">Loading discussions...</p>
+              <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-lg text-center">
+                <p className="text-gray-500 dark:text-gray-400">Loading discussions...</p>
               </div>
             ) : (
               <PostList
@@ -225,21 +225,21 @@ function ConfirmModal({ isOpen, onConfirm, onCancel }) {
         className="absolute inset-0 bg-black/50"
         onClick={onCancel}
       />
-      <div className="relative bg-white rounded-lg p-6 w-full max-w-sm">
-        <h2 className="text-xl font-semibold mb-4">Delete Post</h2>
-        <p className="text-gray-700 mb-6">
+      <div className="relative bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 w-full max-w-sm shadow-xl dark:shadow-2xl">
+        <h2 className="text-xl font-semibold mb-4 dark:text-white">Delete Post</h2>
+        <p className="text-gray-700 dark:text-gray-300 mb-6">
           Are you sure you want to delete this post? This action cannot be undone.
         </p>
         <div className="flex justify-end space-x-3">
           <button
             onClick={onCancel}
-            className="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400 focus:outline-none"
+            className="px-4 py-2 rounded-xl bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 focus:outline-none dark:text-white"
           >
             Cancel
           </button>
           <button
             onClick={onConfirm}
-            className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700 focus:outline-none"
+            className="px-4 py-2 rounded-xl bg-red-600 text-white hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-700 focus:outline-none"
           >
             Delete
           </button>

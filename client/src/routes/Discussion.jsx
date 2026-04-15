@@ -125,10 +125,10 @@ const Discussion = () => {
         <Sidebar /> */}
        
         {/* <main className="flex-1 overflow-auto h-full"> */}
-          <div className="py-8 px-4 max-w-7xl mx-auto">
+          <div className="py-8 px-4 max-w-7xl mx-auto bg-transparent min-h-screen">
             <header className="mb-8">
-              <h1 className="text-3xl font-bold text-gray-800">Discussion Forum</h1>
-              <p className="text-gray-600 mt-2">
+              <h1 className="text-3xl font-bold text-gray-800 dark:text-white">Discussion Forum</h1>
+              <p className="text-gray-600 dark:text-gray-300 mt-2">
                 Join the conversation and share your thoughts with the community
               </p>
             </header>
@@ -140,7 +140,7 @@ const Discussion = () => {
                 placeholder="Search discussions by title, content, or author..."
               />
               {searchQuery && (
-                <div className="mt-2 text-sm text-gray-600">
+                <div className="mt-2 text-sm text-gray-600 dark:text-gray-300">
                   {filteredPosts.length === 0 
                     ? `No results found for "${searchQuery}"`
                     : `Showing ${filteredPosts.length} result${filteredPosts.length !== 1 ? 's' : ''} for "${searchQuery}"`}
@@ -155,8 +155,8 @@ const Discussion = () => {
             )}
 
             {!user && (
-              <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6 rounded-md">
-                <p className="text-blue-700">
+              <div className="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 dark:border-blue-600 p-4 mb-6 rounded-xl shadow-sm">
+                <p className="text-blue-700 dark:text-blue-400">
                   Sign in to participate in discussions and create new posts.
                 </p>
               </div>
@@ -170,8 +170,8 @@ const Discussion = () => {
 
             <section className="pb-8">
               {isLoading && filteredPosts.length === 0 ? (
-                <div className="bg-white p-8 rounded-lg shadow-sm text-center">
-                  <p className="text-gray-500">Loading discussions...</p>
+                <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-lg text-center">
+                  <p className="text-gray-500 dark:text-gray-400">Loading discussions...</p>
                 </div>
               ) : (
                 <PostList 

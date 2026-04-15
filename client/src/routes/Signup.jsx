@@ -203,23 +203,23 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 via-white to-slate-100">
+    <div className="min-h-screen flex flex-col bg-white dark:bg-gray-950">
       <Navbar />
 
       <div className="flex flex-1 items-center justify-center px-4 py-8 sm:px-6 lg:px-8 pt-25">
         <div className="w-full max-w-3xl">
-          <div className="bg-white shadow-xl rounded-2xl border border-slate-200/80 overflow-hidden">
-            <div className="px-6 py-5 border-b border-slate-100 bg-slate-50/80">
-              <h2 className="text-2xl font-semibold tracking-tight text-slate-900">
+          <div className="bg-gray-50 dark:bg-gray-900 shadow-xl dark:shadow-2xl rounded-2xl border-2 border-gray-200 dark:border-gray-800 overflow-hidden">
+            <div className="px-6 py-5 border-b-2 border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800/50">
+              <h2 className="text-2xl font-semibold tracking-tight text-gray-900 dark:text-white">
                 Create your Alum-Connect account
               </h2>
-              <p className="mt-1 text-sm text-slate-500">
+              <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">
                 Join the network as a student or alumni. Use your Gmail account to register.
               </p>
             </div>
 
             {apiError && (
-              <div className="mx-6 mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 flex items-start gap-2">
+              <div className="mx-6 mt-4 rounded-lg border-2 border-red-300 dark:border-red-800 bg-red-50 dark:bg-red-900/30 px-4 py-3 text-sm text-red-800 dark:text-red-300 flex items-start gap-2">
                 <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
                 <span>{apiError}</span>
               </div>
@@ -230,7 +230,7 @@ const Signup = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Full Name */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-700">
+                  <label className="block text-sm font-medium text-gray-800 dark:text-gray-200">
                     Full Name
                   </label>
                   <input
@@ -238,17 +238,17 @@ const Signup = () => {
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
-                    className="mt-1 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                    className="mt-1 block w-full rounded-lg border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-white px-3 py-2 text-sm shadow-sm focus:border-sky-500 dark:focus:border-sky-400 focus:ring-2 focus:ring-sky-200 dark:focus:ring-sky-400 outline-none placeholder-gray-500 dark:placeholder-gray-400"
                     placeholder="John Doe"
                   />
                   {errors.name && (
-                    <p className="mt-1 text-xs text-red-600">{errors.name}</p>
+                    <p className="mt-1 text-xs text-red-700 dark:text-red-400">{errors.name}</p>
                   )}
                 </div>
 
                 {/* Email */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-700">
+                  <label className="block text-sm font-medium text-gray-800 dark:text-gray-200">
                     Email
                   </label>
                   <input
@@ -256,17 +256,17 @@ const Signup = () => {
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
-                    className="mt-1 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                    className="mt-1 block w-full rounded-lg border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-white px-3 py-2 text-sm shadow-sm focus:border-sky-500 dark:focus:border-sky-400 focus:ring-2 focus:ring-sky-200 dark:focus:ring-sky-400 outline-none placeholder-gray-500 dark:placeholder-gray-400"
                     placeholder="you@gmail.com"
                   />
                   {errors.email && (
-                    <p className="mt-1 text-xs text-red-600">{errors.email}</p>
+                    <p className="mt-1 text-xs text-red-700 dark:text-red-400">{errors.email}</p>
                   )}
                 </div>
 
                 {/* Password */}
                 <div className="relative">
-                  <label className="block text-sm font-medium text-slate-700">
+                  <label className="block text-sm font-medium text-gray-800 dark:text-gray-200">
                     Password
                   </label>
                   <div className="mt-1 relative">
@@ -275,13 +275,13 @@ const Signup = () => {
                       name="password"
                       value={formData.password}
                       onChange={handleChange}
-                      className="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 pr-10 text-sm shadow-sm focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                      className="block w-full rounded-lg border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-white px-3 py-2 pr-10 text-sm shadow-sm focus:border-sky-500 dark:focus:border-sky-400 focus:ring-2 focus:ring-sky-200 dark:focus:ring-sky-400 outline-none placeholder-gray-500 dark:placeholder-gray-400"
                       placeholder="At least 8 characters"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(p => !p)}
-                      className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600"
+                      className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
                     >
                       {showPassword ? (
                         <EyeOff className="h-4 w-4" />
@@ -291,7 +291,7 @@ const Signup = () => {
                     </button>
                   </div>
                   {errors.password && (
-                    <p className="mt-1 text-xs text-red-600">
+                    <p className="mt-1 text-xs text-red-700 dark:text-red-400">
                       {errors.password}
                     </p>
                   )}
@@ -299,7 +299,7 @@ const Signup = () => {
 
                 {/* Confirm Password */}
                 <div className="relative">
-                  <label className="block text-sm font-medium text-slate-700">
+                  <label className="block text-sm font-medium text-gray-800 dark:text-gray-200">
                     Confirm Password
                   </label>
                   <div className="mt-1 relative">
@@ -308,13 +308,13 @@ const Signup = () => {
                       name="confirmPassword"
                       value={formData.confirmPassword}
                       onChange={handleChange}
-                      className="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 pr-10 text-sm shadow-sm focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                      className="block w-full rounded-lg border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-white px-3 py-2 pr-10 text-sm shadow-sm focus:border-sky-500 dark:focus:border-sky-400 focus:ring-2 focus:ring-sky-200 dark:focus:ring-sky-400 outline-none placeholder-gray-500 dark:placeholder-gray-400"
                       placeholder="Re-enter your password"
                     />
                     <button
                       type="button"
                       onClick={() => setShowConfirmPassword(p => !p)}
-                      className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600"
+                      className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
                     >
                       {showConfirmPassword ? (
                         <EyeOff className="h-4 w-4" />
@@ -324,7 +324,7 @@ const Signup = () => {
                     </button>
                   </div>
                   {errors.confirmPassword && (
-                    <p className="mt-1 text-xs text-red-600">
+                    <p className="mt-1 text-xs text-red-700 dark:text-red-400">
                       {errors.confirmPassword}
                     </p>
                   )}
@@ -332,7 +332,7 @@ const Signup = () => {
 
                 {/* Phone */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-700">
+                  <label className="block text-sm font-medium text-gray-800 dark:text-gray-200">
                     Phone Number
                   </label>
                   <input
@@ -340,36 +340,36 @@ const Signup = () => {
                     name="phone"
                     value={formData.phone}
                     onChange={handleChange}
-                    className="mt-1 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                    className="mt-1 block w-full rounded-lg border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-white px-3 py-2 text-sm shadow-sm focus:border-sky-500 dark:focus:border-sky-400 focus:ring-2 focus:ring-sky-200 dark:focus:ring-sky-400 outline-none placeholder-gray-500 dark:placeholder-gray-400"
                     placeholder="10–15 digits"
                   />
                   {errors.phone && (
-                    <p className="mt-1 text-xs text-red-600">{errors.phone}</p>
+                    <p className="mt-1 text-xs text-red-700 dark:text-red-400">{errors.phone}</p>
                   )}
                 </div>
 
                 {/* Role */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-700">
+                  <label className="block text-sm font-medium text-gray-800 dark:text-gray-200">
                     Role
                   </label>
                   <select
                     name="role"
                     value={formData.role}
                     onChange={handleChange}
-                    className="mt-1 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                    className="mt-1 block w-full rounded-lg border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-white px-3 py-2 text-sm shadow-sm focus:border-sky-500 dark:focus:border-sky-400 focus:ring-2 focus:ring-sky-200 dark:focus:ring-sky-400 outline-none"
                   >
                     <option value="student">Student</option>
                     <option value="alumni">Alumni</option>
                   </select>
                   {errors.role && (
-                    <p className="mt-1 text-xs text-red-600">{errors.role}</p>
+                    <p className="mt-1 text-xs text-red-700 dark:text-red-400">{errors.role}</p>
                   )}
                 </div>
 
                 {/* DOB */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-700">
+                  <label className="block text-sm font-medium text-gray-800 dark:text-gray-200">
                     Date of Birth
                   </label>
                   <input
@@ -377,23 +377,23 @@ const Signup = () => {
                     name="dob"
                     value={formData.dob}
                     onChange={handleChange}
-                    className="mt-1 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                    className="mt-1 block w-full rounded-lg border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-white px-3 py-2 text-sm shadow-sm focus:border-sky-500 dark:focus:border-sky-400 focus:ring-2 focus:ring-sky-200 dark:focus:ring-sky-400 outline-none"
                   />
                   {errors.dob && (
-                    <p className="mt-1 text-xs text-red-600">{errors.dob}</p>
+                    <p className="mt-1 text-xs text-red-700 dark:text-red-400">{errors.dob}</p>
                   )}
                 </div>
 
                 {/* Branch */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-700">
+                  <label className="block text-sm font-medium text-gray-800 dark:text-gray-200">
                     Branch
                   </label>
                   <select
                     name="branch"
                     value={formData.branch}
                     onChange={handleChange}
-                    className="mt-1 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                    className="mt-1 block w-full rounded-lg border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-white px-3 py-2 text-sm shadow-sm focus:border-sky-500 dark:focus:border-sky-400 focus:ring-2 focus:ring-sky-200 dark:focus:ring-sky-400 outline-none"
                   >
                     <option value="">Select branch</option>
                     {branches.map(b => (
@@ -403,13 +403,13 @@ const Signup = () => {
                     ))}
                   </select>
                   {errors.branch && (
-                    <p className="mt-1 text-xs text-red-600">{errors.branch}</p>
+                    <p className="mt-1 text-xs text-red-700 dark:text-red-400">{errors.branch}</p>
                   )}
                 </div>
 
                 {/* Branch Code (read-only) */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-700">
+                  <label className="block text-sm font-medium text-gray-800 dark:text-gray-200">
                     Branch Code
                   </label>
                   <input
@@ -417,14 +417,14 @@ const Signup = () => {
                     name="branchCode"
                     value={formData.branchCode || selectedBranchCode}
                     readOnly
-                    className="mt-1 block w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm shadow-inner text-slate-600"
+                    className="mt-1 block w-full rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 dark:text-gray-300 px-3 py-2 text-sm shadow-inner text-gray-600"
                     placeholder="Auto-selected"
                   />
                 </div>
 
                 {/* Batch */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-700">
+                  <label className="block text-sm font-medium text-gray-800 dark:text-gray-200">
                     Batch
                   </label>
                   <input
@@ -432,17 +432,17 @@ const Signup = () => {
                     name="batch"
                     value={formData.batch}
                     onChange={handleChange}
-                    className="mt-1 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                    className="mt-1 block w-full rounded-lg border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-white px-3 py-2 text-sm shadow-sm focus:border-sky-500 dark:focus:border-sky-400 focus:ring-2 focus:ring-sky-200 dark:focus:ring-sky-400 outline-none placeholder-gray-500 dark:placeholder-gray-400"
                     placeholder="e.g., 2020–2024"
                   />
                   {errors.batch && (
-                    <p className="mt-1 text-xs text-red-600">{errors.batch}</p>
+                    <p className="mt-1 text-xs text-red-700 dark:text-red-400">{errors.batch}</p>
                   )}
                 </div>
 
                 {/* Home Town */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-700">
+                  <label className="block text-sm font-medium text-gray-800 dark:text-gray-200">
                     Home Town
                   </label>
                   <input
@@ -450,11 +450,11 @@ const Signup = () => {
                     name="homeTown"
                     value={formData.homeTown}
                     onChange={handleChange}
-                    className="mt-1 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                    className="mt-1 block w-full rounded-lg border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-white px-3 py-2 text-sm shadow-sm focus:border-sky-500 dark:focus:border-sky-400 focus:ring-2 focus:ring-sky-200 dark:focus:ring-sky-400 outline-none placeholder-gray-500 dark:placeholder-gray-400"
                     placeholder="Your home town"
                   />
                   {errors.homeTown && (
-                    <p className="mt-1 text-xs text-red-600">
+                    <p className="mt-1 text-xs text-red-700 dark:text-red-400">
                       {errors.homeTown}
                     </p>
                   )}
@@ -462,7 +462,7 @@ const Signup = () => {
 
                 {/* PRN */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-700">
+                  <label className="block text-sm font-medium text-gray-800 dark:text-gray-200">
                     PRN {formData.role === 'student' && <span className="text-red-500">*</span>}
                   </label>
                   <input
@@ -470,14 +470,14 @@ const Signup = () => {
                     name="PRN"
                     value={formData.PRN}
                     onChange={handleChange}
-                    className="mt-1 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                    className="mt-1 block w-full rounded-lg border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-white px-3 py-2 text-sm shadow-sm focus:border-sky-500 dark:focus:border-sky-400 focus:ring-2 focus:ring-sky-200 dark:focus:ring-sky-400 outline-none placeholder-gray-500 dark:placeholder-gray-400"
                     placeholder="10 digit PRN"
                   />
                   {errors.PRN && (
-                    <p className="mt-1 text-xs text-red-600">{errors.PRN}</p>
+                    <p className="mt-1 text-xs text-red-700 dark:text-red-400">{errors.PRN}</p>
                   )}
                   {formData.role === 'alumni' && !errors.PRN && (
-                    <p className="mt-1 text-xs text-slate-400">
+                    <p className="mt-1 text-xs text-gray-600 dark:text-gray-400">
                       Optional for alumni; required for students.
                     </p>
                   )}
@@ -485,11 +485,11 @@ const Signup = () => {
               </div>
 
               {/* Optional / collapsible section */}
-              <div className="pt-2 border-t border-slate-100 mt-4">
+              <div className="pt-2 border-t-2 border-gray-200 dark:border-gray-800 mt-4">
                 <button
                   type="button"
                   onClick={() => setShowOptional(prev => !prev)}
-                  className="flex items-center text-sm font-medium text-sky-700 hover:text-sky-800"
+                  className="flex items-center text-sm font-medium text-sky-700 dark:text-sky-400 hover:text-sky-800 dark:hover:text-sky-300"
                 >
                   <span className="mr-1">
                     {showOptional ? 'Hide optional details' : 'Add optional details'}
@@ -503,7 +503,7 @@ const Signup = () => {
                   <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Current Company */}
                     <div>
-                      <label className="block text-sm font-medium text-slate-700">
+                      <label className="block text-sm font-medium text-gray-800 dark:text-gray-200">
                         Current Company
                       </label>
                       <input
@@ -511,14 +511,14 @@ const Signup = () => {
                         name="currentCompany"
                         value={formData.currentCompany}
                         onChange={handleChange}
-                        className="mt-1 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                        className="mt-1 block w-full rounded-lg border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-white px-3 py-2 text-sm shadow-sm focus:border-sky-500 dark:focus:border-sky-400 focus:ring-2 focus:ring-sky-200 dark:focus:ring-sky-400 outline-none placeholder-gray-500 dark:placeholder-gray-400"
                         placeholder="Company name"
                       />
                     </div>
 
                     {/* Current Company Role */}
                     <div>
-                      <label className="block text-sm font-medium text-slate-700">
+                      <label className="block text-sm font-medium text-gray-800 dark:text-gray-200">
                         Current Role / Position
                       </label>
                       <input
@@ -526,14 +526,14 @@ const Signup = () => {
                         name="currentCompanyRole"
                         value={formData.currentCompanyRole}
                         onChange={handleChange}
-                        className="mt-1 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                        className="mt-1 block w-full rounded-lg border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-white px-3 py-2 text-sm shadow-sm focus:border-sky-500 dark:focus:border-sky-400 focus:ring-2 focus:ring-sky-200 dark:focus:ring-sky-400 outline-none placeholder-gray-500 dark:placeholder-gray-400"
                         placeholder="e.g., Software Engineer"
                       />
                     </div>
 
                     {/* Location */}
                     <div>
-                      <label className="block text-sm font-medium text-slate-700">
+                      <label className="block text-sm font-medium text-gray-800 dark:text-gray-200">
                         Location
                       </label>
                       <input
@@ -541,14 +541,14 @@ const Signup = () => {
                         name="location"
                         value={formData.location}
                         onChange={handleChange}
-                        className="mt-1 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                        className="mt-1 block w-full rounded-lg border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-white px-3 py-2 text-sm shadow-sm focus:border-sky-500 dark:focus:border-sky-400 focus:ring-2 focus:ring-sky-200 dark:focus:ring-sky-400 outline-none placeholder-gray-500 dark:placeholder-gray-400"
                         placeholder="City, Country"
                       />
                     </div>
 
                     {/* LinkedIn */}
                     <div>
-                      <label className="block text-sm font-medium text-slate-700">
+                      <label className="block text-sm font-medium text-gray-800 dark:text-gray-200">
                         LinkedIn
                       </label>
                       <input
@@ -556,14 +556,14 @@ const Signup = () => {
                         name="linkedIn"
                         value={formData.linkedIn}
                         onChange={handleChange}
-                        className="mt-1 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                        className="mt-1 block w-full rounded-lg border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-white px-3 py-2 text-sm shadow-sm focus:border-sky-500 dark:focus:border-sky-400 focus:ring-2 focus:ring-sky-200 dark:focus:ring-sky-400 outline-none placeholder-gray-500 dark:placeholder-gray-400"
                         placeholder="https://linkedin.com/in/username"
                       />
                     </div>
 
                     {/* Instagram */}
                     <div>
-                      <label className="block text-sm font-medium text-slate-700">
+                      <label className="block text-sm font-medium text-gray-800 dark:text-gray-200">
                         Instagram
                       </label>
                       <input
@@ -571,14 +571,14 @@ const Signup = () => {
                         name="instagram"
                         value={formData.instagram}
                         onChange={handleChange}
-                        className="mt-1 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                        className="mt-1 block w-full rounded-lg border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-white px-3 py-2 text-sm shadow-sm focus:border-sky-500 dark:focus:border-sky-400 focus:ring-2 focus:ring-sky-200 dark:focus:ring-sky-400 outline-none placeholder-gray-500 dark:placeholder-gray-400"
                         placeholder="https://instagram.com/username"
                       />
                     </div>
 
                     {/* GitHub */}
                     <div>
-                      <label className="block text-sm font-medium text-slate-700">
+                      <label className="block text-sm font-medium text-gray-800 dark:text-gray-200">
                         GitHub
                       </label>
                       <input
@@ -586,14 +586,14 @@ const Signup = () => {
                         name="github"
                         value={formData.github}
                         onChange={handleChange}
-                        className="mt-1 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                        className="mt-1 block w-full rounded-lg border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-white px-3 py-2 text-sm shadow-sm focus:border-sky-500 dark:focus:border-sky-400 focus:ring-2 focus:ring-sky-200 dark:focus:ring-sky-400 outline-none placeholder-gray-500 dark:placeholder-gray-400"
                         placeholder="https://github.com/username"
                       />
                     </div>
 
                     {/* Twitter / X */}
                     <div>
-                      <label className="block text-sm font-medium text-slate-700">
+                      <label className="block text-sm font-medium text-gray-800 dark:text-gray-200">
                         X (Twitter)
                       </label>
                       <input
@@ -601,7 +601,7 @@ const Signup = () => {
                         name="twitter"
                         value={formData.twitter}
                         onChange={handleChange}
-                        className="mt-1 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+                        className="mt-1 block w-full rounded-lg border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-white px-3 py-2 text-sm shadow-sm focus:border-sky-500 dark:focus:border-sky-400 focus:ring-2 focus:ring-sky-200 dark:focus:ring-sky-400 outline-none placeholder-gray-500 dark:placeholder-gray-400"
                         placeholder="https://x.com/username"
                       />
                     </div>
@@ -614,7 +614,7 @@ const Signup = () => {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="inline-flex w-full sm:w-auto items-center justify-center rounded-lg bg-sky-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-1 disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="inline-flex w-full sm:w-auto items-center justify-center rounded-lg bg-sky-600 dark:bg-sky-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-sky-700 dark:hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 dark:focus:ring-sky-400 focus:ring-offset-1 dark:focus:ring-offset-gray-950 disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {isSubmitting && (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -622,11 +622,11 @@ const Signup = () => {
                   {isSubmitting ? 'Creating account...' : 'Sign up'}
                 </button>
 
-                <p className="text-xs text-slate-500 text-center sm:text-right">
+                <p className="text-xs text-gray-600 dark:text-gray-400 text-center sm:text-right">
                   Already have an account?{' '}
                   <Link
                     to="/login"
-                    className="font-medium text-sky-700 hover:text-sky-800"
+                    className="font-medium text-sky-700 dark:text-sky-400 hover:text-sky-800 dark:hover:text-sky-300"
                   >
                     Log in
                   </Link>

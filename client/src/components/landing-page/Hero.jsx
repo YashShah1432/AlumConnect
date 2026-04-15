@@ -14,7 +14,7 @@ const Hero = () => {
   }, []);
 
   return (
-    <div id="top" className="relative bg-white pt-16 overflow-hidden">
+    <div id="top" className="relative bg-white dark:bg-gray-950 pt-16 overflow-hidden">
       {/* Decorative gradient blobs */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -top-24 -left-24 h-72 w-72 sm:h-96 sm:w-96 rounded-full blur-3xl opacity-30 bg-gradient-to-br from-blue-400 to-cyan-300 animate-gradient" />
@@ -27,7 +27,7 @@ const Hero = () => {
           className={`reveal ${revealed ? "reveal-in" : ""} max-w-5xl mx-auto flex flex-col items-center text-center py-16 sm:py-20`}
         >
           {!imagesLoaded ? (
-            <div className="w-40 h-24 mb-8 bg-gray-200 animate-pulse rounded-xl" />
+            <div className="w-40 h-24 mb-8 bg-gray-200 dark:bg-gray-800 animate-pulse rounded-xl" />
           ) : (
             <div className="animate-float">
               <img
@@ -38,11 +38,11 @@ const Hero = () => {
             </div>
           )}
 
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 tracking-tight">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 dark:text-white tracking-tight">
             Welcome to <span className="text-blue-600 block mt-2">AlumConnect</span>
           </h1>
 
-          <p className="mt-5 sm:mt-6 text-gray-600 text-base sm:text-lg lg:text-xl max-w-2xl mx-auto leading-relaxed">
+          <p className="mt-5 sm:mt-6 text-gray-600 dark:text-gray-300 text-base sm:text-lg lg:text-xl max-w-2xl mx-auto leading-relaxed">
             Connect with your alma mater, build lasting relationships, and contribute to the future of
             education through mentorship, opportunities, and community support.
           </p>
@@ -57,10 +57,10 @@ const Hero = () => {
             ].map((item) => (
               <div
                 key={item.label}
-                className="rounded-2xl border border-gray-100 bg-white/80 backdrop-blur p-5 shadow-sm hover:shadow-md transition-shadow"
+                className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white/85 dark:bg-gray-900/70 backdrop-blur p-5 shadow-sm dark:shadow-lg hover:shadow-md dark:hover:shadow-xl transition-shadow"
               >
-                <p className="text-sm text-gray-500">{item.label}</p>
-                <p className="mt-1 text-lg font-bold text-gray-900">{item.value}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{item.label}</p>
+                <p className="mt-1 text-lg font-bold text-gray-900 dark:text-white">{item.value}</p>
               </div>
             ))}
           </div>

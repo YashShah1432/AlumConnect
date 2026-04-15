@@ -53,7 +53,7 @@ const AdminProfile = () => {
     return (
       <Layout>
         <div className="flex justify-center items-center h-64">
-          <p className="text-blue-600 font-medium">Loading profiles...</p>
+          <p className="text-blue-600 dark:text-blue-400 font-medium">Loading profiles...</p>
         </div>
       </Layout>
     );
@@ -62,7 +62,7 @@ const AdminProfile = () => {
   if (error) {
     return (
       <Layout>
-        <div className="text-center p-8 text-red-500">{error}</div>
+        <div className="text-center p-8 text-red-500 dark:text-red-400">{error}</div>
       </Layout>
     );
   }
@@ -73,15 +73,15 @@ const AdminProfile = () => {
 
         {/* Alumni Section */}
         <section>
-          <h2 className="text-2xl font-semibold text-gray-800 mb-6">
+          <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-6">
             Alumni Profiles
           </h2>
           {alumni.length === 0 ? (
-            <p className="text-gray-600">No alumni profiles found.</p>
+            <p className="text-gray-600 dark:text-gray-400">No alumni profiles found.</p>
           ) : (
-            <div className="overflow-x-auto bg-white rounded-xl shadow">
+            <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded-2xl shadow dark:shadow-lg border border-gray-200 dark:border-gray-700">
               <table className="min-w-full table-auto border-collapse text-left">
-                <thead className="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
+                <thead className="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 uppercase text-xs tracking-wider">
                   <tr>
                     <th className="px-6 py-3 font-medium">Name</th>
                     <th className="px-6 py-3 font-medium">Email</th>
@@ -89,20 +89,20 @@ const AdminProfile = () => {
                     <th className="px-6 py-3 font-medium">Branch</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100 text-sm">
+                <tbody className="divide-y divide-gray-100 dark:divide-gray-700 text-sm">
                   {alumni.map((user) => (
                     <tr
                       key={user._id}
-                      className="hover:bg-gray-50 transition-colors"
+                      className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
                     >
-                      <td className="px-6 py-4 font-semibold text-gray-900">
+                      <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">
                         {user.name}
                       </td>
-                      <td className="px-6 py-4 text-gray-600">{user.email}</td>
-                      <td className="px-6 py-4 text-gray-600">
+                      <td className="px-6 py-4 text-gray-600 dark:text-gray-400">{user.email}</td>
+                      <td className="px-6 py-4 text-gray-600 dark:text-gray-400">
                         {user.batch || 'N/A'}
                       </td>
-                      <td className="px-6 py-4 text-gray-600">
+                      <td className="px-6 py-4 text-gray-600 dark:text-gray-400">
                         {user.branch || 'N/A'}
                       </td>
                     </tr>
@@ -115,15 +115,15 @@ const AdminProfile = () => {
 
         {/* Students Section */}
         <section>
-          <h2 className="text-2xl font-semibold text-gray-800 mb-6">
+          <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-6">
             Student Profiles
           </h2>
           {students.length === 0 ? (
-            <p className="text-gray-600">No student profiles found.</p>
+            <p className="text-gray-600 dark:text-gray-400">No student profiles found.</p>
           ) : (
-            <div className="overflow-x-auto bg-white rounded-xl shadow">
+            <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded-2xl shadow dark:shadow-lg border border-gray-200 dark:border-gray-700">
               <table className="min-w-full table-auto border-collapse text-left">
-                <thead className="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
+                <thead className="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 uppercase text-xs tracking-wider">
                   <tr>
                     <th className="px-6 py-3 font-medium">Name</th>
                     <th className="px-6 py-3 font-medium">Email</th>
@@ -132,26 +132,26 @@ const AdminProfile = () => {
                     <th className="px-6 py-3 font-medium">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100 text-sm">
+                <tbody className="divide-y divide-gray-100 dark:divide-gray-700 text-sm">
                   {students.map((user) => (
                     <tr
                       key={user._id}
-                      className="hover:bg-gray-50 transition-colors"
+                      className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
                     >
-                      <td className="px-6 py-4 font-semibold text-gray-900">
+                      <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">
                         {user.name}
                       </td>
-                      <td className="px-6 py-4 text-gray-600">{user.email}</td>
-                      <td className="px-6 py-4 text-gray-600">
+                      <td className="px-6 py-4 text-gray-600 dark:text-gray-400">{user.email}</td>
+                      <td className="px-6 py-4 text-gray-600 dark:text-gray-400">
                         {user.batch || 'N/A'}
                       </td>
-                      <td className="px-6 py-4 text-gray-600">
+                      <td className="px-6 py-4 text-gray-600 dark:text-gray-400">
                         {user.branch || 'N/A'}
                       </td>
                       <td className="px-6 py-4">
                         <button
                           onClick={() => handleMarkAsAlumni(user._id)}
-                          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition text-xs font-medium"
+                          className="bg-green-600 dark:bg-green-600 text-white px-4 py-2 rounded-xl hover:bg-green-700 dark:hover:bg-green-700 transition text-xs font-medium shadow-sm"
                         >
                           Mark as Alumni
                         </button>

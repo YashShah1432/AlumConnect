@@ -96,7 +96,7 @@ const CreateEvent = () => {
     return (
       <Layout>
         <div className="flex justify-center items-center h-64">
-          <div className="animate-pulse font-medium text-blue-600">Verifying admin access...</div>
+          <div className="animate-pulse font-medium text-blue-600 dark:text-blue-400">Verifying admin access...</div>
         </div>
       </Layout>
     );
@@ -104,35 +104,35 @@ const CreateEvent = () => {
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto px-4 py-6 bg-gray-50 min-h-screen">
+      <div className="max-w-4xl mx-auto px-4 py-6 bg-transparent min-h-screen">
         {/* Page Header */}
         <div className="mb-8 flex items-center">
           <button 
             onClick={handleCancel}
-            className="mr-4 text-gray-500 hover:text-gray-700"
+            className="mr-4 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
           >
             <ArrowLeft size={24} />
           </button>
-          <h1 className="text-2xl font-semibold text-gray-800">Create New Event</h1>
+          <h1 className="text-2xl font-semibold text-gray-800 dark:text-white">Create New Event</h1>
         </div>
 
         {error && (
-          <div className="bg-red-50 text-red-500 p-4 rounded-lg mb-6 shadow-sm border border-red-100">
+          <div className="bg-red-50 dark:bg-red-900/20 text-red-500 dark:text-red-400 p-4 rounded-lg mb-6 shadow-sm border border-red-100 dark:border-red-800">
             {error}
           </div>
         )}
 
         {/* Create Event Form */}
-        <div className="bg-white rounded-xl shadow-sm p-6 mb-8 border border-gray-100">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm dark:shadow-lg p-6 mb-8 border border-gray-100 dark:border-gray-700">
           <form onSubmit={handleCreateEvent} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Title <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
-                  className="w-full border border-gray-200 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
                   value={title}
                   onChange={e => setTitle(e.target.value)}
                   placeholder="Enter event title"
@@ -141,12 +141,12 @@ const CreateEvent = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Venue <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
-                  className="w-full border border-gray-200 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
                   value={venue}
                   onChange={e => setVenue(e.target.value)}
                   placeholder="Enter venue location"
@@ -156,11 +156,11 @@ const CreateEvent = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Description <span className="text-red-500">*</span>
               </label>
               <textarea
-                className="w-full border border-gray-200 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
                 rows="5"
                 value={description}
                 onChange={e => setDescription(e.target.value)}
@@ -171,12 +171,12 @@ const CreateEvent = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Event Date & Time <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="datetime-local"
-                  className="w-full border border-gray-200 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
                   value={eventDateTime}
                   onChange={e => setEventDateTime(e.target.value)}
                   required
@@ -184,16 +184,16 @@ const CreateEvent = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Upload Image
                 </label>
                 <input
                   type="file"
                   accept="image/*"
                   onChange={e => setImage(e.target.files[0])}
-                  className="w-full border border-gray-200 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  className="w-full border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-sm"
                 />
-                <p className="mt-1 text-xs text-gray-500">Recommended size: 1200x630px</p>
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Recommended size: 1200x630px</p>
               </div>
             </div>
 
@@ -201,14 +201,14 @@ const CreateEvent = () => {
               <button
                 type="button"
                 onClick={handleCancel}
-                className="px-6 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition font-medium"
+                className="px-6 py-2.5 border border-gray-300 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 rounded-lg hover:bg-gray-50 transition font-medium"
                 disabled={loading}
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="flex items-center gap-2 bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition font-medium disabled:opacity-70"
+                className="flex items-center gap-2 bg-blue-600 dark:bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-700 transition font-medium disabled:opacity-70"
                 disabled={loading}
               >
                 {loading ? (

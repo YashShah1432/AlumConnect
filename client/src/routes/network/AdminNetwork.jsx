@@ -65,7 +65,7 @@ const AdminNetwork = () => {
     return (
       <Layout>
         <div className="flex justify-center items-center h-64">
-          <p className="text-blue-600 font-medium">Loading Admin Network data...</p>
+          <p className="text-blue-600 dark:text-blue-400 font-medium">Loading Admin Network data...</p>
         </div>
       </Layout>
     );
@@ -74,43 +74,43 @@ const AdminNetwork = () => {
   if (error) {
     return (
       <Layout>
-        <div className="text-center p-8 text-red-500">{error}</div>
+        <div className="text-center p-8 text-red-500 dark:text-red-400">{error}</div>
       </Layout>
     );
   }
 
   return (
     <Layout>
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-8 bg-white dark:bg-gray-900 min-h-screen">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           
-          <span className="text-gray-500 text-sm">
+          <span className="text-gray-500 dark:text-gray-400 text-sm">
             {jobs.length} {jobs.length === 1 ? 'job' : 'jobs'} found
           </span>
         </div>
 
         {jobs.length === 0 ? (
-          <p className="text-gray-600 text-center">No job opportunities found.</p>
+          <p className="text-gray-600 dark:text-gray-400 text-center">No job opportunities found.</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
             {jobs.map((job) => (
               <div
                 key={job._id}
-                className="bg-white rounded-xl shadow-md hover:shadow-xl transition-transform duration-300 transform hover:scale-105 p-6 flex flex-col justify-between"
+                className="bg-white dark:bg-gray-800 rounded-xl shadow-md dark:shadow-lg hover:shadow-xl dark:hover:shadow-xl transition-transform duration-300 transform hover:scale-105 p-6 flex flex-col justify-between border border-gray-100 dark:border-gray-700"
               >
                 {/* Job Info */}
                 <div>
-                  <div className="mb-4 h-12 w-12 bg-gray-100 rounded-full flex items-center justify-center">
-                    <span className="text-gray-400 text-sm">Logo</span>
+                  <div className="mb-4 h-12 w-12 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
+                    <span className="text-gray-400 dark:text-gray-500 text-sm">Logo</span>
                   </div>
-                  <h2 className="text-lg font-semibold text-gray-900 mb-1">
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
                     {job.title}
                   </h2>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
                     {job.company} • {job.location}
                   </p>
-                  <div className="mt-2 text-sm text-gray-500 space-y-1">
+                  <div className="mt-2 text-sm text-gray-500 dark:text-gray-400 space-y-1">
                     <p>
                       Type: <span className="font-medium">{job.employmentType}</span>
                     </p>
@@ -120,7 +120,7 @@ const AdminNetwork = () => {
                       </p>
                     )}
                   </div>
-                  <p className="mt-2 text-sm text-gray-500 line-clamp-3">
+                  <p className="mt-2 text-sm text-gray-500 dark:text-gray-400 line-clamp-3">
                     {job.description}
                   </p>
                 </div>
@@ -136,14 +136,14 @@ const AdminNetwork = () => {
                     <>
                       <button
                         onClick={() => handleAccept(job._id)}
-                        className="flex items-center gap-1 px-3 py-1 rounded-md bg-green-600 text-white hover:bg-green-700 text-sm"
+                        className="flex items-center gap-1 px-3 py-1 rounded-md bg-green-600 dark:bg-green-700 text-white hover:bg-green-700 dark:hover:bg-green-800 text-sm transition"
                       >
                         <CheckCircle2 size={16} />
                         Accept
                       </button>
                       <button
                         onClick={() => handleReject(job._id)}
-                        className="flex items-center gap-1 px-3 py-1 rounded-md bg-red-600 text-white hover:bg-red-700 text-sm"
+                        className="flex items-center gap-1 px-3 py-1 rounded-md bg-red-600 dark:bg-red-700 text-white hover:bg-red-700 dark:hover:bg-red-800 text-sm transition"
                       >
                         <XCircle size={16} />
                         Reject
@@ -152,7 +152,7 @@ const AdminNetwork = () => {
                   ) : (
                     <button
                       onClick={() => handleReject(job._id)}
-                      className="flex items-center gap-1 px-3 py-1 rounded-md bg-gray-600 text-white hover:bg-gray-700 text-sm"
+                      className="flex items-center gap-1 px-3 py-1 rounded-md bg-gray-600 dark:bg-gray-700 text-white hover:bg-gray-700 dark:hover:bg-gray-800 text-sm transition"
                     >
                       <Trash2 size={16} />
                       Delete
@@ -173,24 +173,24 @@ const StatusBadge = ({ status }) => {
   let textColor = '';
   switch (status) {
     case 'pending':
-      bgColor = 'bg-yellow-100';
-      textColor = 'text-yellow-800';
+      bgColor = 'bg-yellow-100 dark:bg-yellow-900/40';
+      textColor = 'text-yellow-800 dark:text-yellow-300';
       break;
     case 'active':
-      bgColor = 'bg-green-100';
-      textColor = 'text-green-800';
+      bgColor = 'bg-green-100 dark:bg-green-900/40';
+      textColor = 'text-green-800 dark:text-green-300';
       break;
     case 'filled':
-      bgColor = 'bg-blue-100';
-      textColor = 'text-blue-800';
+      bgColor = 'bg-blue-100 dark:bg-blue-900/40';
+      textColor = 'text-blue-800 dark:text-blue-300';
       break;
     case 'expired':
-      bgColor = 'bg-red-100';
-      textColor = 'text-red-800';
+      bgColor = 'bg-red-100 dark:bg-red-900/40';
+      textColor = 'text-red-800 dark:text-red-300';
       break;
     default:
-      bgColor = 'bg-gray-100';
-      textColor = 'text-gray-800';
+      bgColor = 'bg-gray-100 dark:bg-gray-700';
+      textColor = 'text-gray-800 dark:text-gray-300';
       break;
   }
   return (

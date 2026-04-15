@@ -63,8 +63,11 @@ const People = () => {
   const previewAlumni = filteredAlumni.slice(0, 3);
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
-      <h1 className="text-2xl font-bold text-gray-800 mb-4">Connect and Connect</h1>
+    <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-900/85 shadow-sm dark:shadow-xl p-6 mb-8 backdrop-blur-sm">
+      <div className="mb-5">
+        <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Connect and Grow Your Network</h1>
+        <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">Browse alumni profiles, discover mentors, and start meaningful conversations from one place.</p>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {previewAlumni.map((profile) => (
           <ProfileCard
@@ -77,7 +80,7 @@ const People = () => {
       <div className="flex justify-end mt-6">
         <button
           onClick={() => navigate('/network/all-people')}
-          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          className="bg-green-600 text-white px-4 py-2 rounded-xl hover:bg-green-700 shadow-sm"
         >
           View All
         </button>

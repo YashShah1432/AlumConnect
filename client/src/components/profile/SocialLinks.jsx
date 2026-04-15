@@ -6,10 +6,10 @@ const SocialLinks = ({ socialLinks }) => {
   if (!socialLinks) return null;
 
   const socialIcons = [
-    { key: 'linkedin', icon: <FaLinkedin className="text-blue-600" />, url: socialLinks.linkedin },
-    { key: 'github', icon: <FaGithub className="text-gray-800" />, url: socialLinks.github },
-    { key: 'instagram', icon: <FaInstagram className="text-pink-600" />, url: socialLinks.instagram },
-    { key: 'x', icon: <FaTwitter className="text-blue-400" />, url: socialLinks.x || socialLinks.twitter }
+    { key: 'linkedin', icon: <FaLinkedin className="text-blue-600 dark:text-blue-400" />, url: socialLinks.linkedin },
+    { key: 'github', icon: <FaGithub className="text-gray-800 dark:text-gray-300" />, url: socialLinks.github },
+    { key: 'instagram', icon: <FaInstagram className="text-pink-600 dark:text-pink-400" />, url: socialLinks.instagram },
+    { key: 'x', icon: <FaTwitter className="text-blue-400 dark:text-sky-300" />, url: socialLinks.x || socialLinks.twitter }
   ].filter(item => item.url && item.url.trim() !== '');
 
   if (socialIcons.length === 0) return null;

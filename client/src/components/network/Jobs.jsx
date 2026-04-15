@@ -65,23 +65,26 @@ const handleStatusChange = async (jobId, newStatus) => {
 };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-900/85 p-6 text-gray-600 dark:text-gray-300 shadow-sm dark:shadow-xl">Loading job opportunities...</div>;
   }
 
   if (error) {
-    return <div className="text-red-600">{error}</div>;
+    return <div className="rounded-2xl border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 p-4 text-red-600 dark:text-red-400">{error}</div>;
   }
 
   const displayedJobs = preview ? jobs.slice(0, 2) : jobs;
 
   return (
-    <div className="h-full bg-white rounded-lg shadow-md p-6 mt-8">
+    <div className="h-full rounded-2xl border border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-900/85 shadow-sm dark:shadow-xl p-6 mt-8 backdrop-blur-sm">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">Job Opportunities</h2>
+        <div>
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Job Opportunities</h2>
+          <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">Explore open roles shared by alumni and discover the latest opportunities.</p>
+        </div>
         {preview && (
           <button
             onClick={() => navigate("/network/all-jobs")}
-            className="text-blue-600 hover:text-blue-800 font-medium"
+            className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
           >
             View All Jobs →
           </button>
@@ -103,7 +106,7 @@ const handleStatusChange = async (jobId, newStatus) => {
         {isAlumni && (
           <button
             onClick={() => navigate("/network/create-job")}
-            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+            className="bg-green-600 text-white px-4 py-2 rounded-xl hover:bg-green-700 shadow-sm"
           >
             Create Job Opportunity
           </button>

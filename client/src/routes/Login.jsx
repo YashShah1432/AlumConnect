@@ -13,13 +13,13 @@ const Modal = ({ isOpen, onClose, children }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div 
-        className="absolute inset-0 bg-black/50"
+        className="absolute inset-0 bg-black/50 dark:bg-black/70"
         onClick={onClose}
       />
-      <div className="relative bg-white rounded-lg w-full max-w-md p-6 m-4 z-10">
+      <div className="relative bg-white dark:bg-gray-900 rounded-2xl w-full max-w-md p-6 m-4 z-10 border border-gray-200 dark:border-gray-700 shadow-xl dark:shadow-2xl">
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
+          className="absolute right-4 top-4 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
         >
           <X className="h-5 w-5" />
         </button>
@@ -155,8 +155,8 @@ const Login = () => {
   return (
     <>
     <Navbar />
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4 pt-20">
-      <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-blue-50 dark:from-gray-950 dark:via-gray-900 dark:to-slate-950 p-4 pt-20">
+      <div className="w-full max-w-md bg-white/95 dark:bg-gray-900/95 rounded-2xl shadow-xl dark:shadow-2xl p-8 border border-gray-200 dark:border-gray-800 backdrop-blur-sm">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-3">
             <img 
@@ -165,13 +165,13 @@ const Login = () => {
               className="w-20 h-auto"
             />
           </div>
-          <h2 className="text-2xl font-bold text-blue-700">Welcome Back</h2>
-          <p className="text-gray-500">Please sign in to continue</p>
+          <h2 className="text-2xl font-bold text-blue-700 dark:text-blue-300">Welcome Back</h2>
+          <p className="text-gray-600 dark:text-gray-300">Please sign in to continue</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="role" className="block text-sm font-medium text-gray-800 dark:text-gray-200 mb-2">
               Role
             </label>
             <div className="relative">
@@ -180,18 +180,18 @@ const Login = () => {
                 name="role"
                 value={formData.role}
                 onChange={handleRoleChange}
-                className="block w-full rounded-lg border border-gray-300 px-4 py-2.5 pr-8 text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 appearance-none bg-white"
+                className="block w-full rounded-lg border-2 border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white px-4 py-2.5 pr-8 text-gray-900 bg-white focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 appearance-none"
               >
                 <option value="admin">Admin</option>
                 <option value="alumni">Alumni</option>
                 <option value="student">Student</option>
               </select>
-              <UserCircle className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
+              <UserCircle className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500 pointer-events-none" />
             </div>
           </div>
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-800 dark:text-gray-200 mb-2">
               Email
             </label>
             <div className="relative">
@@ -203,15 +203,15 @@ const Login = () => {
               value={formData.email}
               onChange={handleChange}
               placeholder="Enter your email"
-              className="block w-full rounded-lg border border-gray-300 px-4 py-2.5 pr-10 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+              className="block w-full rounded-lg border-2 border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white px-4 py-2.5 pr-10 text-gray-900 bg-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
               disabled={formData.role === 'visitor'}
             />
-            <Mail className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
+            <Mail className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500 pointer-events-none" />
           </div>
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="password" className="block text-sm font-medium text-gray-800 dark:text-gray-200 mb-2">
               Password
             </label>
             <div className="relative">
@@ -223,14 +223,14 @@ const Login = () => {
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="Enter your password"
-                className="block w-full rounded-lg border border-gray-300 px-4 py-2.5 pr-10 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+                className="block w-full rounded-lg border-2 border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white px-4 py-2.5 pr-10 text-gray-900 bg-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
                 disabled={formData.role === 'visitor'}
               />
               {formData.role !== 'visitor' && (
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
                 >
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
@@ -239,7 +239,7 @@ const Login = () => {
           </div>
 
           {error && (
-            <div className="bg-red-50 text-red-700 px-4 py-3 rounded-lg text-sm">
+            <div className="bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-300 px-4 py-3 rounded-lg text-sm border-2 border-red-300 dark:border-red-700">
               {error}
             </div>
           )}
@@ -247,7 +247,7 @@ const Login = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className={`w-full rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${isLoading ? 'opacity-75 cursor-not-allowed' : ''}`}
+            className={`w-full rounded-xl bg-blue-600 dark:bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md dark:shadow-lg hover:bg-blue-700 dark:hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-2 dark:focus:ring-offset-gray-900 ${isLoading ? 'opacity-75 cursor-not-allowed' : ''}`}
           >
             {isLoading ? (
               <span className="flex items-center justify-center">
@@ -265,7 +265,7 @@ const Login = () => {
           <button
             type="button"
             onClick={() => setIsModalOpen(true)}
-            className="w-full text-sm text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            className="w-full text-sm text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 rounded py-1"
           >
             Forgot Password?
           </button>
@@ -275,22 +275,22 @@ const Login = () => {
         {/* <div className="mt-6">
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300" />
+            <div className=\"w-full border-t border-gray-300 dark:border-gray-600\" />
             </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">
+            <div className=\"relative flex justify-center text-sm\">
+              <span className=\"px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400\">
                 Or continue with
               </span>
             </div>
           </div>
-          <div className="mt-2 text-center text-sm text-gray-600">
+          <div className=\"mt-2 text-center text-sm text-gray-600 dark:text-gray-400\">
               Please use your College email (@gmail.com)
              </div>
 
           <button
-            type="button"
+            type=\"button\"
             onClick={handleGoogleLoginClick}
-            className="mt-4 w-full flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+            className=\"mt-4 w-full flex items-center justify-center gap-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600\"
           >
             <svg className="h-5 w-5" viewBox="0 0 24 24">
               <path
@@ -325,10 +325,10 @@ const Login = () => {
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <div className="text-center">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
             Password Recovery
           </h3>
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-600 dark:text-gray-300 mb-6">
             Please contact your college admin or alumni cell for password recovery assistance.
           </p>
           <button

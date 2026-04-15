@@ -2,6 +2,7 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { UserProvider, useUser } from './context/UserContext';
+import { ThemeProvider } from './context/ThemeContext';
 
 // Import your custom ToastProvider
 import { ToastProvider } from './components/Toast';
@@ -79,7 +80,7 @@ const LandingPage = () => {
   }, [location]);
 
   return (
-    <div id="top" className="min-h-screen bg-white">
+    <div id="top" className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
       <Navbar />
       <div className="pt-5">
         <Hero />
@@ -293,24 +294,26 @@ const AppRoutes = () => {
 
 const App = () => {
   return (
-    <UserProvider>
-      <MessageProvider>
-        <BrowserRouter>
-          <ToastProvider>
-            {/* ToastContainer for notifications */}
-            <ToastContainer
-              position="top-right"
-              autoClose={3000}
-              hideProgressBar
-              newestOnTop
-              closeOnClick
-              pauseOnHover
-            />
-            <AppRoutes />
-          </ToastProvider>
-        </BrowserRouter>
-      </MessageProvider>
-    </UserProvider>
+    <ThemeProvider>
+      <UserProvider>
+        <MessageProvider>
+          <BrowserRouter>
+            <ToastProvider>
+              {/* ToastContainer for notifications */}
+              <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar
+                newestOnTop
+                closeOnClick
+                pauseOnHover
+              />
+              <AppRoutes />
+            </ToastProvider>
+          </BrowserRouter>
+        </MessageProvider>
+      </UserProvider>
+    </ThemeProvider>
   );
 };
 

@@ -58,32 +58,32 @@ const AllEvents = () => {
 
   return (
     <Layout>
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-8 bg-transparent min-h-screen">
         {/* Back Button - Fixed to go to announcements page */}
         <div className="flex justify-start mb-4">
           <button
             type="button"
             onClick={() => navigate('/announcements')}
-            className="px-5 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg shadow-lg hover:bg-blue-700 transition"
+            className="px-5 py-2 text-sm font-medium text-white bg-blue-600 dark:bg-blue-700 rounded-xl shadow-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition"
           >
             ← Back
           </button>
         </div>
         
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-4">All Events</h1>
-          <p className="text-gray-600 mb-4">Browse all our upcoming and past events.</p>
+          <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-4">All Events</h1>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">Browse all our upcoming and past events.</p>
         </div>
         
         {/* Events Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
           {events.length === 0 ? (
-            <div className="col-span-3 bg-white rounded-xl shadow-sm p-8 text-center text-gray-500">
+            <div className="col-span-3 bg-white dark:bg-gray-800 rounded-xl shadow-sm dark:shadow-lg p-8 text-center text-gray-500 dark:text-gray-400">
               No events available at the moment.
             </div>
           ) : (
             events.map((event) => (
-              <div key={event._id} className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all duration-300 group">
+              <div key={event._id} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm dark:shadow-lg overflow-hidden hover:shadow-md dark:hover:shadow-xl transition-all duration-300 group border border-gray-100 dark:border-gray-700">
                 {event.imageUrl && (
                   <div className="h-52 overflow-hidden">
                     <img
@@ -95,13 +95,13 @@ const AllEvents = () => {
                 )}
                 <div className="p-6">
                   <div className="mb-3">
-                    <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-xs font-medium">
+                    <span className="px-3 py-1 bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 rounded-full text-xs font-medium">
                       Event
                     </span>
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-3">{event.title}</h3>
-                  <p className="text-gray-600 font-normal leading-relaxed mb-4">{event.description}</p>
-                  <div className="flex items-center text-gray-500 text-sm">
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">{event.title}</h3>
+                  <p className="text-gray-600 dark:text-gray-400 font-normal leading-relaxed mb-4">{event.description}</p>
+                  <div className="flex items-center text-gray-500 dark:text-gray-400 text-sm">
                     <Calendar size={16} className="mr-2" />
                     <span>
                       {event.eventDateTime
@@ -109,7 +109,7 @@ const AllEvents = () => {
                         : 'No date/time provided'}
                     </span>
                   </div>
-                  <div className="flex items-center text-gray-500 text-sm mt-2">
+                  <div className="flex items-center text-gray-500 dark:text-gray-400 text-sm mt-2">
                     <MapPin size={16} className="mr-2" />
                     <span>{event.venue || 'No venue provided'}</span>
                   </div>

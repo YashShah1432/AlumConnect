@@ -47,12 +47,12 @@ const Services = () => {
   return (
     <section
       ref={ref}
-      className={`reveal ${revealed ? "reveal-in" : ""} py-14 sm:py-16 bg-white`}
+      className={`reveal ${revealed ? "reveal-in" : ""} py-14 sm:py-16 bg-white dark:bg-gray-950`}
     >
       <div className="w-full px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
         <div className="text-center">
-          <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">Our Services</h2>
-          <p className="mt-3 text-base text-gray-600 sm:text-lg max-w-2xl mx-auto">
+          <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white sm:text-4xl">Our Services</h2>
+          <p className="mt-3 text-base text-gray-600 dark:text-gray-300 sm:text-lg max-w-2xl mx-auto">
             Everything needed to keep alumni and students connected—securely and meaningfully.
           </p>
         </div>
@@ -61,18 +61,18 @@ const Services = () => {
           {services.map((service, index) => (
             <div
               key={index}
-              className="group relative rounded-2xl border border-gray-200 bg-white p-6 shadow-sm hover:shadow-lg transition-all duration-300"
+              className="group relative rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900/80 p-6 shadow-sm dark:shadow-lg hover:shadow-lg dark:hover:shadow-xl transition-all duration-300"
             >
-              <div className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-br from-blue-50 to-transparent" />
+              <div className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-br from-blue-50 to-transparent dark:from-blue-950/50" />
 
               <div className="relative flex items-center gap-4">
                 <div className="rounded-xl bg-blue-500/10 p-3 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
                   {service.icon}
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900">{service.title}</h3>
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">{service.title}</h3>
               </div>
 
-              <p className="relative mt-4 text-sm sm:text-base text-gray-600 leading-relaxed">
+              <p className="relative mt-4 text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed">
                 {service.description}
               </p>
 

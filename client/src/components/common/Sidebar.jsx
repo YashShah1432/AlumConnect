@@ -18,11 +18,11 @@ const SidebarItem = ({ icon: Icon, label, path, active, collapsed, onClick }) =>
       className={`flex items-center w-full py-4 px-5 rounded-xl text-base font-medium transition-all duration-200 group relative cursor-pointer ${
         active 
           ? "bg-blue-500 text-white" 
-          : "text-gray-600 hover:bg-gray-100 hover:text-gray-800"
+          : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-800 dark:hover:text-gray-200"
       }`}
     >
       <div className="flex items-center justify-center">
-        <Icon size={collapsed ? 26 : 22} className={`transition-all ${!active && "text-gray-500 group-hover:text-gray-800"}`} />
+        <Icon size={collapsed ? 26 : 22} className={`transition-all ${!active && "text-gray-500 dark:text-gray-500 group-hover:text-gray-800 dark:group-hover:text-gray-300"}`} />
       </div>
       
       {!collapsed && (
@@ -45,7 +45,7 @@ const SidebarItem = ({ icon: Icon, label, path, active, collapsed, onClick }) =>
 
       {/* Tooltip for collapsed state */}
       {collapsed && (
-        <div className="absolute left-full ml-3 px-3 py-1.5 bg-gray-800 text-white text-sm rounded opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-20">
+        <div className="absolute left-full ml-3 px-3 py-1.5 bg-gray-800 dark:bg-gray-700 text-white dark:text-gray-100 text-sm rounded opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-20">
           {label}
         </div>
       )}
@@ -212,7 +212,7 @@ const Sidebar = () => {
       {/* Desktop sidebar */}
       {!isSmallScreen && (
         <aside 
-          className={`fixed left-0 top-16 h-[calc(100vh-4rem)] bg-white border-r border-gray-200 shadow-sm z-30 transition-all duration-300 ease-in-out ${
+          className={`fixed left-0 top-16 h-[calc(100vh-4rem)] bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-lg z-30 transition-all duration-300 ease-in-out ${
             collapsed ? "w-[100px]" : "w-[280px]"
           }`}
           id="sidebar"
@@ -238,22 +238,22 @@ const Sidebar = () => {
             </nav>
 
             {/* User profile + logout + collapse button (desktop only) */}
-            <div className={`mt-auto border-t border-gray-200 p-5 ${collapsed ? "flex flex-col items-center" : ""}`}>
-              <div className={`flex items-center ${collapsed ? "justify-center flex-col" : ""} mb-4 p-3 rounded-xl hover:bg-gray-100 transition-all`}>
-                <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-medium text-lg">
+            <div className={`mt-auto border-t border-gray-200 dark:border-gray-700 p-5 ${collapsed ? "flex flex-col items-center" : ""}`}>
+              <div className={`flex items-center ${collapsed ? "justify-center flex-col" : ""} mb-4 p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-all`}>
+                <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-600 dark:text-blue-400 font-medium text-lg">
                   {user?.name?.charAt(0) || 'U'}
                 </div>
                 {!collapsed && (
                   <div className="ml-4 truncate">
-                    <p className="text-base font-medium text-gray-700 truncate">{user?.name || 'User'}</p>
-                    <p className="text-sm text-gray-500 truncate">{user?.email || 'user@example.com'}</p>
+                    <p className="text-base font-medium text-gray-700 dark:text-gray-300 truncate">{user?.name || 'User'}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{user?.email || 'user@example.com'}</p>
                   </div>
             )}
               </div>
               
               <button 
                 onClick={handleLogout}
-                className={`flex items-center w-full py-3 px-4 text-base text-red-500 hover:bg-red-50 rounded-xl transition-all group cursor-pointer ${
+                className={`flex items-center w-full py-3 px-4 text-base text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all group cursor-pointer ${
                   collapsed ? "justify-center" : ""
                 }`}
               >
@@ -261,7 +261,7 @@ const Sidebar = () => {
                 {!collapsed && <span className="ml-3">Logout</span>}
                 
                 {collapsed && (
-                  <div className="absolute left-full ml-3 px-3 py-1.5 bg-gray-800 text-white text-sm rounded opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-20">
+                  <div className="absolute left-full ml-3 px-3 py-1.5 bg-gray-800 dark:bg-gray-700 text-white text-sm rounded opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-20">
                     Logout
                   </div>
                 )}
@@ -270,7 +270,7 @@ const Sidebar = () => {
               {!isSmallScreen && (
                 <button
                   onClick={toggleSidebar}
-                  className="flex items-center justify-center w-12 h-12 mx-auto mt-4 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition-all cursor-pointer"
+                  className="flex items-center justify-center w-12 h-12 mx-auto mt-4 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-400 transition-all cursor-pointer"
                   aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
                 >
                   {collapsed ? (
@@ -289,7 +289,7 @@ const Sidebar = () => {
       {isSmallScreen && (
         <div
           id="mobile-sidebar-bar"
-          className={`fixed left-0 top-16 z-30 w-full bg-white border-b border-gray-200 shadow-sm transition-transform duration-200 ${
+          className={`fixed left-0 top-16 z-30 w-full bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm transition-transform duration-200 ${
             showMobileBar ? "translate-y-0" : "-translate-y-full"
           }`}
         >
@@ -303,7 +303,7 @@ const Sidebar = () => {
                   className={`flex items-center justify-center px-2 py-3 text-xs font-medium text-center ${
                     isActive
                       ? "bg-blue-500 text-white"
-                      : "text-gray-600 hover:bg-gray-100 hover:text-gray-800"
+                      : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-800 dark:hover:text-gray-200"
                   }`}
                 >
                   {/* Mobile: label only, no icon */}

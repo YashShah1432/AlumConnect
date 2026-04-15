@@ -36,7 +36,7 @@ const Layout = ({ children, hasSidebar = true }) => {
   
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-blue-50 dark:from-gray-950 dark:via-gray-900 dark:to-slate-950">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     );
@@ -44,7 +44,7 @@ const Layout = ({ children, hasSidebar = true }) => {
 
   return (
     // Remove hardcoded 'sidebar-expanded' and use the state
-    <div className={`min-h-screen bg-gray-50 ${
+    <div className={`min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/70 text-gray-900 dark:from-gray-950 dark:via-gray-900 dark:to-slate-950 dark:text-gray-100 ${
       hasSidebar 
         ? `has-sidebar ${sidebarCollapsed ? 'sidebar-collapsed' : 'sidebar-expanded'}` 
         : ''

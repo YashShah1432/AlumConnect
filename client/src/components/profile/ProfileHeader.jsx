@@ -29,7 +29,7 @@ const ProfileHeader = ({ profile, onProfileUpdate }) => {
           <div className="hidden sm:block sm:ml-4 mt-4 sm:mt-0 text-left">
             <h1 className="text-2xl font-bold text-white">{profile.name}</h1>
             {profile.role && (
-              <span className="inline-block mt-2 px-2 py-1 text-xs font-semibold bg-blue-100 text-blue-800 rounded-full">
+              <span className="inline-block mt-2 px-2 py-1 text-xs font-semibold bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300 rounded-full">
                 {profile.role.charAt(0).toUpperCase() + profile.role.slice(1)}
               </span>
             )}
@@ -38,7 +38,7 @@ const ProfileHeader = ({ profile, onProfileUpdate }) => {
         <div className="flex space-x-2">
           <button
             onClick={() => setIsEditModalOpen(true)}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition flex items-center"
+            className="px-4 py-2 bg-blue-600 dark:bg-blue-600 text-white rounded-xl hover:bg-blue-700 dark:hover:bg-blue-700 transition flex items-center shadow-sm"
           >
             <FaEdit className="mr-2" /> Edit
           </button>
@@ -49,9 +49,9 @@ const ProfileHeader = ({ profile, onProfileUpdate }) => {
       {/* Mobile-only: name + role outside avatar parent, full width */}
       <div className="block sm:hidden w-full mt-2">
         <div className="inline-flex items-center gap-2">
-          <h1 className="text-2xl font-bold text-black">{profile.name}</h1>
+          <h1 className="text-2xl font-bold text-white dark:text-white">{profile.name}</h1>
           {profile.role && (
-            <span className="inline-block px-2 py-1 text-xs font-semibold bg-blue-100 text-blue-800 rounded-full">
+            <span className="inline-block px-2 py-1 text-xs font-semibold bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300 rounded-full">
               {profile.role.charAt(0).toUpperCase() + profile.role.slice(1)}
             </span>
           )}

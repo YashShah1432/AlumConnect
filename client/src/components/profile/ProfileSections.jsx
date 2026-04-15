@@ -15,8 +15,8 @@ const ProfileSections = ({ profile }) => {
   
   return (
     <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div>
-        <h2 className="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">Personal Information</h2>
+      <div className="rounded-2xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-600 p-5">
+        <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white border-b border-gray-200 dark:border-gray-600 pb-2">Personal Information</h2>
         <InfoItem 
           icon={<FaCalendarAlt />} 
           label="Date of Birth" 
@@ -34,8 +34,8 @@ const ProfileSections = ({ profile }) => {
         />
       </div>
       
-      <div>
-        <h2 className="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">Academic & Professional</h2>
+      <div className="rounded-2xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-600 p-5">
+        <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white border-b border-gray-200 dark:border-gray-600 pb-2">Academic & Professional</h2>
         <InfoItem 
           icon={<FaGraduationCap />} 
           label="Branch" 

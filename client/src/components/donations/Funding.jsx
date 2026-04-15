@@ -27,15 +27,15 @@ const FundingCard = ({
   const displayedComments = expanded ? comments : comments.slice(0, MAX_CHAR);
 
   return (
-    <div className="border border-gray-200 rounded p-4 shadow-md hover:shadow-lg transition-shadow">
+    <div className="border border-gray-200 dark:border-gray-700 rounded-2xl p-4 shadow-md dark:shadow-lg hover:shadow-lg dark:hover:shadow-xl transition-shadow bg-white dark:bg-gray-800">
       {/* Title / Name */}
-      <h2 className="text-lg font-semibold text-gray-800 mb-1">
+      <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-1">
         {name}
       </h2>
 
       {/* Main text / comments */}
       {comments && (
-        <p className="text-sm text-gray-600 mb-2">
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
           {displayedComments}
           {!expanded && isLong && '...'}
         </p>
@@ -45,7 +45,7 @@ const FundingCard = ({
       {isLong && (
         <button
           onClick={() => setExpanded(!expanded)}
-          className="text-blue-600 text-sm mb-2 focus:outline-none"
+          className="text-blue-600 dark:text-blue-400 text-sm mb-2 focus:outline-none hover:text-blue-700 dark:hover:text-blue-300"
         >
           {expanded ? 'Show Less' : 'Show More'}
         </button>
@@ -53,8 +53,8 @@ const FundingCard = ({
 
       {/* Bottom row: amount on left, batch/email on right */}
       <div className="flex justify-between items-center mb-2">
-        <span className="text-blue-600 font-medium">₹{amount}</span>
-        <span className="text-gray-500 text-sm">
+        <span className="text-blue-600 dark:text-blue-400 font-medium">₹{amount}</span>
+        <span className="text-gray-500 dark:text-gray-400 text-sm">
           {batch || email || 'Unknown'}
         </span>
       </div>
@@ -65,7 +65,7 @@ const FundingCard = ({
           {tags.map((tag, index) => (
             <span 
               key={index}
-              className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded"
+              className="bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300 text-xs px-2 py-1 rounded"
             >
               {tag}
             </span>
@@ -129,24 +129,27 @@ const Funding = ({ preview = false, filter }) => {
   }, [filter, preview]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 text-gray-600 dark:text-gray-400 shadow-sm dark:shadow-lg">Loading funding opportunities...</div>;
   }
 
   if (error) {
-    return <div className="text-red-600">{error}</div>;
+    return <div className="rounded-2xl border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 p-4 text-red-600 dark:text-red-400">{error}</div>;
   }
 
   // If preview mode, limit the list to 2 items
   const displayedRequests = preview ? opportunities.slice(0, 2) : opportunities;
 
   return (
-    <div className="h-full bg-white rounded-lg shadow-md p-6">
+    <div className="h-full bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-md dark:shadow-lg p-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">Boost Start-Up Culture</h2>
+        <div>
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Boost Start-Up Culture</h2>
+          <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">Discover active requests and help promising student ideas move forward.</p>
+        </div>
         {preview && (
           <button
             onClick={() => navigate('/donation/opportunities')}
-            className="text-blue-600 hover:text-blue-800 font-medium"
+            className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
           >
             View All →
           </button>
@@ -156,11 +159,11 @@ const Funding = ({ preview = false, filter }) => {
       <div className="space-y-6">
         {/* Banner or highlight section */}
         <div className="grid grid-cols-1 gap-4">
-          <div className="bg-purple-50 p-4 rounded-lg">
-            <h3 className="text-lg font-semibold text-purple-800 mb-2">
+          <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-xl border border-purple-100 dark:border-purple-900/40">
+            <h3 className="text-lg font-semibold text-purple-800 dark:text-purple-300 mb-2">
               Invest in College Startups and Projects
             </h3>
-            <p className="text-gray-700">
+            <p className="text-gray-700 dark:text-gray-300">
               Support innovative ideas from your alma mater's entrepreneurs.
             </p>
           </div>
@@ -190,7 +193,7 @@ const Funding = ({ preview = false, filter }) => {
           {userRole === 'student' && (
             <button
               onClick={() => navigate('/donation/create-funding-request')}
-              className="bg-green-600 text-white px-10 py-3 md:px-4 md:py-2 rounded-lg hover:bg-green-700"
+              className="bg-green-600 dark:bg-green-600 text-white px-10 py-3 md:px-4 md:py-2 rounded-xl hover:bg-green-700 dark:hover:bg-green-700 shadow-sm"
             >
               Create your own Request!
             </button>

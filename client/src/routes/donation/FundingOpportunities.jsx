@@ -73,7 +73,7 @@ const FundingOpportunities = () => {
     return (
       <Layout>
         <div className="flex justify-center items-center h-64">
-          <p className="text-blue-600 font-medium">Loading funding opportunities...</p>
+          <p className="text-blue-600 dark:text-blue-400 font-medium">Loading funding opportunities...</p>
         </div>
       </Layout>
     );
@@ -82,7 +82,7 @@ const FundingOpportunities = () => {
   if (error) {
     return (
       <Layout>
-        <div className="text-center p-8 text-red-500">{error}</div>
+        <div className="text-center p-8 text-red-500 dark:text-red-400">{error}</div>
       </Layout>
     );
   }
@@ -102,7 +102,7 @@ const FundingOpportunities = () => {
           <button
             type="button"
             onClick={() => navigate('/donation')}
-            className="px-5 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg shadow-lg hover:bg-blue-700 transition"
+            className="px-5 py-2 text-sm font-medium text-white bg-blue-600 rounded-xl shadow-lg hover:bg-blue-700 transition"
           >
             ← Back
           </button>
@@ -110,14 +110,14 @@ const FundingOpportunities = () => {
 
         {/* Page Header */}
         <div className="mb-6 text-center">
-          <h1 className="text-3xl font-bold text-gray-900">Funding Opportunities</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Funding Opportunities</h1>
           {isStudent ? (
-            <p className="mt-2 text-gray-600 max-w-2xl mx-auto">
+            <p className="mt-2 text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
               See how alumni are investing in the campus innovation ecosystem. These contributions
               strengthen labs, clubs and student‑led initiatives across the institute.
             </p>
           ) : (
-            <p className="mt-2 text-gray-600 max-w-2xl mx-auto">
+            <p className="mt-2 text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
               Explore how you can support student startups, research projects and innovation teams
               through transparent, institute‑verified opportunities.
             </p>
@@ -128,9 +128,9 @@ const FundingOpportunities = () => {
     Section 1: Alumni Contributions
    ========================= */}
         <section>
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">Alumni Contributions</h2>
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Alumni Contributions</h2>
           {visibleDonations.length === 0 ? (
-            <p className="text-gray-600 text-center">No alumni donations available at the moment.</p>
+            <p className="text-gray-600 dark:text-gray-400 text-center">No alumni donations available at the moment.</p>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {visibleDonations.map((donation) => (
@@ -221,9 +221,9 @@ const FundingOpportunities = () => {
    ========================= */}
         {!isStudent && (
           <section>
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">Student Funding Requests</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Student Funding Requests</h2>
             {opportunities.length === 0 ? (
-              <p className="text-gray-600 text-center">No funding requests available at the moment.</p>
+              <p className="text-gray-600 dark:text-gray-400 text-center">No funding requests available at the moment.</p>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {opportunities.map((opp) => {
