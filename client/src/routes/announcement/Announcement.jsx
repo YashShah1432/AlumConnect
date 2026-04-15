@@ -281,7 +281,7 @@ useEffect(() => {
                         </span>
                         <span>
                           <span className="font-medium text-gray-700">Branch:</span>{' '}
-                          {achievement.branch || 'N/A'}
+                          {achievement.branch|| 'N/A'}
                         </span>
                         <span>
                           <span className="font-medium text-gray-700">Date:</span>{' '}

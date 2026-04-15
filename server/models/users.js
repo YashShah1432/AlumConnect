@@ -4,21 +4,21 @@ const bcrypt = require('bcrypt');
 
 const UserSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  email: { 
-    type: String, 
-    required: true, 
+  email: {
+    type: String,
+    required: true,
     unique: true,
     lowercase: true,
     trim: true,
     validate: {
-      validator: function(v) {
+      validator: function (v) {
         return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(v);
       },
       message: props => `${props.value} is not a valid email!`
     }
   },
   password: { type: String, required: true, minlength: 8 },
- 
+
   phone: {
     type: String,
     required: true,          // required for ALL
@@ -50,8 +50,10 @@ const UserSchema = new mongoose.Schema({
     }
   },
 
-  role: { type: String, enum: ['student', 'admin', 'alumni']},
+  role: { type: String, enum: ['student', 'admin', 'alumni'] },
   isActive: { type: Boolean, default: true },
+  isApproved: { type: Boolean, default: false },
+  rejectionReason: { type: String, default: null },
   lastLogin: { type: Date },
   // New fields:
   dob: { type: Date },
@@ -72,7 +74,7 @@ const UserSchema = new mongoose.Schema({
     enum: ['CSE', 'IT', 'E&TC', 'MECH', 'CIVIL', 'ECM'],
     required: true
   },
-  currentCompany: { type: String, default: null},
+  currentCompany: { type: String, default: null },
   currentCompanyRole: { type: String, default: null },
   location: { type: String },
   batch: { type: String },
@@ -86,14 +88,14 @@ const UserSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // Hash password before saving
-UserSchema.pre('save', async function(next) {
+UserSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
   this.password = await bcrypt.hash(this.password, 12);
   next();
 });
 
 // Add password comparison method
-UserSchema.methods.comparePassword = async function(candidatePassword) {
+UserSchema.methods.comparePassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 

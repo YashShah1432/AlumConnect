@@ -12,6 +12,10 @@ module.exports = function(passport) {
     try {
       const user = await User.findOne({ email });
       if (!user) return done(null, false, { message: 'User not found' });
+
+      if (!user.isApproved) {
+  return done(null, false, { message: 'Account pending admin approval' });
+}
       
       // Compare password
       const isMatch = await bcrypt.compare(password, user.password);
@@ -49,6 +53,10 @@ async function(accessToken, refreshToken, profile, done) {
         message: 'This email is not registered in our system. Please contact the administrator.' 
       });
     }
+
+    if (!user.isApproved) {
+  return done(null, false, { message: 'Account pending admin approval' });
+}
 
     // Update user's Google info
     user.googleId = profile.id;

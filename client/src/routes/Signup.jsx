@@ -1,7 +1,6 @@
-// ...existing code...
 import { useState, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react';
+import { Eye, EyeOff, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
 import Navbar from '../components/landing-page/Navbar';
 import Footer from '../components/landing-page/Footer';
 import axiosInstance from '../utils/axiosConfig';
@@ -43,10 +42,35 @@ const Signup = () => {
   const [formData, setFormData] = useState(initialFormData);
   const [errors, setErrors] = useState({});
   const [apiError, setApiError] = useState('');
+  const [apiSuccess, setApiSuccess] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showOptional, setShowOptional] = useState(false);
+
+  // OTP state
+  const [otpSent, setOtpSent] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [otpVerified, setOtpVerified] = useState(false);
+  const [otpTimer, setOtpTimer] = useState(0);
+  const [otpLoading, setOtpLoading] = useState(false);
+
+  // Timer effect
+  useMemo(() => {
+    let interval;
+    if (otpTimer > 0) {
+      interval = setInterval(() => {
+        setOtpTimer((t) => {
+          if (t <= 1) {
+            clearInterval(interval);
+            return 0;
+          }
+          return t - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [otpTimer]);
 
   const selectedBranchCode = useMemo(() => {
     const found = branches.find(b => b.label === formData.branch);
@@ -64,10 +88,6 @@ const Signup = () => {
         updated.branchCode = found ? found.code : '';
       }
 
-      if (name === 'role' && value === 'alumni') {
-        // keep PRN but relax validation (handled in validate)
-      }
-
       if (name === 'phone') {
         updated.phone = value.replace(/\D/g, '');
       }
@@ -81,6 +101,7 @@ const Signup = () => {
 
     setErrors(prev => ({ ...prev, [name]: '' }));
     setApiError('');
+    setApiSuccess('');
   };
 
   const validate = () => {
@@ -164,6 +185,7 @@ const Signup = () => {
       currentCompanyRole: formData.currentCompanyRole || undefined,
       location: formData.location || undefined,
       socialLinks: Object.keys(socialLinks).length ? socialLinks : undefined,
+      otp
     };
 
     Object.keys(payload).forEach(key => {
@@ -175,21 +197,68 @@ const Signup = () => {
     return payload;
   };
 
+  // Send OTP
+  const handleSendOtp = async (e) => {
+    e.preventDefault();
+    setApiError('');
+    setApiSuccess('');
+    if (!formData.email || errors.email) {
+      setErrors(prev => ({ ...prev, email: 'Enter a valid Gmail address' }));
+      return;
+    }
+    setOtpLoading(true);
+    try {
+      await axiosInstance.post('/auth/send-otp', { email: formData.email });
+      setOtpSent(true);
+      setOtpTimer(60);
+      setApiSuccess('OTP sent to your email.');
+    } catch (err) {
+      setApiError(err.response?.data?.error || 'Failed to send OTP');
+    } finally {
+      setOtpLoading(false);
+    }
+  };
+
+  // Verify OTP
+  const handleVerifyOtp = async (e) => {
+    e.preventDefault();
+    setApiError('');
+    setApiSuccess('');
+    if (!otp || otp.length !== 6) {
+      setApiError('Enter the 6-digit OTP sent to your email.');
+      return;
+    }
+    setOtpLoading(true);
+    try {
+      await axiosInstance.post('/auth/verify-otp', { email: formData.email, otp });
+      setOtpVerified(true);
+      setApiSuccess('OTP verified! You can now register.');
+    } catch (err) {
+      setApiError(err.response?.data?.error || 'OTP verification failed');
+    } finally {
+      setOtpLoading(false);
+    }
+  };
+
+  // Register
   const handleSubmit = async (e) => {
     e.preventDefault();
     setApiError('');
-
+    setApiSuccess('');
     if (!validate()) return;
-
+    if (!otpVerified) {
+      setApiError('Please verify your OTP before registering.');
+      return;
+    }
     const payload = buildPayload();
-
     try {
       setIsSubmitting(true);
       const res = await axiosInstance.post('/auth/register', payload);
       if (res.data && res.data.success === false) {
         throw new Error(res.data.message || 'Registration failed');
       }
-      navigate('/login');
+      setApiSuccess('Registration successful! Await admin approval.');
+      setTimeout(() => navigate('/login'), 2000);
     } catch (error) {
       const backendMessage =
         error.response?.data?.message ||
@@ -218,10 +287,18 @@ const Signup = () => {
               </p>
             </div>
 
-            {apiError && (
-              <div className="mx-6 mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 flex items-start gap-2">
-                <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                <span>{apiError}</span>
+            {(apiError || apiSuccess) && (
+              <div className={`mx-6 mt-4 rounded-lg border px-4 py-3 text-sm flex items-start gap-2 ${
+                apiError
+                  ? 'border-red-200 bg-red-50 text-red-700'
+                  : 'border-green-200 bg-green-50 text-green-700'
+              }`}>
+                {apiError ? (
+                  <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                ) : (
+                  <CheckCircle2 className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                )}
+                <span>{apiError || apiSuccess}</span>
               </div>
             )}
 
@@ -484,6 +561,57 @@ const Signup = () => {
                 </div>
               </div>
 
+              {/* OTP Section */}
+              <div className="mt-4 flex flex-col gap-2">
+                {!otpSent && (
+                  <button
+                    type="button"
+                    onClick={handleSendOtp}
+                    disabled={otpLoading || !formData.email || !!errors.email}
+                    className="inline-flex w-full sm:w-auto items-center justify-center rounded-lg bg-sky-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-1 disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    {otpLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {otpLoading ? 'Sending OTP...' : 'Send OTP'}
+                  </button>
+                )}
+
+                {otpSent && !otpVerified && (
+                  <div className="flex flex-col sm:flex-row gap-2 items-center">
+                    <input
+                      type="text"
+                      maxLength={6}
+                      value={otp}
+                      onChange={e => setOtp(e.target.value.replace(/\D/g, ''))}
+                      placeholder="Enter 6-digit OTP"
+                      className="rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none w-full sm:w-48"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleVerifyOtp}
+                      disabled={otpLoading || otp.length !== 6}
+                      className="inline-flex items-center justify-center rounded-lg bg-green-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1 disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                      {otpLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                      {otpLoading ? 'Verifying...' : 'Verify OTP'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleSendOtp}
+                      disabled={otpTimer > 0}
+                      className="inline-flex items-center justify-center rounded-lg bg-sky-100 px-4 py-2.5 text-sm font-semibold text-sky-700 shadow-sm hover:bg-sky-200 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-1 disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                      Resend OTP {otpTimer > 0 && `(${otpTimer}s)`}
+                    </button>
+                  </div>
+                )}
+
+                {otpVerified && (
+                  <div className="flex items-center gap-2 text-green-700 text-sm">
+                    <CheckCircle2 className="h-4 w-4" /> OTP verified!
+                  </div>
+                )}
+              </div>
+
               {/* Optional / collapsible section */}
               <div className="pt-2 border-t border-slate-100 mt-4">
                 <button
@@ -613,7 +741,7 @@ const Signup = () => {
               <div className="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <button
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || !otpVerified}
                   className="inline-flex w-full sm:w-auto items-center justify-center rounded-lg bg-sky-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-1 disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {isSubmitting && (
@@ -638,8 +766,7 @@ const Signup = () => {
       </div>
       <Footer />
     </div>
-);
+  );
 };
 
 export default Signup;
-// ...existing code...

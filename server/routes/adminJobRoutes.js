@@ -6,27 +6,30 @@ const { verifyAdmin } = require('../middleware/authMiddleware');
 
 // GET all jobs for admin
 router.get('/', verifyAdmin, async (req, res) => {
-  console.log(
-    "adminJobRoutes.js: GET /api/jobs/admin called by:",
-    req.user ? req.user.email : 'unknown'
-  );
   try {
-    // 🔹 Build dynamic filter from query params (used by AdminNetwork.jsx)
+    // Build dynamic filter from query params
     const filter = {};
+    if (req.query.status) filter.status = req.query.status;
+    if (req.query.location) filter.location = { $regex: req.query.location, $options: 'i' };
+    if (req.query.employmentType) filter.employmentType = req.query.employmentType;
 
-    if (req.query.status) {
-      filter.status = req.query.status;
+    // 1. Find all active jobs with deadline passed
+    const now = new Date();
+    const expiredJobs = await Job.find({
+      status: 'active',
+      applicationDeadline: { $ne: null, $lt: now }
+    });
+
+    // 2. Update their status to 'filled'
+    if (expiredJobs.length > 0) {
+      const expiredIds = expiredJobs.map(j => j._id);
+      await Job.updateMany(
+        { _id: { $in: expiredIds } },
+        { $set: { status: 'filled' } }
+      );
     }
 
-    if (req.query.location) {
-      // case-insensitive partial match
-      filter.location = { $regex: req.query.location, $options: 'i' };
-    }
-
-    if (req.query.employmentType) {
-      filter.employmentType = req.query.employmentType;
-    }
-
+    // 3. Fetch jobs with updated statuses
     const jobs = await Job.find(filter).sort({ createdAt: -1 });
     res.json(jobs);
   } catch (error) {

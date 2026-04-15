@@ -124,6 +124,9 @@ app.use((req, res, next) => {
 // Routes
 const routes = [
   { path: '/auth', router: require('./routes/authRoutes') },
+  { path: '/auth', router: require('./routes/signupRoutes') },
+  { path: '/api/signup', router: require('./routes/signupRoutes') },
+  { path: '/api/auth', router: require('./routes/signupRoutes') },
   { path: '/api/profile', router: require('./routes/profileRoutes') },
   { path: '/api/announcements', router: require('./routes/announcementRoutes') },
   { path: '/api/admin/announcements', router: require('./routes/adminAnnouncementRoutes') },
