@@ -5,6 +5,7 @@ import Layout from '../../components/common/Layout';
 import { useSidebarLayout } from '../../hooks/useSidebarLayout';
 import { PlusCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useUser } from '../../context/UserContext';
 
 import AllAlumni from './AllAlumni';
 import AllJobs from './AllJobs';
@@ -12,6 +13,7 @@ import AllJobs from './AllJobs';
 const Network = () => {
   useSidebarLayout(true);
   const navigate = useNavigate();
+  const {user} = useUser();
 
   // Tabs: 'alumni' | 'jobs'
   const [selectedTab, setSelectedTab] = useState('alumni');
@@ -55,7 +57,7 @@ const Network = () => {
         </div>
 
         {/* Create Job button – Jobs tab only, below tabs, above job cards */}
-        {selectedTab === 'jobs' && (
+        {selectedTab === 'jobs' && user?.role === 'alumni' &&  (
           <div className="flex justify-start">
             <button
               type="button"
