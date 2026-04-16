@@ -79,31 +79,57 @@ exports.verifyOtp = async (req, res) => {
 };
 
 exports.register = async (req, res) => {
-  try {
-    const { email, ...userData } = req.body;
-    if (!email) return res.status(400).json({ error: 'Email required' });
+    try {
+        const { email, ...userData } = req.body;
+        if (!email) return res.status(400).json({ error: 'Email required' });
 
-    // Check session for OTP verification
-    if (!req.session.otpVerified || req.session.otpEmail !== email) {
-      return res.status(400).json({ error: 'OTP not verified for this email' });
+        // Check session for OTP verification
+        if (!req.session.otpVerified || req.session.otpEmail !== email) {
+            return res.status(400).json({ error: 'OTP not verified for this email' });
+        }
+
+        // === Paste the validation code here ===
+        const phone = req.body.phone;
+        if (!/^\d{10,12}$/.test(phone)) {
+            return res.status(400).json({ error: 'Phone must be 10-12 digits.' });
+        }
+
+        if (req.body.role === 'student') {
+            const prn = req.body.PRN;
+            if (!/^\d{10}$/.test(prn)) {
+                return res.status(400).json({ error: 'PRN must be exactly 10 digits.' });
+            }
+        }
+
+        const dob = new Date(req.body.dob);
+        const minDate = new Date();
+        minDate.setFullYear(minDate.getFullYear() - 18);
+        if (dob > minDate) {
+            return res.status(400).json({ error: 'You must be at least 18 years old.' });
+        }
+
+        const password = req.body.password;
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+        if (!passwordRegex.test(password)) {
+            return res.status(400).json({ error: 'Password must be at least 8 characters and include uppercase, lowercase, digit, and special character.' });
+        }
+
+        // Create user (pending approval)
+        const user = new User({
+            ...userData,
+            email,
+            isApproved: false
+        });
+        await user.save();
+
+        // Clear OTP session flag
+        req.session.otpVerified = false;
+        req.session.otpEmail = null;
+
+        res.json({ message: 'Registration successful. Await admin approval.' });
+    } catch (err) {
+        res.status(500).json({ error: 'Registration failed', details: err.message });
     }
-
-    // Create user (pending approval)
-    const user = new User({
-      ...userData,
-      email,
-      isApproved: false
-    });
-    await user.save();
-
-    // Clear OTP session flag
-    req.session.otpVerified = false;
-    req.session.otpEmail = null;
-
-    res.json({ message: 'Registration successful. Await admin approval.' });
-  } catch (err) {
-    res.status(500).json({ error: 'Registration failed', details: err.message });
-  }
 };
 
 // Admin approval/rejection (add to admin routes)

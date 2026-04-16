@@ -17,7 +17,18 @@ const UserSchema = new mongoose.Schema({
       message: props => `${props.value} is not a valid email!`
     }
   },
-  password: { type: String, required: true, minlength: 8 },
+  password: {
+    type: String,
+    required: true,
+    minlength: 8,
+    validate: {
+      validator: function (v) {
+        // At least 1 upper, 1 lower, 1 digit, 1 special, min 8 chars
+        return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/.test(v);
+      },
+      message: props => 'Password must be at least 8 characters and include uppercase, lowercase, digit, and special character.'
+    }
+  },
 
   phone: {
     type: String,
@@ -27,7 +38,7 @@ const UserSchema = new mongoose.Schema({
     validate: {
       validator: function (v) {
         // only digits, 10–15 length (adjust as needed)
-        return /^\d{10,15}$/.test(v);
+        return /^\d{10,12}$/.test(v);
       },
       message: props => `${props.value} is not a valid phone number!`
     }
@@ -56,7 +67,19 @@ const UserSchema = new mongoose.Schema({
   rejectionReason: { type: String, default: null },
   lastLogin: { type: Date },
   // New fields:
-  dob: { type: Date },
+  dob: {
+    type: Date,
+    required: true,
+    validate: {
+      validator: function (v) {
+        if (!v) return false;
+        const minDate = new Date();
+        minDate.setFullYear(minDate.getFullYear() - 18);
+        return v <= minDate;
+      },
+      message: props => `Date of birth must be at least 18 years ago.`
+    }
+  },
   branch: {
     type: String,
     enum: [

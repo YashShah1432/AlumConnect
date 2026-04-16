@@ -15,7 +15,7 @@ import {
 import { useSidebarLayout } from '../../hooks/useSidebarLayout';
 
 const AdminNetwork = () => {
-  const [selectedTab, setSelectedTab] = useState('alumnis');
+  const [selectedTab, setSelectedTab] = useState('profiles');
   const [pendingUsers, setPendingUsers] = useState([]);
 
   const [jobs, setJobs] = useState([]);
@@ -243,14 +243,14 @@ const AdminNetwork = () => {
           <nav className="-mb-px flex space-x-6" aria-label="Tabs">
             <button
               type="button"
-              onClick={() => setSelectedTab('alumnis')}
+              onClick={() => setSelectedTab('profiles')}
               className={`whitespace-nowrap py-2 px-1 border-b-2 text-sm font-medium
-                ${selectedTab === 'alumnis'
+                ${selectedTab === 'profiles'
                   ? 'border-blue-600 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
             >
-              Alumnis
+              Profiles
             </button>
 
             <button
@@ -268,7 +268,7 @@ const AdminNetwork = () => {
         </div>
 
         {/* Tab Content */}
-        {selectedTab === 'alumnis' && (
+        {selectedTab === 'profiles' && (
           <div className="min-h-[200px] py-6">
   {pendingUsers && pendingUsers.length > 0 ? (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
