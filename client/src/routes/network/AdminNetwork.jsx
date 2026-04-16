@@ -11,6 +11,13 @@ import {
   Wallet,
   CalendarDays,
   Mail,
+  PhoneIcon,
+  BookOpenIcon,
+  IdCardIcon,
+  BuildingIcon,
+  BriefcaseIcon,
+  MapPinIcon,
+  HomeIcon,
 } from 'lucide-react';
 import { useSidebarLayout } from '../../hooks/useSidebarLayout';
 
@@ -22,6 +29,11 @@ const AdminNetwork = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [copiedJobId, setCopiedJobId] = useState(null);
+
+  const [roleFilter, setRoleFilter] = useState('');
+const [branchFilter, setBranchFilter] = useState('');
+const [batchFilter, setBatchFilter] = useState('');
+const [searchQuery, setSearchQuery] = useState('');
 
   // 🔹 Filters
   const [statusFilter, setStatusFilter] = useState('');
@@ -235,6 +247,23 @@ const AdminNetwork = () => {
     );
   }
 
+  const filteredUsers = pendingUsers.filter(user => {
+  // Role filter
+  if (roleFilter && user.role !== roleFilter) return false;
+  // Branch filter
+  if (branchFilter && user.branchCode !== branchFilter) return false;
+  // Batch filter
+  if (batchFilter && String(user.batch) !== String(batchFilter)) return false;
+  // Search by name or PRN (case-insensitive)
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    const nameMatch = user.name?.toLowerCase().includes(q);
+    const prnMatch = user.PRN?.toString().includes(q);
+    if (!nameMatch && !prnMatch) return false;
+  }
+  return true;
+});
+
   return (
     <Layout>
       <div className="max-w-7xl mx-auto px-4 py-10 space-y-6">
@@ -270,77 +299,191 @@ const AdminNetwork = () => {
         {/* Tab Content */}
         {selectedTab === 'profiles' && (
           <div className="min-h-[200px] py-6">
-  {pendingUsers && pendingUsers.length > 0 ? (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      {pendingUsers.map((user, idx) => (
-        <div
-          key={user._id}
-          className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all p-5 sm:p-6 flex flex-col animate-fade-in"
-          style={{
-            animationDelay: `${idx * 60}ms`,
-            animationFillMode: 'both'
-          }}
-        >
-          {/* Header: Name + Role */}
-          <div className="flex items-start justify-between gap-3 mb-3">
-            <div className="min-w-0">
-              <h3 className="text-lg sm:text-xl font-semibold text-blue-700 truncate">
-                {user.name}
-              </h3>
-              <p className="mt-1 text-sm text-gray-600 truncate">
-                {user.email}
-                {user.role ? ` • ${user.role}` : ''}
-              </p>
-            </div>
-          </div>
+            <section className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+  <div className="flex flex-col md:flex-row md:items-center gap-3">
+    <h2 className="text-xl font-bold text-gray-900">Filter:</h2>
+    <form
+      onSubmit={e => { e.preventDefault(); }}
+      className="flex flex-wrap gap-2 md:gap-3 text-xs sm:text-sm"
+    >
+      {/* Role */}
+      <select
+        value={roleFilter}
+        onChange={e => setRoleFilter(e.target.value)}
+        className="px-3 py-2 border border-gray-300 rounded-lg w-full sm:w-32"
+      >
+        <option value="">All Roles</option>
+        <option value="alumni">Alumni</option>
+        <option value="student">Student</option>
+      </select>
+      {/* Branch */}
+      <input
+        type="text"
+        value={branchFilter}
+        onChange={e => setBranchFilter(e.target.value)}
+        placeholder="Branch"
+        className="px-3 py-2 border border-gray-300 rounded-lg w-full sm:w-32"
+      />
+      {/* Batch */}
+      <input
+        type="text"
+        value={batchFilter}
+        onChange={e => setBatchFilter(e.target.value)}
+        placeholder="Batch"
+        className="px-3 py-2 border border-gray-300 rounded-lg w-full sm:w-32"
+      />
+      {/* Search */}
+      <input
+        type="text"
+        value={searchQuery}
+        onChange={e => setSearchQuery(e.target.value)}
+        placeholder="Search Name or PRN"
+        className="px-3 py-2 border border-gray-300 rounded-lg w-full sm:w-44"
+      />
+      {/* Apply/Clear */}
+      <button
+        type="button"
+        onClick={() => {}} // Filtering is live, so no-op
+        className="px-3 py-2 text-[11px] sm:text-xs font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700"
+      >
+        Apply
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          setRoleFilter('');
+          setBranchFilter('');
+          setBatchFilter('');
+          setSearchQuery('');
+        }}
+        className="px-3 py-2 text-[11px] sm:text-xs font-semibold rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200"
+      >
+        Clear
+      </button>
+    </form>
+  </div>
+  <div className="text-gray-500 text-sm flex items-center mt-2 md:mt-0 h-full">
+    {filteredUsers.length} {filteredUsers.length === 1 ? 'profile' : 'profiles'} found
+  </div>
+</section>
+            {filteredUsers && filteredUsers.length > 0 ? (
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    {filteredUsers.map((user, idx) => (
+                  <div
+                    key={user._id}
+                    className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all p-5 sm:p-6 flex flex-col animate-fade-in"
+                    style={{
+                      animationDelay: `${idx * 60}ms`,
+                      animationFillMode: 'both'
+                    }}
+                  >
+                    {/* Header: Name + Role */}
+                    <div className="flex items-center gap-3 mb-4 mt-2">
+                      {/* <div className="flex-shrink-0 bg-gray-100 rounded-full p-2">
+        <Mail className="text-gray-500" size={28} />
+      </div> */}
+                      <div className="min-w-0 ml-1">
+                        <h3 className="text-xl font-bold text-blue-700 truncate flex items-center gap-2">
+                          {user.name}
+                          {user.role === 'alumni' && <CheckCircle2 className="text-gray-500" size={18} title="Alumni" />}
+                          {user.role === 'student'}
+                        </h3>
+                        <p className="mt-0.5 text-sm text-gray-600 truncate flex items-center gap-1">
+                          <Mail size={14} className="text-gray-500" /> {user.email}
+                          <span className="mx-1 text-gray-500 text-base text-xl">•</span>
+                          <span className="capitalize">{user.role}</span>
+                        </p>
+                      </div>
+                    </div>
 
-          {/* Details grid */}
-          <div className="rounded-xl bg-gray-50 border border-gray-100 p-4 space-y-2 mb-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1 text-sm text-gray-700">
-              <p><span className="font-semibold">Phone:</span> {user.phone || '-'}</p>
-              <p><span className="font-semibold">DOB:</span> {user.dob ? new Date(user.dob).toLocaleDateString() : '-'}</p>
-              <p><span className="font-semibold">Branch:</span> {user.branchCode || '-'}</p>
-              <p><span className="font-semibold">Batch:</span> {user.batch || '-'}</p>
-              <p><span className="font-semibold">PRN:</span> {user.PRN || '-'}</p>
-              <p><span className="font-semibold">Current Company:</span> {user.currentCompany || '-'}</p>
-              <p><span className="font-semibold">Current Role:</span> {user.currentCompanyRole || '-'}</p>
-              <p><span className="font-semibold">Location:</span> {user.location || '-'}</p>
-              <p><span className="font-semibold">Home Town:</span> {user.homeTown || '-'}</p>
-              {user.socialLinks && (
-                <>
-                  <p><span className="font-semibold">LinkedIn:</span> {user.socialLinks.linkedIn || '-'}</p>
-                  <p><span className="font-semibold">Instagram:</span> {user.socialLinks.instagram || '-'}</p>
-                  <p><span className="font-semibold">GitHub:</span> {user.socialLinks.github || '-'}</p>
-                  <p><span className="font-semibold">Twitter:</span> {user.socialLinks.twitter || '-'}</p>
-                </>
-              )}
-            </div>
-          </div>
+                    {/* Details grid with icons */}
+                    <div className="rounded-xl bg-gray-50 border border-gray-100 p-4 space-y-2 mb-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm text-gray-700">
+                        <p className="flex items-center gap-2">
+                          <PhoneIcon size={16} className="text-gray-500" />
+                          <span className="font-semibold">Phone:</span> {user.phone || '-'}
+                        </p>
+                        <p className="flex items-center gap-2">
+                          <CalendarDays size={16} className="text-gray-500" />
+                          <span className="font-semibold">DOB:</span> {user.dob ? new Date(user.dob).toLocaleDateString() : '-'}
+                        </p>
+                        <p className="flex items-center gap-2">
+                          <BookOpenIcon size={16} className="text-gray-500" />
+                          <span className="font-semibold">Branch:</span> {user.branchCode || '-'}
+                        </p>
+                        <p className="flex items-center gap-2">
+                          <Copy size={16} className="text-gray-500" />
+                          <span className="font-semibold">Batch:</span> {user.batch || '-'}
+                        </p>
+                        <p className="flex items-center gap-2">
+                          <IdCardIcon size={16} className="text-gray-500" />
+                          <span className="font-semibold">PRN:</span> {user.PRN || '-'}
+                        </p>
+                        <p className="flex items-center gap-2">
+                          <BuildingIcon size={16} className="text-gray-500" />
+                          <span className="font-semibold">Current Company:</span> {user.currentCompany || '-'}
+                        </p>
+                        <p className="flex items-center gap-2">
+                          <BriefcaseIcon size={16} className="text-gray-500" />
+                          <span className="font-semibold">Current Role:</span> {user.currentCompanyRole || '-'}
+                        </p>
+                        <p className="flex items-center gap-2">
+                          <MapPinIcon size={16} className="text-gray-500" />
+                          <span className="font-semibold">Location:</span> {user.location || '-'}
+                        </p>
+                        <p className="flex items-center gap-2">
+                          <HomeIcon size={16} className="text-gray-500" />
+                          <span className="font-semibold">Home Town:</span> {user.homeTown || '-'}
+                        </p>
+                        {user.socialLinks && (
+                          <>
+                            <p className="flex items-center gap-2">
+                              <ExternalLink size={16} className="text-gray-500" />
+                              <span className="font-semibold">LinkedIn:</span> {user.socialLinks.linkedIn || '-'}
+                            </p>
+                            <p className="flex items-center gap-2">
+                              <ExternalLink size={16} className="text-gray-500" />
+                              <span className="font-semibold">Instagram:</span> {user.socialLinks.instagram || '-'}
+                            </p>
+                            <p className="flex items-center gap-2">
+                              <ExternalLink size={16} className="text-gray-500" />
+                              <span className="font-semibold">GitHub:</span> {user.socialLinks.github || '-'}
+                            </p>
+                            <p className="flex items-center gap-2">
+                              <ExternalLink size={16} className="text-gray-500" />
+                              <span className="font-semibold">Twitter:</span> {user.socialLinks.twitter || '-'}
+                            </p>
+                          </>
+                        )}
+                      </div>
+                    </div>
 
-          {/* Actions */}
-          <div className="mt-auto flex flex-wrap gap-2">
-            <button
-              onClick={() => handleAcceptUser(user._id)}
-              className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-green-600 text-white hover:bg-green-700 transition flex-1"
-            >
-              Accept
-            </button>
-            <button
-              onClick={() => handleRejectUser(user._id)}
-              className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-red-600 text-white hover:bg-red-700 transition flex-1"
-            >
-              Reject
-            </button>
+                    {/* Actions */}
+                    <div className="mt-auto flex flex-wrap gap-2">
+                      <button
+                        onClick={() => handleAcceptUser(user._id)}
+                        className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-green-600 text-white hover:bg-green-700 transition flex-1"
+                      >
+                        <CheckCircle2 size={16} />
+                        Accept
+                      </button>
+                      <button
+                        onClick={() => handleRejectUser(user._id)}
+                        className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-red-600 text-white hover:bg-red-700 transition flex-1"
+                      >
+                        <XCircle size={16} />
+                        Reject
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="flex items-center justify-center text-gray-400 text-lg h-full">
+                No pending profiles to display.
+              </div>
+            )}
           </div>
-        </div>
-      ))}
-    </div>
-  ) : (
-    <div className="flex items-center justify-center text-gray-400 text-lg h-full">
-      No pending alumni to display.
-    </div>
-  )}
-</div>
         )}
 
         {/* Jobs Tab */}
@@ -439,10 +582,14 @@ const AdminNetwork = () => {
               <p className="text-gray-600 text-center">No job opportunities found.</p>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {jobs.map((job) => (
+                {jobs.map((job, idx) => (
                   <div
                     key={job._id}
-                    className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all p-5 sm:p-6 flex flex-col"
+                    className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all p-5 sm:p-6 flex flex-col animate-fade-in"
+                    style={{
+                      animationDelay: `${idx * 60}ms`,
+                      animationFillMode: 'both'
+                    }}
                   >
                     {/* Header: Job Title + Status */}
                     <div className="flex items-start justify-between gap-3 mb-4">
