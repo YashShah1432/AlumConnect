@@ -22,6 +22,7 @@ import Footer from './components/landing-page/Footer';
 // Routes for public and protected pages
 import Login from './routes/Login';
 import Signup from './routes/Signup';
+import ForgotPassword from './routes/ForgotPassword';
 import PrivacyPolicy from "./routes/technical_support/PrivacyPolicy";
 import TermsOfService from "./routes/technical_support/TermsOfService";
 import Support from "./routes/technical_support/Support";
@@ -105,6 +106,7 @@ const AppRoutes = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/jobs" element={<JobCard />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/apply/:jobId" element={<ApplyForm />} />
 
       {/* New static pages */}

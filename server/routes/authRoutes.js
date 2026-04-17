@@ -4,6 +4,7 @@ const passport = require("passport");
 const router = express.Router();
 const { ensureInstitutionalEmail } = require('../middleware/roleMiddleware');
 const { isAuthenticated } = require('../middleware/isAuthenticated');
+const authCtrl = require('../controllers/authController');
 
 // ✅ POST /auth/login
 router.post("/login",ensureInstitutionalEmail, (req, res, next) => {
@@ -200,5 +201,9 @@ router.get('/check', (req, res) => {
     }
   });
 });
+
+router.post('/forgot-password', authCtrl.forgotPassword);
+router.post('/verify-reset-otp', authCtrl.verifyResetOtp);
+router.post('/reset-password', authCtrl.resetPassword);
 
 module.exports = router;

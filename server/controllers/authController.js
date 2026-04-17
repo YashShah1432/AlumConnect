@@ -149,3 +149,53 @@ exports.rejectUser = async (req, res) => {
     await User.findByIdAndDelete(id);
     res.json({ message: 'User rejected and deleted' });
 };
+
+// 1. Send OTP for password reset
+exports.forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+  if (!user) return res.status(404).json({ message: 'User not found' });
+
+  // Generate OTP and save (reuse your OTP logic)
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  const hashedOtp = await bcrypt.hash(otp, 10);
+  await Otp.findOneAndUpdate(
+    { email },
+    { otp: hashedOtp, attempts: 0, updatedAt: new Date() },
+    { upsert: true }
+  );
+  await sendOtpMail(email, otp);
+  res.json({ message: 'OTP sent to email' });
+};
+
+// 2. Verify OTP
+exports.verifyResetOtp = async (req, res) => {
+  const { email, otp } = req.body;
+  const record = await Otp.findOne({ email });
+  if (!record) return res.status(400).json({ message: 'OTP not found' });
+  const isMatch = await bcrypt.compare(otp, record.otp);
+  if (!isMatch) return res.status(400).json({ message: 'Invalid OTP' });
+  res.json({ message: 'OTP verified' });
+};
+
+// 3. Reset password
+exports.resetPassword = async (req, res) => {
+  const { email, otp, newPassword } = req.body;
+  const record = await Otp.findOne({ email });
+  if (!record) return res.status(400).json({ message: 'OTP not found' });
+  const isMatch = await bcrypt.compare(otp, record.otp);
+  if (!isMatch) return res.status(400).json({ message: 'Invalid OTP' });
+
+  // Password validation (same as registration)
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+  if (!passwordRegex.test(newPassword)) {
+    return res.status(400).json({ message: 'Password does not meet criteria' });
+  }
+
+  const user = await User.findOne({ email });
+  if (!user) return res.status(404).json({ message: 'User not found' });
+  user.password = newPassword;
+  await user.save();
+  await Otp.deleteOne({ email }); // Remove OTP after use
+  res.json({ message: 'Password reset successful' });
+};
