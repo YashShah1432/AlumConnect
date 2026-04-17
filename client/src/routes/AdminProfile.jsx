@@ -1,7 +1,6 @@
-// client/src/routes/AdminProfile.jsx
 import React, { useState, useEffect } from 'react';
-import Layout from '../components/common/Layout';
 import axios from 'axios';
+import Layout from '../components/common/Layout';
 import { useSidebarLayout } from '../hooks/useSidebarLayout';
 
 const AdminProfile = () => {
@@ -10,16 +9,16 @@ const AdminProfile = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // NEW: which tab is active: 'students' | 'alumni'
-  // default -> Student Profiles first
+  // which tab is active: 'students' | 'alumni'
   const [selectedTab, setSelectedTab] = useState('students');
 
-  // 🔹 NEW: filter state (shared between tabs but independent per role)
+  // Filters
   const [studentBatchFilter, setStudentBatchFilter] = useState('');
   const [studentBranchCodeFilter, setStudentBranchCodeFilter] = useState('');
+  const [studentPrnFilter, setStudentPrnFilter] = useState('');
   const [alumniBatchFilter, setAlumniBatchFilter] = useState('');
   const [alumniBranchCodeFilter, setAlumniBranchCodeFilter] = useState('');
-
+  const [alumniPrnFilter, setAlumniPrnFilter] = useState('');
   const [studentNameFilter, setStudentNameFilter] = useState('');
   const [alumniNameFilter, setAlumniNameFilter] = useState('');
 
@@ -35,8 +34,6 @@ const AdminProfile = () => {
         }
       );
       const users = res.data;
-
-      // Separate into alumni vs. students
       setAlumni(users.filter((u) => u.role === 'alumni'));
       setStudents(users.filter((u) => u.role === 'student'));
     } catch (err) {
@@ -59,7 +56,6 @@ const AdminProfile = () => {
         { role: 'alumni' },
         { withCredentials: true }
       );
-      // Refresh after update
       fetchUsers();
     } catch (err) {
       console.error('Error updating user role:', err);
@@ -82,7 +78,7 @@ const AdminProfile = () => {
     }
   };
 
-  // 🔹 Derived filtered lists
+  // Filtered lists
   const filteredStudents = students.filter((u) => {
     const nameMatch = studentNameFilter
       ? (u.name || '').toLowerCase().includes(studentNameFilter.toLowerCase())
@@ -93,7 +89,10 @@ const AdminProfile = () => {
     const branchCodeMatch = studentBranchCodeFilter
       ? (u.branchCode || '').toLowerCase().includes(studentBranchCodeFilter.toLowerCase())
       : true;
-    return nameMatch && batchMatch && branchCodeMatch;
+    const prnMatch = studentPrnFilter
+      ? (u.PRN || '').toLowerCase().includes(studentPrnFilter.toLowerCase())
+      : true;
+    return nameMatch && batchMatch && branchCodeMatch && prnMatch;
   });
 
   const filteredAlumni = alumni.filter((u) => {
@@ -106,7 +105,10 @@ const AdminProfile = () => {
     const branchCodeMatch = alumniBranchCodeFilter
       ? (u.branchCode || '').toLowerCase().includes(alumniBranchCodeFilter.toLowerCase())
       : true;
-    return nameMatch && batchMatch && branchCodeMatch;
+    const prnMatch = alumniPrnFilter
+      ? (u.PRN || '').toLowerCase().includes(alumniPrnFilter.toLowerCase())
+      : true;
+    return nameMatch && batchMatch && branchCodeMatch && prnMatch;
   });
 
   if (loading) {
@@ -130,7 +132,7 @@ const AdminProfile = () => {
   return (
     <Layout>
       <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
-        {/* ===== Tabs Header (Students / Alumni) ===== */}
+        {/* Tabs Header */}
         <div className="border-b border-gray-200">
           <nav className="-mb-px flex space-x-6" aria-label="Tabs">
             <button
@@ -144,7 +146,6 @@ const AdminProfile = () => {
             >
               Student Profiles
             </button>
-
             <button
               type="button"
               onClick={() => setSelectedTab('alumni')}
@@ -159,17 +160,13 @@ const AdminProfile = () => {
           </nav>
         </div>
 
-        {/* ===== Tab Panels ===== */}
-
-        {/* Students Tab (default) */}
+        {/* Students Tab */}
         {selectedTab === 'students' && (
           <section className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-center gap-3">
               <h1 className="text-xl font-bold text-gray-900">
                 Filter:
               </h1>
-
-              {/* 🔹 Filters (responsive) */}
               <form
                 onSubmit={(e) => e.preventDefault()}
                 className="flex flex-wrap gap-2 md:gap-3 text-sm"
@@ -195,13 +192,21 @@ const AdminProfile = () => {
                   placeholder="Filter by branch code"
                   className="px-3 py-2 border border-gray-300 rounded-lg text-sm w-full sm:w-40"
                 />
-                {(studentNameFilter || studentBatchFilter || studentBranchCodeFilter) && (
+                <input
+                  type="text"
+                  value={studentPrnFilter}
+                  onChange={(e) => setStudentPrnFilter(e.target.value)}
+                  placeholder="Filter by PRN"
+                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm w-full sm:w-40"
+                />
+                {(studentNameFilter || studentBatchFilter || studentBranchCodeFilter || studentPrnFilter) && (
                   <button
                     type="button"
                     onClick={() => {
                       setStudentNameFilter('');
                       setStudentBatchFilter('');
                       setStudentBranchCodeFilter('');
+                      setStudentPrnFilter('');
                     }}
                     className="px-3 py-2 text-xs font-semibold rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200"
                   >
@@ -219,7 +224,7 @@ const AdminProfile = () => {
               </p>
             ) : (
               <>
-                {/* 🔹 Mobile: card layout (no horizontal scroll) */}
+                {/* Mobile: card layout */}
                 <div className="grid gap-4 md:hidden">
                   {filteredStudents.map((user) => (
                     <div
@@ -239,7 +244,6 @@ const AdminProfile = () => {
                           {(user.name || 'U').charAt(0).toUpperCase()}
                         </span>
                       </div>
-
                       <div className="text-sm text-gray-700 space-y-1">
                         <p className="break-all">
                           <span className="text-gray-500 text-xs uppercase tracking-wide">
@@ -259,8 +263,13 @@ const AdminProfile = () => {
                           </span>
                           {user.branchCode || 'N/A'}
                         </p>
+                        <p>
+                          <span className="text-gray-500 text-xs uppercase tracking-wide">
+                            PRN:{' '}
+                          </span>
+                          {user.PRN || 'N/A'}
+                        </p>
                       </div>
-
                       <div className="pt-2 border-t border-gray-100 flex justify-end">
                         <button
                           onClick={() => handleMarkAsAlumni(user._id)}
@@ -272,8 +281,7 @@ const AdminProfile = () => {
                     </div>
                   ))}
                 </div>
-
-                {/* 🔹 md+ screens: table view */}
+                {/* Desktop: table view */}
                 <div className="hidden md:block overflow-x-auto bg-white rounded-xl shadow">
                   <table className="min-w-full table-auto border-collapse text-left">
                     <thead className="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
@@ -283,6 +291,7 @@ const AdminProfile = () => {
                         <th className="px-6 py-3 font-medium text-center">Phone</th>
                         <th className="px-6 py-3 font-medium text-center">Batch</th>
                         <th className="px-6 py-3 font-medium text-center">Branch</th>
+                        <th className="px-6 py-3 font-medium text-center">PRN</th>
                         <th className="px-6 py-3 font-medium text-center">Action</th>
                       </tr>
                     </thead>
@@ -306,6 +315,9 @@ const AdminProfile = () => {
                           </td>
                           <td className="px-6 py-4 text-gray-600 text-center">
                             {user.branchCode || 'N/A'}
+                          </td>
+                          <td className="px-6 py-4 text-gray-600 text-center">
+                            {user.PRN || 'N/A'}
                           </td>
                           <td className="px-6 py-4 text-center">
                             <button
@@ -332,8 +344,6 @@ const AdminProfile = () => {
               <h1 className="text-xl font-bold text-gray-900">
                 Filter:
               </h1>
-
-              {/* 🔹 Filters (responsive) */}
               <form
                 onSubmit={(e) => e.preventDefault()}
                 className="flex flex-wrap gap-2 md:gap-3 text-sm"
@@ -359,13 +369,21 @@ const AdminProfile = () => {
                   placeholder="Filter by branch code"
                   className="px-3 py-2 border border-gray-300 rounded-lg text-sm w-full sm:w-40"
                 />
-                {(alumniNameFilter || alumniBatchFilter || alumniBranchCodeFilter) && (
+                <input
+                  type="text"
+                  value={alumniPrnFilter}
+                  onChange={(e) => setAlumniPrnFilter(e.target.value)}
+                  placeholder="Filter by PRN"
+                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm w-full sm:w-40"
+                />
+                {(alumniNameFilter || alumniBatchFilter || alumniBranchCodeFilter || alumniPrnFilter) && (
                   <button
                     type="button"
                     onClick={() => {
                       setAlumniNameFilter('');
                       setAlumniBatchFilter('');
                       setAlumniBranchCodeFilter('');
+                      setAlumniPrnFilter('');
                     }}
                     className="px-3 py-2 text-xs font-semibold rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200"
                   >
@@ -383,7 +401,7 @@ const AdminProfile = () => {
               </p>
             ) : (
               <>
-                {/* 🔹 Mobile: card layout (no horizontal scroll) */}
+                {/* Mobile: card layout */}
                 <div className="grid gap-4 md:hidden">
                   {filteredAlumni.map((user) => (
                     <div
@@ -403,7 +421,6 @@ const AdminProfile = () => {
                           {(user.name || 'A').charAt(0).toUpperCase()}
                         </span>
                       </div>
-
                       <div className="text-sm text-gray-700 space-y-1">
                         <p className="break-all">
                           <span className="text-gray-500 text-xs uppercase tracking-wide">
@@ -423,6 +440,12 @@ const AdminProfile = () => {
                           </span>
                           {user.branchCode || 'N/A'}
                         </p>
+                        <p>
+                          <span className="text-gray-500 text-xs uppercase tracking-wide">
+                            PRN:{' '}
+                          </span>
+                          {user.PRN || 'N/A'}
+                        </p>
                       </div>
                       <div className="pt-2 border-t border-gray-100 flex justify-end">
                         <button
@@ -435,8 +458,7 @@ const AdminProfile = () => {
                     </div>
                   ))}
                 </div>
-
-                {/* 🔹 md+ screens: table view */}
+                {/* Desktop: table view */}
                 <div className="hidden md:block overflow-x-auto bg-white rounded-xl shadow">
                   <table className="min-w-full table-auto border-collapse text-left">
                     <thead className="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
@@ -446,6 +468,7 @@ const AdminProfile = () => {
                         <th className="px-6 py-3 font-medium text-center">Phone</th>
                         <th className="px-6 py-3 font-medium text-center">Batch</th>
                         <th className="px-6 py-3 font-medium text-center">Branch</th>
+                        <th className="px-6 py-3 font-medium text-center">PRN</th>
                         <th className="px-6 py-3 font-medium text-center">Action</th>
                       </tr>
                     </thead>
@@ -469,6 +492,9 @@ const AdminProfile = () => {
                           </td>
                           <td className="px-6 py-4 text-gray-600 text-center">
                             {user.branchCode || 'N/A'}
+                          </td>
+                          <td className="px-6 py-4 text-gray-600 text-center">
+                            {user.PRN || 'N/A'}
                           </td>
                           <td className="px-6 py-4 text-center">
                             <button

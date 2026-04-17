@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../../components/common/Layout';
+import SocialLinks from '../../components/profile/SocialLinks';
 import axios from 'axios';
 import {
   CheckCircle2,
@@ -21,6 +22,57 @@ import {
 } from 'lucide-react';
 import { useSidebarLayout } from '../../hooks/useSidebarLayout';
 
+const JOB_TYPE_OPTIONS = [
+  { label: 'All Types', value: '' },
+  { label: 'Full-time', value: 'full-time' },
+  { label: 'Part-time', value: 'part-time' },
+  { label: 'Internship', value: 'internship' },
+  { label: 'Contract', value: 'contract' },
+  { label: 'Freelance', value: 'freelance' },
+];
+
+const DATE_FILTER_OPTIONS = [
+  { label: 'Anytime', value: '' },
+  { label: 'Today', value: 'today' },
+  { label: 'This week', value: 'week' },
+  { label: 'This month', value: 'month' },
+  { label: 'This year', value: 'year' },
+];
+
+function isWithinDateRange(dateString, range) {
+  if (!dateString || !range) return true;
+  const date = new Date(dateString);
+  const now = new Date();
+  switch (range) {
+    case 'today':
+      return (
+        date.getDate() === now.getDate() &&
+        date.getMonth() === now.getMonth() &&
+        date.getFullYear() === now.getFullYear()
+      );
+    case 'week': {
+      // Get start of week (Monday)
+      const startOfWeek = new Date(now);
+      startOfWeek.setDate(now.getDate() - now.getDay() + 1);
+      startOfWeek.setHours(0, 0, 0, 0);
+      // Get end of week (Sunday)
+      const endOfWeek = new Date(startOfWeek);
+      endOfWeek.setDate(startOfWeek.getDate() + 6);
+      endOfWeek.setHours(23, 59, 59, 999);
+      return date >= startOfWeek && date <= endOfWeek;
+    }
+    case 'month':
+      return (
+        date.getMonth() === now.getMonth() &&
+        date.getFullYear() === now.getFullYear()
+      );
+    case 'year':
+      return date.getFullYear() === now.getFullYear();
+    default:
+      return true;
+  }
+}
+
 const AdminNetwork = () => {
   const [selectedTab, setSelectedTab] = useState('profiles');
   const [pendingUsers, setPendingUsers] = useState([]);
@@ -30,65 +82,25 @@ const AdminNetwork = () => {
   const [error, setError] = useState('');
   const [copiedJobId, setCopiedJobId] = useState(null);
 
+  // Profiles tab filters
   const [roleFilter, setRoleFilter] = useState('');
-const [branchFilter, setBranchFilter] = useState('');
-const [batchFilter, setBatchFilter] = useState('');
-const [searchQuery, setSearchQuery] = useState('');
+  const [branchFilter, setBranchFilter] = useState('');
+  const [batchFilter, setBatchFilter] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
 
-  // 🔹 Filters
-  const [statusFilter, setStatusFilter] = useState('');
-  const [locationFilter, setLocationFilter] = useState('');
-  const [typeFilter, setTypeFilter] = useState(''); // employmentType
-  const [deadlineRange, setDeadlineRange] = useState(''); // '', today, week, month, year
+  // Jobs tab filters
+  const [jobStatusFilter, setJobStatusFilter] = useState('');
+  const [jobRoleTypeFilter, setJobRoleTypeFilter] = useState('');
+  const [jobDeadlineFilter, setJobDeadlineFilter] = useState('');
+  const [jobLocationFilter, setJobLocationFilter] = useState('');
+  const [jobSearchQuery, setJobSearchQuery] = useState('');
 
   useSidebarLayout(true);
-
-  // Small helper to handle date range filter on applicationDeadline
-  const isWithinDeadlineRange = (dateValue, range) => {
-    if (!range || !dateValue) return true;
-
-    const d = new Date(dateValue);
-    if (Number.isNaN(d.getTime())) return false;
-
-    const now = new Date();
-    const start = new Date(now);
-
-    switch (range) {
-      case 'today':
-        return (
-          d.getDate() === now.getDate() &&
-          d.getMonth() === now.getMonth() &&
-          d.getFullYear() === now.getFullYear()
-        );
-      case 'week': {
-        const day = now.getDay(); // 0 = Sun
-        const diff = now.getDate() - day + (day === 0 ? -6 : 1); // Monday as start
-        start.setDate(diff);
-        start.setHours(0, 0, 0, 0);
-        return d >= start && d <= now;
-      }
-      case 'month':
-        start.setDate(1);
-        start.setHours(0, 0, 0, 0);
-        return (
-          d.getMonth() === now.getMonth() &&
-          d.getFullYear() === now.getFullYear() &&
-          d >= start &&
-          d <= now
-        );
-      case 'year':
-        start.setMonth(0, 1);
-        start.setHours(0, 0, 0, 0);
-        return d.getFullYear() === now.getFullYear() && d >= start && d <= now;
-      default:
-        return true;
-    }
-  };
 
   useEffect(() => {
     const fetchPendingUsers = async () => {
       const res = await axios.get(`${import.meta.env.VITE_backend_URL}/api/users?pending=true`, { withCredentials: true });
-      setPendingUsers(res.data); // useState for pendingUsers
+      setPendingUsers(res.data);
     };
     fetchPendingUsers();
   }, []);
@@ -103,36 +115,14 @@ const [searchQuery, setSearchQuery] = useState('');
     setPendingUsers(users => users.filter(u => u._id !== userId));
   };
 
-  // Fetch all jobs from the admin endpoint (with optional filters)
-  const fetchJobs = async ({
-    status = statusFilter,
-    location = locationFilter,
-    type = typeFilter,
-    deadline = deadlineRange,
-  } = {}) => {
+  // Fetch all jobs (no filters)
+  const fetchJobs = async () => {
     try {
       setLoading(true);
       setError('');
-
-      const params = new URLSearchParams();
-      if (status) params.append('status', status);
-      if (location) params.append('location', location);
-      if (type) params.append('employmentType', type);
-      // We’ll keep deadlineRange as a purely frontend filter (no need to change backend).
-      const query = params.toString();
-      const url =
-        `${import.meta.env.VITE_backend_URL}/api/jobs/admin` +
-        (query ? `?${query}` : '');
-
+      const url = `${import.meta.env.VITE_backend_URL}/api/jobs/admin`;
       const res = await axios.get(url, { withCredentials: true });
-
-      // Apply deadline range filtering on the client
-      const allJobs = Array.isArray(res.data) ? res.data : [];
-      const filtered = allJobs.filter((job) =>
-        isWithinDeadlineRange(job.applicationDeadline, deadline)
-      );
-
-      setJobs(filtered);
+      setJobs(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error('Error fetching admin jobs:', err);
       setError('Failed to load admin network data');
@@ -143,32 +133,7 @@ const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     fetchJobs();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // Handle filter form submit
-  const handleFilterSubmit = (e) => {
-    e.preventDefault();
-    fetchJobs({
-      status: statusFilter,
-      location: locationFilter,
-      type: typeFilter,
-      deadline: deadlineRange,
-    });
-  };
-
-  const handleClearFilters = () => {
-    setStatusFilter('');
-    setLocationFilter('');
-    setTypeFilter('');
-    setDeadlineRange('');
-    fetchJobs({
-      status: '',
-      location: '',
-      type: '',
-      deadline: '',
-    });
-  };
 
   // Copy Application URL to clipboard
   const copyToClipboard = async (value, id) => {
@@ -247,22 +212,39 @@ const [searchQuery, setSearchQuery] = useState('');
     );
   }
 
+  // Profiles tab filtering
   const filteredUsers = pendingUsers.filter(user => {
-  // Role filter
-  if (roleFilter && user.role !== roleFilter) return false;
-  // Branch filter
-  if (branchFilter && user.branchCode !== branchFilter) return false;
-  // Batch filter
-  if (batchFilter && String(user.batch) !== String(batchFilter)) return false;
-  // Search by name or PRN (case-insensitive)
-  if (searchQuery) {
-    const q = searchQuery.toLowerCase();
-    const nameMatch = user.name?.toLowerCase().includes(q);
-    const prnMatch = user.PRN?.toString().includes(q);
-    if (!nameMatch && !prnMatch) return false;
-  }
-  return true;
-});
+    if (roleFilter && user.role !== roleFilter) return false;
+    if (branchFilter && user.branchCode !== branchFilter) return false;
+    if (batchFilter && String(user.batch) !== String(batchFilter)) return false;
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      const nameMatch = user.name?.toLowerCase().includes(q);
+      const prnMatch = user.PRN?.toString().includes(q);
+      if (!nameMatch && !prnMatch) return false;
+    }
+    return true;
+  });
+
+  // Jobs tab filtering
+  const filteredJobs = jobs.filter(job => {
+    // Status filter
+    if (jobStatusFilter && job.status !== jobStatusFilter) return false;
+    // Role type filter (employmentType)
+    if (jobRoleTypeFilter && job.employmentType !== jobRoleTypeFilter) return false;
+    // Application deadline filter (relative)
+    if (jobDeadlineFilter && !isWithinDateRange(job.applicationDeadline, jobDeadlineFilter)) return false;
+    // Location filter
+    if (jobLocationFilter && (!job.location || !job.location.toLowerCase().includes(jobLocationFilter.toLowerCase()))) return false;
+    // Search bar (job role or company name)
+    if (jobSearchQuery) {
+      const q = jobSearchQuery.toLowerCase();
+      const roleMatch = job.title?.toLowerCase().includes(q);
+      const companyMatch = job.company?.toLowerCase().includes(q);
+      if (!roleMatch && !companyMatch) return false;
+    }
+    return true;
+  });
 
   return (
     <Layout>
@@ -300,75 +282,68 @@ const [searchQuery, setSearchQuery] = useState('');
         {selectedTab === 'profiles' && (
           <div className="min-h-[200px] py-6">
             <section className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
-  <div className="flex flex-col md:flex-row md:items-center gap-3">
-    <h2 className="text-xl font-bold text-gray-900">Filter:</h2>
-    <form
-      onSubmit={e => { e.preventDefault(); }}
-      className="flex flex-wrap gap-2 md:gap-3 text-xs sm:text-sm"
-    >
-      {/* Role */}
-      <select
-        value={roleFilter}
-        onChange={e => setRoleFilter(e.target.value)}
-        className="px-3 py-2 border border-gray-300 rounded-lg w-full sm:w-32"
-      >
-        <option value="">All Roles</option>
-        <option value="alumni">Alumni</option>
-        <option value="student">Student</option>
-      </select>
-      {/* Branch */}
-      <input
-        type="text"
-        value={branchFilter}
-        onChange={e => setBranchFilter(e.target.value)}
-        placeholder="Branch"
-        className="px-3 py-2 border border-gray-300 rounded-lg w-full sm:w-32"
-      />
-      {/* Batch */}
-      <input
-        type="text"
-        value={batchFilter}
-        onChange={e => setBatchFilter(e.target.value)}
-        placeholder="Batch"
-        className="px-3 py-2 border border-gray-300 rounded-lg w-full sm:w-32"
-      />
-      {/* Search */}
-      <input
-        type="text"
-        value={searchQuery}
-        onChange={e => setSearchQuery(e.target.value)}
-        placeholder="Search Name or PRN"
-        className="px-3 py-2 border border-gray-300 rounded-lg w-full sm:w-44"
-      />
-      {/* Apply/Clear */}
-      <button
-        type="button"
-        onClick={() => {}} // Filtering is live, so no-op
-        className="px-3 py-2 text-[11px] sm:text-xs font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700"
-      >
-        Apply
-      </button>
-      <button
-        type="button"
-        onClick={() => {
-          setRoleFilter('');
-          setBranchFilter('');
-          setBatchFilter('');
-          setSearchQuery('');
-        }}
-        className="px-3 py-2 text-[11px] sm:text-xs font-semibold rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200"
-      >
-        Clear
-      </button>
-    </form>
-  </div>
-  <div className="text-gray-500 text-sm flex items-center mt-2 md:mt-0 h-full">
-    {filteredUsers.length} {filteredUsers.length === 1 ? 'profile' : 'profiles'} found
-  </div>
-</section>
+              <div className="flex flex-col md:flex-row md:items-center gap-3">
+                <h2 className="text-xl font-bold text-gray-900">Filter:</h2>
+                <form
+                  onSubmit={e => { e.preventDefault(); }}
+                  className="flex flex-wrap gap-2 md:gap-3 text-xs sm:text-sm"
+                >
+                  {/* Role */}
+                  <select
+                    value={roleFilter}
+                    onChange={e => setRoleFilter(e.target.value)}
+                    className="px-3 py-2 border border-gray-300 rounded-lg w-full sm:w-32"
+                  >
+                    <option value="">All Roles</option>
+                    <option value="alumni">Alumni</option>
+                    <option value="student">Student</option>
+                  </select>
+                  {/* Branch */}
+                  <input
+                    type="text"
+                    value={branchFilter}
+                    onChange={e => setBranchFilter(e.target.value)}
+                    placeholder="Branch"
+                    className="px-3 py-2 border border-gray-300 rounded-lg w-full sm:w-32"
+                  />
+                  {/* Batch */}
+                  <input
+                    type="text"
+                    value={batchFilter}
+                    onChange={e => setBatchFilter(e.target.value)}
+                    placeholder="Batch"
+                    className="px-3 py-2 border border-gray-300 rounded-lg w-full sm:w-32"
+                  />
+                  {/* Search */}
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                    placeholder="Search Name or PRN"
+                    className="px-3 py-2 border border-gray-300 rounded-lg w-full sm:w-44"
+                  />
+                  {/* Clear */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setRoleFilter('');
+                      setBranchFilter('');
+                      setBatchFilter('');
+                      setSearchQuery('');
+                    }}
+                    className="px-3 py-2 text-[11px] sm:text-xs font-semibold rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  >
+                    Clear
+                  </button>
+                </form>
+              </div>
+              <div className="text-gray-500 text-sm flex items-center mt-2 md:mt-0 h-full">
+                {filteredUsers.length} {filteredUsers.length === 1 ? 'profile' : 'profiles'} found
+              </div>
+            </section>
             {filteredUsers && filteredUsers.length > 0 ? (
-  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-    {filteredUsers.map((user, idx) => (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredUsers.map((user, idx) => (
                   <div
                     key={user._id}
                     className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all p-5 sm:p-6 flex flex-col animate-fade-in"
@@ -379,9 +354,6 @@ const [searchQuery, setSearchQuery] = useState('');
                   >
                     {/* Header: Name + Role */}
                     <div className="flex items-center gap-3 mb-4 mt-2">
-                      {/* <div className="flex-shrink-0 bg-gray-100 rounded-full p-2">
-        <Mail className="text-gray-500" size={28} />
-      </div> */}
                       <div className="min-w-0 ml-1">
                         <h3 className="text-xl font-bold text-blue-700 truncate flex items-center gap-2">
                           {user.name}
@@ -398,64 +370,57 @@ const [searchQuery, setSearchQuery] = useState('');
 
                     {/* Details grid with icons */}
                     <div className="rounded-xl bg-gray-50 border border-gray-100 p-4 space-y-2 mb-4">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm text-gray-700">
-                        <p className="flex items-center gap-2">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-2 gap-y-2 text-sm text-gray-700">
+                        <p className="flex items-center gap-1">
                           <PhoneIcon size={16} className="text-gray-500" />
                           <span className="font-semibold">Phone:</span> {user.phone || '-'}
                         </p>
-                        <p className="flex items-center gap-2">
+                        <p className="flex items-center gap-1">
                           <CalendarDays size={16} className="text-gray-500" />
-                          <span className="font-semibold">DOB:</span> {user.dob ? new Date(user.dob).toLocaleDateString() : '-'}
+                          <span className="font-semibold">DOB:</span> {user.dob ? new Date(user.dob).toLocaleDateString('en-GB') : '-'}
                         </p>
-                        <p className="flex items-center gap-2">
+                        <p className="flex items-center gap-1">
                           <BookOpenIcon size={16} className="text-gray-500" />
                           <span className="font-semibold">Branch:</span> {user.branchCode || '-'}
                         </p>
-                        <p className="flex items-center gap-2">
+                        <p className="flex items-center gap-1">
                           <Copy size={16} className="text-gray-500" />
                           <span className="font-semibold">Batch:</span> {user.batch || '-'}
                         </p>
-                        <p className="flex items-center gap-2">
+                        <p className="flex items-center gap-1">
                           <IdCardIcon size={16} className="text-gray-500" />
                           <span className="font-semibold">PRN:</span> {user.PRN || '-'}
                         </p>
-                        <p className="flex items-center gap-2">
-                          <BuildingIcon size={16} className="text-gray-500" />
-                          <span className="font-semibold">Current Company:</span> {user.currentCompany || '-'}
-                        </p>
-                        <p className="flex items-center gap-2">
-                          <BriefcaseIcon size={16} className="text-gray-500" />
-                          <span className="font-semibold">Current Role:</span> {user.currentCompanyRole || '-'}
-                        </p>
-                        <p className="flex items-center gap-2">
-                          <MapPinIcon size={16} className="text-gray-500" />
-                          <span className="font-semibold">Location:</span> {user.location || '-'}
-                        </p>
-                        <p className="flex items-center gap-2">
+                        <p className="flex items-center gap-1">
                           <HomeIcon size={16} className="text-gray-500" />
                           <span className="font-semibold">Home Town:</span> {user.homeTown || '-'}
                         </p>
-                        {user.socialLinks && (
-                          <>
-                            <p className="flex items-center gap-2">
-                              <ExternalLink size={16} className="text-gray-500" />
-                              <span className="font-semibold">LinkedIn:</span> {user.socialLinks.linkedIn || '-'}
-                            </p>
-                            <p className="flex items-center gap-2">
-                              <ExternalLink size={16} className="text-gray-500" />
-                              <span className="font-semibold">Instagram:</span> {user.socialLinks.instagram || '-'}
-                            </p>
-                            <p className="flex items-center gap-2">
-                              <ExternalLink size={16} className="text-gray-500" />
-                              <span className="font-semibold">GitHub:</span> {user.socialLinks.github || '-'}
-                            </p>
-                            <p className="flex items-center gap-2">
-                              <ExternalLink size={16} className="text-gray-500" />
-                              <span className="font-semibold">Twitter:</span> {user.socialLinks.twitter || '-'}
-                            </p>
-                          </>
-                        )}
+
+                        {/* Divider: full row */}
+                        <hr className="col-span-full my-2 border-gray-200" />
+
+                        {/* Place these three at the end, each taking full width */}
+                        <p className="flex items-center gap-2 col-span-full">
+                          <BuildingIcon size={16} className="text-gray-500" />
+                          <span className="font-semibold">Current Company:</span> {user.currentCompany || '-'}
+                        </p>
+                        <p className="flex items-center gap-2 col-span-full">
+                          <BriefcaseIcon size={16} className="text-gray-500" />
+                          <span className="font-semibold">Current Role:</span> {user.currentCompanyRole || '-'}
+                        </p>
+                        <p className="flex items-center gap-2 col-span-full">
+                          <MapPinIcon size={16} className="text-gray-500" />
+                          <span className="font-semibold">Current Location:</span> {user.location || '-'}
+                        </p>
                       </div>
+                      {/* Divider: full row */}
+                      <hr className="col-span-full my-2 border-gray-200" />
+                      {/* Social icons row, full width */}
+                      {user.socialLinks && (
+                        <div className="flex justify-center">
+                          <SocialLinks socialLinks={user.socialLinks} />
+                        </div>
+                      )}
                     </div>
 
                     {/* Actions */}
@@ -489,29 +454,18 @@ const [searchQuery, setSearchQuery] = useState('');
         {/* Jobs Tab */}
         {selectedTab === 'jobs' && (
           <>
-            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2 mb-2">
-              {/* <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-                Admin Job Opportunities
-              </h1> */}
-              {/* <span className="text-gray-500 text-sm">
-                {jobs.length} {jobs.length === 1 ? 'job' : 'jobs'} found
-              </span> */}
-            </div>
-
-            {/* 🔹 Filters (responsive, similar to AdminDonations) */}
             <section className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
               <div className="flex flex-col md:flex-row md:items-center gap-3">
                 <h2 className="text-xl font-bold text-gray-900">Filter:</h2>
-
                 <form
-                  onSubmit={handleFilterSubmit}
+                  onSubmit={e => { e.preventDefault(); }}
                   className="flex flex-wrap gap-2 md:gap-3 text-xs sm:text-sm"
                 >
-                  {/* Status */}
+                  {/* Job Status */}
                   <select
-                    value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value)}
-                    className="px-3 py-2 border border-gray-300 rounded-lg w-full sm:w-40"
+                    value={jobStatusFilter}
+                    onChange={e => setJobStatusFilter(e.target.value)}
+                    className="px-3 py-2 border border-gray-300 rounded-lg w-full sm:w-32"
                   >
                     <option value="">All Status</option>
                     <option value="pending">Pending</option>
@@ -519,70 +473,68 @@ const [searchQuery, setSearchQuery] = useState('');
                     <option value="filled">Filled</option>
                     <option value="expired">Expired</option>
                   </select>
-
+                  {/* Role Type */}
+                  <select
+                    value={jobRoleTypeFilter}
+                    onChange={e => setJobRoleTypeFilter(e.target.value)}
+                    className="px-3 py-2 border border-gray-300 rounded-lg w-full sm:w-32"
+                  >
+                    {JOB_TYPE_OPTIONS.map(opt => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </select>
+                  {/* Application Deadline */}
+                  <select
+                    value={jobDeadlineFilter}
+                    onChange={e => setJobDeadlineFilter(e.target.value)}
+                    className="px-3 py-2 border border-gray-300 rounded-lg w-full sm:w-40"
+                  >
+                    {DATE_FILTER_OPTIONS.map(opt => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </select>
                   {/* Location */}
                   <input
                     type="text"
-                    value={locationFilter}
-                    onChange={(e) => setLocationFilter(e.target.value)}
-                    placeholder="Filter by location"
-                    className="px-3 py-2 border border-gray-300 rounded-lg w-full sm:w-40"
+                    value={jobLocationFilter}
+                    onChange={e => setJobLocationFilter(e.target.value)}
+                    placeholder="Location"
+                    className="px-3 py-2 border border-gray-300 rounded-lg w-full sm:w-32"
                   />
-
-                  {/* Job Type / Employment Type */}
-                  <select
-                    value={typeFilter}
-                    onChange={(e) => setTypeFilter(e.target.value)}
-                    className="px-3 py-2 border border-gray-300 rounded-lg w-full sm:w-40"
-                  >
-                    <option value="">All Job Types</option>
-                    <option value="full-time">Full-time</option>
-                    <option value="part-time">Part-time</option>
-                    <option value="contract">Contract</option>
-                    <option value="internship">Internship</option>
-                    <option value="freelance">Freelance</option>
-                  </select>
-
-                  {/* Application Deadline Range */}
-                  <select
-                    value={deadlineRange}
-                    onChange={(e) => setDeadlineRange(e.target.value)}
+                  {/* Search */}
+                  <input
+                    type="text"
+                    value={jobSearchQuery}
+                    onChange={e => setJobSearchQuery(e.target.value)}
+                    placeholder="Search Role or Company"
                     className="px-3 py-2 border border-gray-300 rounded-lg w-full sm:w-44"
-                  >
-                    <option value="">All Deadlines</option>
-                    <option value="today">Today</option>
-                    <option value="week">This Week</option>
-                    <option value="month">This Month</option>
-                    <option value="year">This Year</option>
-                  </select>
-
-                  {/* 🔹 Always show Apply / Clear buttons (keeps it usable) */}
-                  <button
-                    type="submit"
-                    className="px-3 py-2 text-[11px] sm:text-xs font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700"
-                  >
-                    Apply
-                  </button>
+                  />
+                  {/* Clear */}
                   <button
                     type="button"
-                    onClick={handleClearFilters}
+                    onClick={() => {
+                      setJobStatusFilter('');
+                      setJobRoleTypeFilter('');
+                      setJobDeadlineFilter('');
+                      setJobLocationFilter('');
+                      setJobSearchQuery('');
+                    }}
                     className="px-3 py-2 text-[11px] sm:text-xs font-semibold rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200"
                   >
                     Clear
                   </button>
                 </form>
-
               </div>
               <div className="text-gray-500 text-sm flex items-center mt-2 md:mt-0 h-full">
-                {jobs.length} {jobs.length === 1 ? 'job' : 'jobs'} found
+                {filteredJobs.length} {filteredJobs.length === 1 ? 'job' : 'jobs'} found
               </div>
             </section>
 
-            {jobs.length === 0 ? (
+            {filteredJobs.length === 0 ? (
               <p className="text-gray-600 text-center">No job opportunities found.</p>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {jobs.map((job, idx) => (
+                {filteredJobs.map((job, idx) => (
                   <div
                     key={job._id}
                     className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all p-5 sm:p-6 flex flex-col animate-fade-in"
@@ -624,7 +576,7 @@ const [searchQuery, setSearchQuery] = useState('');
                       )}
                     </div>
 
-                    {/* Details Box (like donation cards) */}
+                    {/* Details Box */}
                     <div className="rounded-xl bg-gray-50 border border-gray-100 p-4 space-y-3 mb-4">
                       {/* Contact / Email (if present) */}
                       {job.contactEmail && (

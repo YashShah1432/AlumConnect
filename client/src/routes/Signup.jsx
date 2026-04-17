@@ -166,10 +166,10 @@ const Signup = () => {
 
   const buildPayload = () => {
     const socialLinks = {
-      linkedIn: formData.linkedIn || undefined,
+      linkedin: formData.linkedIn || undefined,
       instagram: formData.instagram || undefined,
       github: formData.github || undefined,
-      twitter: formData.twitter || undefined,
+      x: formData.twitter || undefined,
     };
 
     Object.keys(socialLinks).forEach(key => {
@@ -586,57 +586,6 @@ const Signup = () => {
                 </div>
               </div>
 
-              {/* OTP Section */}
-              <div className="mt-4 flex flex-col gap-2">
-                {!otpSent && (
-                  <button
-                    type="button"
-                    onClick={handleSendOtp}
-                    disabled={otpLoading || !formData.email || !!errors.email}
-                    className="inline-flex w-full sm:w-auto items-center justify-center rounded-lg bg-sky-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-1 disabled:opacity-60 disabled:cursor-not-allowed"
-                  >
-                    {otpLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    {otpLoading ? 'Sending OTP...' : 'Send OTP'}
-                  </button>
-                )}
-
-                {otpSent && !otpVerified && (
-                  <div className="flex flex-col sm:flex-row gap-2 items-center">
-                    <input
-                      type="text"
-                      maxLength={6}
-                      value={otp}
-                      onChange={e => setOtp(e.target.value.replace(/\D/g, ''))}
-                      placeholder="Enter 6-digit OTP"
-                      className="rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none w-full sm:w-48"
-                    />
-                    <button
-                      type="button"
-                      onClick={handleVerifyOtp}
-                      disabled={otpLoading || otp.length !== 6}
-                      className="inline-flex items-center justify-center rounded-lg bg-green-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1 disabled:opacity-60 disabled:cursor-not-allowed"
-                    >
-                      {otpLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                      {otpLoading ? 'Verifying...' : 'Verify OTP'}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleSendOtp}
-                      disabled={otpTimer > 0}
-                      className="inline-flex items-center justify-center rounded-lg bg-sky-100 px-4 py-2.5 text-sm font-semibold text-sky-700 shadow-sm hover:bg-sky-200 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-1 disabled:opacity-60 disabled:cursor-not-allowed"
-                    >
-                      Resend OTP {otpTimer > 0 && `(${otpTimer}s)`}
-                    </button>
-                  </div>
-                )}
-
-                {otpVerified && (
-                  <div className="flex items-center gap-2 text-green-700 text-sm">
-                    <CheckCircle2 className="h-4 w-4" /> OTP verified!
-                  </div>
-                )}
-              </div>
-
               {/* Optional / collapsible section */}
               <div className="pt-2 border-t border-slate-100 mt-4">
                 <button
@@ -687,7 +636,7 @@ const Signup = () => {
                     {/* Location */}
                     <div>
                       <label className="block text-sm font-medium text-slate-700">
-                        Location
+                        Current Location
                       </label>
                       <input
                         type="text"
@@ -758,6 +707,57 @@ const Signup = () => {
                         placeholder="https://x.com/username"
                       />
                     </div>
+                  </div>
+                )}
+              </div>
+
+              {/* OTP Section */}
+              <div className="mt-4 flex flex-col gap-2">
+                {!otpSent && (
+                  <button
+                    type="button"
+                    onClick={handleSendOtp}
+                    disabled={otpLoading || !formData.email || !!errors.email}
+                    className="inline-flex w-full sm:w-auto items-center justify-center rounded-lg bg-sky-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-1 disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    {otpLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {otpLoading ? 'Sending OTP...' : 'Send OTP'}
+                  </button>
+                )}
+
+                {otpSent && !otpVerified && (
+                  <div className="flex flex-col sm:flex-row gap-2 items-center">
+                    <input
+                      type="text"
+                      maxLength={6}
+                      value={otp}
+                      onChange={e => setOtp(e.target.value.replace(/\D/g, ''))}
+                      placeholder="Enter 6-digit OTP"
+                      className="rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none w-full sm:w-48"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleVerifyOtp}
+                      disabled={otpLoading || otp.length !== 6}
+                      className="inline-flex items-center justify-center rounded-lg bg-green-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1 disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                      {otpLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                      {otpLoading ? 'Verifying...' : 'Verify OTP'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleSendOtp}
+                      disabled={otpTimer > 0}
+                      className="inline-flex items-center justify-center rounded-lg bg-sky-100 px-4 py-2.5 text-sm font-semibold text-sky-700 shadow-sm hover:bg-sky-200 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-1 disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                      Resend OTP {otpTimer > 0 && `(${otpTimer}s)`}
+                    </button>
+                  </div>
+                )}
+
+                {otpVerified && (
+                  <div className="flex items-center gap-2 text-green-700 text-sm">
+                    <CheckCircle2 className="h-4 w-4" /> OTP verified!
                   </div>
                 )}
               </div>
