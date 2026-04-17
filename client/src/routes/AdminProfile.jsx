@@ -67,6 +67,21 @@ const AdminProfile = () => {
     }
   };
 
+  // Handler: update a alumni's role to student
+  const handleMarkAsStudent = async (userId) => {
+    try {
+      await axios.patch(
+        `${import.meta.env.VITE_backend_URL}/api/users/${userId}/role`,
+        { role: 'student' },
+        { withCredentials: true }
+      );
+      fetchUsers();
+    } catch (err) {
+      console.error('Error updating user role:', err);
+      setError('Failed to update user role');
+    }
+  };
+
   // 🔹 Derived filtered lists
   const filteredStudents = students.filter((u) => {
     const nameMatch = studentNameFilter
@@ -263,12 +278,12 @@ const AdminProfile = () => {
                   <table className="min-w-full table-auto border-collapse text-left">
                     <thead className="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
                       <tr>
-                        <th className="px-6 py-3 font-medium">Name</th>
-                        <th className="px-6 py-3 font-medium">Email</th>
-                        <th className="px-6 py-3 font-medium">Phone</th>
-                        <th className="px-6 py-3 font-medium">Batch</th>
-                        <th className="px-6 py-3 font-medium">Branch</th>
-                        <th className="px-6 py-3 font-medium">Action</th>
+                        <th className="px-6 py-3 font-medium text-center">Name</th>
+                        <th className="px-6 py-3 font-medium text-center">Email</th>
+                        <th className="px-6 py-3 font-medium text-center">Phone</th>
+                        <th className="px-6 py-3 font-medium text-center">Batch</th>
+                        <th className="px-6 py-3 font-medium text-center">Branch</th>
+                        <th className="px-6 py-3 font-medium text-center">Action</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100 text-sm">
@@ -277,22 +292,22 @@ const AdminProfile = () => {
                           key={user._id}
                           className="hover:bg-gray-50 transition-colors"
                         >
-                          <td className="px-6 py-4 font-semibold text-gray-900">
+                          <td className="px-6 py-4 font-semibold text-gray-900 text-center">
                             {user.name}
                           </td>
-                          <td className="px-6 py-4 text-gray-600">
+                          <td className="px-6 py-4 text-gray-600 text-center">
                             {user.email}
                           </td>
-                          <td className="px-6 py-4 text-gray-600">
+                          <td className="px-6 py-4 text-gray-600 text-center">
                             {user.phone || 'N/A'}
                           </td>
-                          <td className="px-6 py-4 text-gray-600">
+                          <td className="px-6 py-4 text-gray-600 text-center">
                             {user.batch || 'N/A'}
                           </td>
-                          <td className="px-6 py-4 text-gray-600">
+                          <td className="px-6 py-4 text-gray-600 text-center">
                             {user.branchCode || 'N/A'}
                           </td>
-                          <td className="px-6 py-4">
+                          <td className="px-6 py-4 text-center">
                             <button
                               onClick={() => handleMarkAsAlumni(user._id)}
                               className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition text-xs font-medium"
@@ -409,6 +424,14 @@ const AdminProfile = () => {
                           {user.branchCode || 'N/A'}
                         </p>
                       </div>
+                      <div className="pt-2 border-t border-gray-100 flex justify-end">
+                        <button
+                          onClick={() => handleMarkAsStudent(user._id)}
+                          className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+                        >
+                          Mark as Student
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -418,11 +441,12 @@ const AdminProfile = () => {
                   <table className="min-w-full table-auto border-collapse text-left">
                     <thead className="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
                       <tr>
-                        <th className="px-6 py-3 font-medium">Name</th>
-                        <th className="px-6 py-3 font-medium">Email</th>
-                        <th className="px-6 py-3 font-medium">Phone</th>
-                        <th className="px-6 py-3 font-medium">Batch</th>
-                        <th className="px-6 py-3 font-medium">Branch</th>
+                        <th className="px-6 py-3 font-medium text-center">Name</th>
+                        <th className="px-6 py-3 font-medium text-center">Email</th>
+                        <th className="px-6 py-3 font-medium text-center">Phone</th>
+                        <th className="px-6 py-3 font-medium text-center">Batch</th>
+                        <th className="px-6 py-3 font-medium text-center">Branch</th>
+                        <th className="px-6 py-3 font-medium text-center">Action</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100 text-sm">
@@ -431,20 +455,28 @@ const AdminProfile = () => {
                           key={user._id}
                           className="hover:bg-gray-50 transition-colors"
                         >
-                          <td className="px-6 py-4 font-semibold text-gray-900">
+                          <td className="px-6 py-4 font-semibold text-gray-900 text-center">
                             {user.name}
                           </td>
-                          <td className="px-6 py-4 text-gray-600">
+                          <td className="px-6 py-4 text-gray-600 text-center">
                             {user.email}
                           </td>
-                          <td className="px-6 py-4 text-gray-600">
+                          <td className="px-6 py-4 text-gray-600 text-center">
                             {user.phone || 'N/A'}
                           </td>
-                          <td className="px-6 py-4 text-gray-600">
+                          <td className="px-6 py-4 text-gray-600 text-center">
                             {user.batch || 'N/A'}
                           </td>
-                          <td className="px-6 py-4 text-gray-600">
+                          <td className="px-6 py-4 text-gray-600 text-center">
                             {user.branchCode || 'N/A'}
+                          </td>
+                          <td className="px-6 py-4 text-center">
+                            <button
+                              onClick={() => handleMarkAsStudent(user._id)}
+                              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition text-xs font-medium"
+                            >
+                              Mark as Student
+                            </button>
                           </td>
                         </tr>
                       ))}
