@@ -16,9 +16,9 @@ const AdminProfile = () => {
 
   // 🔹 NEW: filter state (shared between tabs but independent per role)
   const [studentBatchFilter, setStudentBatchFilter] = useState('');
-  const [studentBranchFilter, setStudentBranchFilter] = useState('');
+  const [studentBranchCodeFilter, setStudentBranchCodeFilter] = useState('');
   const [alumniBatchFilter, setAlumniBatchFilter] = useState('');
-  const [alumniBranchFilter, setAlumniBranchFilter] = useState('');
+  const [alumniBranchCodeFilter, setAlumniBranchCodeFilter] = useState('');
 
   const [studentNameFilter, setStudentNameFilter] = useState('');
   const [alumniNameFilter, setAlumniNameFilter] = useState('');
@@ -75,10 +75,10 @@ const AdminProfile = () => {
     const batchMatch = studentBatchFilter
       ? (u.batch || '').toLowerCase().includes(studentBatchFilter.toLowerCase())
       : true;
-    const branchMatch = studentBranchFilter
-      ? (u.branch || '').toLowerCase().includes(studentBranchFilter.toLowerCase())
+    const branchCodeMatch = studentBranchCodeFilter
+      ? (u.branchCode || '').toLowerCase().includes(studentBranchCodeFilter.toLowerCase())
       : true;
-    return nameMatch && batchMatch && branchMatch;
+    return nameMatch && batchMatch && branchCodeMatch;
   });
 
   const filteredAlumni = alumni.filter((u) => {
@@ -88,10 +88,10 @@ const AdminProfile = () => {
     const batchMatch = alumniBatchFilter
       ? (u.batch || '').toLowerCase().includes(alumniBatchFilter.toLowerCase())
       : true;
-    const branchMatch = alumniBranchFilter
-      ? (u.branch || '').toLowerCase().includes(alumniBranchFilter.toLowerCase())
+    const branchCodeMatch = alumniBranchCodeFilter
+      ? (u.branchCode || '').toLowerCase().includes(alumniBranchCodeFilter.toLowerCase())
       : true;
-    return nameMatch && batchMatch && branchMatch;
+    return nameMatch && batchMatch && branchCodeMatch;
   });
 
   if (loading) {
@@ -122,10 +122,9 @@ const AdminProfile = () => {
               type="button"
               onClick={() => setSelectedTab('students')}
               className={`whitespace-nowrap py-2 px-1 border-b-2 text-sm font-medium
-                ${
-                  selectedTab === 'students'
-                    ? 'border-blue-600 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ${selectedTab === 'students'
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
             >
               Student Profiles
@@ -135,10 +134,9 @@ const AdminProfile = () => {
               type="button"
               onClick={() => setSelectedTab('alumni')}
               className={`whitespace-nowrap py-2 px-1 border-b-2 text-sm font-medium
-                ${
-                  selectedTab === 'alumni'
-                    ? 'border-blue-600 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ${selectedTab === 'alumni'
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
             >
               Alumni Profiles
@@ -153,7 +151,7 @@ const AdminProfile = () => {
           <section className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-center gap-3">
               <h1 className="text-xl font-bold text-gray-900">
-                Filter: 
+                Filter:
               </h1>
 
               {/* 🔹 Filters (responsive) */}
@@ -177,18 +175,18 @@ const AdminProfile = () => {
                 />
                 <input
                   type="text"
-                  value={studentBranchFilter}
-                  onChange={(e) => setStudentBranchFilter(e.target.value)}
-                  placeholder="Filter by branch"
+                  value={studentBranchCodeFilter}
+                  onChange={(e) => setStudentBranchCodeFilter(e.target.value)}
+                  placeholder="Filter by branch code"
                   className="px-3 py-2 border border-gray-300 rounded-lg text-sm w-full sm:w-40"
                 />
-                {(studentNameFilter || studentBatchFilter || studentBranchFilter) && (
+                {(studentNameFilter || studentBatchFilter || studentBranchCodeFilter) && (
                   <button
                     type="button"
                     onClick={() => {
                       setStudentNameFilter('');
                       setStudentBatchFilter('');
-                      setStudentBranchFilter('');
+                      setStudentBranchCodeFilter('');
                     }}
                     className="px-3 py-2 text-xs font-semibold rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200"
                   >
@@ -236,9 +234,15 @@ const AdminProfile = () => {
                         </p>
                         <p>
                           <span className="text-gray-500 text-xs uppercase tracking-wide">
+                            Phone:{' '}
+                          </span>
+                          {user.phone || 'N/A'}
+                        </p>
+                        <p>
+                          <span className="text-gray-500 text-xs uppercase tracking-wide">
                             Branch:{' '}
                           </span>
-                          {user.branch || 'N/A'}
+                          {user.branchCode || 'N/A'}
                         </p>
                       </div>
 
@@ -261,6 +265,7 @@ const AdminProfile = () => {
                       <tr>
                         <th className="px-6 py-3 font-medium">Name</th>
                         <th className="px-6 py-3 font-medium">Email</th>
+                        <th className="px-6 py-3 font-medium">Phone</th>
                         <th className="px-6 py-3 font-medium">Batch</th>
                         <th className="px-6 py-3 font-medium">Branch</th>
                         <th className="px-6 py-3 font-medium">Action</th>
@@ -279,10 +284,13 @@ const AdminProfile = () => {
                             {user.email}
                           </td>
                           <td className="px-6 py-4 text-gray-600">
+                            {user.phone || 'N/A'}
+                          </td>
+                          <td className="px-6 py-4 text-gray-600">
                             {user.batch || 'N/A'}
                           </td>
                           <td className="px-6 py-4 text-gray-600">
-                            {user.branch || 'N/A'}
+                            {user.branchCode || 'N/A'}
                           </td>
                           <td className="px-6 py-4">
                             <button
@@ -307,7 +315,7 @@ const AdminProfile = () => {
           <section className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-center gap-3">
               <h1 className="text-xl font-bold text-gray-900">
-                Filter: 
+                Filter:
               </h1>
 
               {/* 🔹 Filters (responsive) */}
@@ -331,18 +339,18 @@ const AdminProfile = () => {
                 />
                 <input
                   type="text"
-                  value={alumniBranchFilter}
-                  onChange={(e) => setAlumniBranchFilter(e.target.value)}
-                  placeholder="Filter by branch"
+                  value={alumniBranchCodeFilter}
+                  onChange={(e) => setAlumniBranchCodeFilter(e.target.value)}
+                  placeholder="Filter by branch code"
                   className="px-3 py-2 border border-gray-300 rounded-lg text-sm w-full sm:w-40"
                 />
-                {(alumniNameFilter || alumniBatchFilter || alumniBranchFilter) && (
+                {(alumniNameFilter || alumniBatchFilter || alumniBranchCodeFilter) && (
                   <button
                     type="button"
                     onClick={() => {
                       setAlumniNameFilter('');
                       setAlumniBatchFilter('');
-                      setAlumniBranchFilter('');
+                      setAlumniBranchCodeFilter('');
                     }}
                     className="px-3 py-2 text-xs font-semibold rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200"
                   >
@@ -390,9 +398,15 @@ const AdminProfile = () => {
                         </p>
                         <p>
                           <span className="text-gray-500 text-xs uppercase tracking-wide">
+                            Phone:{' '}
+                          </span>
+                          {user.phone || 'N/A'}
+                        </p>
+                        <p>
+                          <span className="text-gray-500 text-xs uppercase tracking-wide">
                             Branch:{' '}
                           </span>
-                          {user.branch || 'N/A'}
+                          {user.branchCode || 'N/A'}
                         </p>
                       </div>
                     </div>
@@ -406,6 +420,7 @@ const AdminProfile = () => {
                       <tr>
                         <th className="px-6 py-3 font-medium">Name</th>
                         <th className="px-6 py-3 font-medium">Email</th>
+                        <th className="px-6 py-3 font-medium">Phone</th>
                         <th className="px-6 py-3 font-medium">Batch</th>
                         <th className="px-6 py-3 font-medium">Branch</th>
                       </tr>
@@ -423,10 +438,13 @@ const AdminProfile = () => {
                             {user.email}
                           </td>
                           <td className="px-6 py-4 text-gray-600">
+                            {user.phone || 'N/A'}
+                          </td>
+                          <td className="px-6 py-4 text-gray-600">
                             {user.batch || 'N/A'}
                           </td>
                           <td className="px-6 py-4 text-gray-600">
-                            {user.branch || 'N/A'}
+                            {user.branchCode || 'N/A'}
                           </td>
                         </tr>
                       ))}
