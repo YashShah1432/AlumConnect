@@ -108,6 +108,10 @@ const UserSchema = new mongoose.Schema({
     github: { type: String, default: null },
     x: { type: String, default: null }  // Changed from twitter to x to match your data
   },
+  skills: [String],
+  education: [String],
+  experience: [String],
+  
 }, { timestamps: true });
 
 // Hash password before saving
@@ -121,5 +125,7 @@ UserSchema.pre('save', async function (next) {
 UserSchema.methods.comparePassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
+
+
 
 module.exports = mongoose.model('User', UserSchema);

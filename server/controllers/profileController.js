@@ -1,70 +1,39 @@
 const User = require('../models/users');
+const axios = require('axios');
+const FormData = require('form-data');
+const fs = require('fs');
 
-const updateProfile = async (req, res) => {
+// Resume upload and parsing
+const uploadResume = async (req, res) => {
   try {
-    console.log('updateProfile body:', req.body);
-    console.log('updateProfile user:', req.user && req.user.id);
-    // Retrieve the user document from the database
-    const user = await User.findById(req.user.id);
-    if (!user) {
-      return res.status(404).json({ 
-        success: false, 
-        message: 'User not found' 
-      });
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
     }
 
-    // List of allowed fields for general updates
-    const allowedUpdates = [
-      'location',
-      // 'personalEmail',
-      'currentCompany',
-      'currentCompanyRole',
-      'socialLinks',    
-      'phone',   // optional: allow updating phone
-      'PRN'      // or 'prnNumber' depending on your UserSchema field name
-    ];
+    console.log("FILE PATH:", req.file.path);
 
-    // Update allowed fields on the user document
-    allowedUpdates.forEach(field => {
-      if (req.body[field] !== undefined) {
-        user[field] = req.body[field];
-      }
-    });
+    // send file to Python service
+    const formData = new FormData();
+    formData.append("resume", fs.createReadStream(req.file.path));
 
-    // Handle password update
-    if (req.body.currentPassword && req.body.newPassword) {
-      // Verify that the current password is correct
-      const isMatch = await user.comparePassword(req.body.currentPassword);
-      if (!isMatch) {
-        return res.status(400).json({ 
-          success: false, 
-          message: 'Current password is incorrect' 
-        });
-      }
-      // Assign the new password (this will trigger the pre-save hook on save())
-      user.password = req.body.newPassword;
-    }
+    const response = await axios.post(
+      "http://localhost:5001/parse",
+      formData,
+      { headers: formData.getHeaders() }
+    );
 
-    // Save the user document; the pre-save hook will hash the password if it was updated
-    await user.save();
-
-    // Convert to a plain object and remove the password field before sending the response
-    const userData = user.toObject();
-    delete userData.password;
+    console.log("PARSED:", response.data);
 
     res.json({
-      success: true,
-      data: userData
+      message: "Resume uploaded & parsed",
+      data: response.data
     });
-  } catch (error) {
-    console.error('Profile update error:', error);
-    res.status(400).json({ 
-      success: false, 
-      message: error.message 
-    });
+
+  } catch (err) {
+    console.error("UPLOAD ERROR:", err.message);
+    res.status(500).json({ message: "Failed" });
   }
 };
-
 module.exports = {
-  updateProfile
+    uploadResume,
 };

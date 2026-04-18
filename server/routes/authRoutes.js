@@ -182,23 +182,15 @@ router.get('/protected', isAuthenticated, (req, res) => {
 });
 // Detailed authentication check route
 router.get('/check', (req, res) => {
-  console.log('===== AUTH CHECK ROUTE =====');
-  console.log('Session:', req.session);
-  console.log('Passport User:', req.session?.passport?.user);
-  console.log('Current User:', req.user);
+    console.log("req.isAuthenticated:", req.isAuthenticated);
+    console.log("req.user:", req.user);
 
-  res.json({ 
-    isAuthenticated: !!req.user,
-    user: req.user ? {
-      id: req.user.id,
-      email: req.user.email,
-      role: req.user.role
-    } : null,
-    sessionDetails: {
-      passport: req.session?.passport,
-      exists: !!req.session
+    if (req.isAuthenticated && req.isAuthenticated()) {
+        return res.json({ isAuthenticated: true, user: req.user });
     }
-  });
+
+    res.json({ isAuthenticated: false });
 });
+console.log("Auth routes loaded");
 
 module.exports = router;

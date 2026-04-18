@@ -4,11 +4,14 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const connectDB = require('./config/db');
 const passport = require('passport');
+require('./config/passport');
 const dotenv = require('dotenv');
-const cors = require('cors'); 
+const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
 const http = require('http');
+const authRoutes = require('./routes/authRoutes');
+
 
 // Load environment variables
 dotenv.config({ path: path.join(__dirname, '.env') });
@@ -29,66 +32,7 @@ if (missingEnvVars.length > 0) {
   process.exit(1);
 }
 
-// Connect to MongoDB
-connectDB();
-
-const app = express();
-
-// Security Middleware
-app.use(helmet());
-app.use(compression());
-
-const allowedOrigins = [
-  'http://localhost:5173',
-  'http://localhost:3000',
-  'http://15.206.215.46:5173',
-  'http://15.206.215.46',
-  'http://alumconnect.home.kg',
-  process.env.VITE_API_BASE_URL,
-  process.env.VITE_backend_URL
-];
-
-const corsOptions = {
-// <<<<<<< main
-  // origin: (origin, callback) => {
-  //   if (!origin || allowedOrigins.includes(origin)) {
-  //     callback(null, origin);  // Allow the request
-  //   } else {
-  //     callback(new Error('Not allowed by CORS'));
-  //   }
-  // },
-  // credentials: true,  // Required when using cookies, authentication headers, etc.
-// =======
-  origin: [
-    'http://localhost:5173',
-    'http://localhost:3000',
-    'http://15.206.215.46:5173',
-    'http://15.206.215.46',
-    'http://15.206.215.46:3000',
-    'http://alumconnect.home.kg',
-    process.env.VITE_API_BASE_URL,
-    process.env.VITE_backend_URL
-    ].filter(Boolean),
-  credentials: true,
-// >>>>>>> main
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: [
-    'Content-Type', 
-    'Authorization', 
-    'Cookie', 
-    'X-Requested-With',
-    'Pragma',
-    'Cache-Control' 
-  ],
-  optionsSuccessStatus: 200
-};
-app.use(cors(corsOptions));
-
-// Body parser middleware
-app.use(express.json({ limit: '10kb' }));
-app.use(express.urlencoded({ extended: true, limit: '10kb' }));
-
-// Session configuration
+ // defining session config
 const sessionConfig = {
   secret: process.env.SESSION_SECRET,
   resave: false,
@@ -107,13 +51,81 @@ const sessionConfig = {
   }
 };
 
-// Apply session middleware
+// Connect to MongoDB
+connectDB();
+
+const app = express();
+
+
+// 1 - Body parser middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 app.use(session(sessionConfig));
 
-// Passport initialization
+// 3 - Passport configuration
 app.use(passport.initialize());
 app.use(passport.session());
-require('./config/passport')(passport);
+
+app.use('/api/auth', authRoutes);
+
+// Security Middleware
+app.use(helmet());
+app.use(compression());
+
+app.use((req, res, next) => {
+  console.log("SESSION DEBUG:", req.session);
+  next();
+});
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'http://15.206.215.46:5173',
+  'http://15.206.215.46',
+  'http://alumconnect.home.kg',
+  process.env.VITE_API_BASE_URL,
+  process.env.VITE_backend_URL
+];
+
+const corsOptions = {
+  // <<<<<<< main
+  // origin: (origin, callback) => {
+  //   if (!origin || allowedOrigins.includes(origin)) {
+  //     callback(null, origin);  // Allow the request
+  //   } else {
+  //     callback(new Error('Not allowed by CORS'));
+  //   }
+  // },
+  // credentials: true,  // Required when using cookies, authentication headers, etc.
+  // =======
+  origin: [
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'http://15.206.215.46:5173',
+    'http://15.206.215.46',
+    'http://15.206.215.46:3000',
+    'http://alumconnect.home.kg',
+    process.env.VITE_API_BASE_URL,
+    process.env.VITE_backend_URL
+  ].filter(Boolean),
+  credentials: true,
+  // >>>>>>> main
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'Cookie',
+    'X-Requested-With',
+    'Pragma',
+    'Cache-Control'
+  ],
+  optionsSuccessStatus: 200
+};
+app.use(cors(corsOptions));
+
+// Body parser middleware
+app.use(express.json({ limit: '10kb' }));
+app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 
 // Logging Middleware
 app.use((req, res, next) => {
@@ -124,9 +136,7 @@ app.use((req, res, next) => {
 // Routes
 const routes = [
   { path: '/auth', router: require('./routes/authRoutes') },
-  { path: '/auth', router: require('./routes/signupRoutes') },
   { path: '/api/signup', router: require('./routes/signupRoutes') },
-  { path: '/api/auth', router: require('./routes/signupRoutes') },
   { path: '/api/profile', router: require('./routes/profileRoutes') },
   { path: '/api/announcements', router: require('./routes/announcementRoutes') },
   { path: '/api/admin/announcements', router: require('./routes/adminAnnouncementRoutes') },
@@ -210,5 +220,6 @@ process.on('unhandledRejection', (reason, promise) => {
   process.exit(1);
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
 });
+console.log("Server running routes...");
 
 module.exports = { app, server, io };

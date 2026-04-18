@@ -1,10 +1,12 @@
-// server\routes\profileRoutes.js
 const express = require('express');
 const router = express.Router();
-const { updateProfile } = require('../controllers/profileController');
+
+const { uploadResume, updateProfile } = require('../controllers/profileController');
 const { isAuthenticated } = require('../middleware/isAuthenticated');
+const multer = require('multer');
 
-// Protect route with auth middleware so req.user is set
-router.patch('/update', isAuthenticated, updateProfile);
+const upload = multer({ dest: 'uploads/' });
 
+// ✅ protect route (important)
+router.post('/upload-resume', isAuthenticated, upload.single('resume'), uploadResume);
 module.exports = router;

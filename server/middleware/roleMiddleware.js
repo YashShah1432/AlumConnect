@@ -1,30 +1,22 @@
-// server/middleware/roleMiddleware.js
-const ensureRole = (allowedRoles) => {
-  return (req, res, next) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ error: 'Not authenticated' });
-    }
-
-    if (!allowedRoles.includes(req.user.role)) {
-      return res.status(403).json({
-        error: `Access restricted. Required role: ${allowedRoles.join(' or ')}`
-      });
-    }
-
-    next();
-  };
-};
-
 const ensureInstitutionalEmail = (req, res, next) => {
-  const email = req.body.email || (req.user && req.user.email);
+  // Debug
+  console.log("BODY:", req.body);
 
-  if (!email || !email.endsWith('@gmail.com')) {
+  if (!req.body || !req.body.email) {
+    return res.status(400).json({
+      error: "Email is required"
+    });
+  }
+
+  const email = req.body.email.trim();
+
+  if (!email.endsWith("@gmail.com")) {
     return res.status(403).json({
-      error: 'Only @gmail.com email addresses are allowed'
+      error: "Only @gmail.com email addresses are allowed"
     });
   }
 
   next();
 };
 
-module.exports = { ensureRole, ensureInstitutionalEmail };
+module.exports = { ensureInstitutionalEmail };
