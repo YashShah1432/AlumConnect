@@ -82,6 +82,7 @@ const AdminNetwork = () => {
   const [error, setError] = useState('');
   const [copiedJobId, setCopiedJobId] = useState(null);
 
+  const [userActionLoading, setUserActionLoading] = useState({ userId: null, action: null });
   // Profiles tab filters
   const [roleFilter, setRoleFilter] = useState('');
   const [branchFilter, setBranchFilter] = useState('');
@@ -106,13 +107,23 @@ const AdminNetwork = () => {
   }, []);
 
   const handleAcceptUser = async (userId) => {
-    await axios.patch(`${import.meta.env.VITE_backend_URL}/api/signup/approve/${userId}`, {}, { withCredentials: true });
-    setPendingUsers(users => users.filter(u => u._id !== userId));
+    setUserActionLoading({ userId, action: 'accept' });
+    try {
+      await axios.patch(`${import.meta.env.VITE_backend_URL}/api/signup/approve/${userId}`, {}, { withCredentials: true });
+      setPendingUsers(users => users.filter(u => u._id !== userId));
+    } finally {
+      setUserActionLoading({ userId: null, action: null });
+    }
   };
 
   const handleRejectUser = async (userId) => {
-    await axios.patch(`${import.meta.env.VITE_backend_URL}/api/signup/reject/${userId}`, {}, { withCredentials: true });
-    setPendingUsers(users => users.filter(u => u._id !== userId));
+    setUserActionLoading({ userId, action: 'reject' });
+    try {
+      await axios.patch(`${import.meta.env.VITE_backend_URL}/api/signup/reject/${userId}`, {}, { withCredentials: true });
+      setPendingUsers(users => users.filter(u => u._id !== userId));
+    } finally {
+      setUserActionLoading({ userId: null, action: null });
+    }
   };
 
   // Fetch all jobs (no filters)
@@ -371,27 +382,27 @@ const AdminNetwork = () => {
                     {/* Details grid with icons */}
                     <div className="rounded-xl bg-gray-50 border border-gray-100 p-4 space-y-2 mb-4">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-2 gap-y-2 text-sm text-gray-700">
-                        <p className="flex items-center gap-1">
-                          <PhoneIcon size={16} className="text-gray-500" />
-                          <span className="font-semibold">Phone:</span> {user.phone || '-'}
-                        </p>
-                        <p className="flex items-center gap-1">
-                          <CalendarDays size={16} className="text-gray-500" />
-                          <span className="font-semibold">DOB:</span> {user.dob ? new Date(user.dob).toLocaleDateString('en-GB') : '-'}
-                        </p>
-                        <p className="flex items-center gap-1">
-                          <BookOpenIcon size={16} className="text-gray-500" />
-                          <span className="font-semibold">Branch:</span> {user.branchCode || '-'}
-                        </p>
-                        <p className="flex items-center gap-1">
-                          <Copy size={16} className="text-gray-500" />
-                          <span className="font-semibold">Batch:</span> {user.batch || '-'}
-                        </p>
-                        <p className="flex items-center gap-1">
+                        <p className="flex items-center gap-2">
                           <IdCardIcon size={16} className="text-gray-500" />
                           <span className="font-semibold">PRN:</span> {user.PRN || '-'}
                         </p>
-                        <p className="flex items-center gap-1">
+                        <p className="flex items-center gap-2">
+                          <CalendarDays size={16} className="text-gray-500" />
+                          <span className="font-semibold">DOB:</span> {user.dob ? new Date(user.dob).toLocaleDateString('en-GB') : '-'}
+                        </p>
+                        <p className="flex items-center gap-2">
+                          <BookOpenIcon size={16} className="text-gray-500" />
+                          <span className="font-semibold">Branch:</span> {user.branchCode || '-'}
+                        </p>
+                        <p className="flex items-center gap-2">
+                          <Copy size={16} className="text-gray-500" />
+                          <span className="font-semibold">Batch:</span> {user.batch || '-'}
+                        </p>
+                        <p className="flex items-center gap-2 col-span-full">
+                          <PhoneIcon size={16} className="text-gray-500" />
+                          <span className="font-semibold">Phone:</span> {user.phone || '-'}
+                        </p>
+                        <p className="flex items-center gap-2 col-span-full">
                           <HomeIcon size={16} className="text-gray-500" />
                           <span className="font-semibold">Home Town:</span> {user.homeTown || '-'}
                         </p>
@@ -427,14 +438,22 @@ const AdminNetwork = () => {
                     <div className="mt-auto flex flex-wrap gap-2">
                       <button
                         onClick={() => handleAcceptUser(user._id)}
-                        className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-green-600 text-white hover:bg-green-700 transition flex-1"
+                        disabled={userActionLoading.userId === user._id && userActionLoading.action === 'accept'}
+                        className={`inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-green-600 text-white hover:bg-green-700 transition flex-1 ${userActionLoading.userId === user._id && userActionLoading.action === 'accept'
+                            ? 'opacity-50 cursor-not-allowed'
+                            : ''
+                          }`}
                       >
                         <CheckCircle2 size={16} />
                         Accept
                       </button>
                       <button
                         onClick={() => handleRejectUser(user._id)}
-                        className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-red-600 text-white hover:bg-red-700 transition flex-1"
+                        disabled={userActionLoading.userId === user._id && userActionLoading.action === 'reject'}
+                        className={`inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-red-600 text-white hover:bg-red-700 transition flex-1 ${userActionLoading.userId === user._id && userActionLoading.action === 'reject'
+                            ? 'opacity-50 cursor-not-allowed'
+                            : ''
+                          }`}
                       >
                         <XCircle size={16} />
                         Reject

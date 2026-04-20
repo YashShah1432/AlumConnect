@@ -34,8 +34,8 @@ const AdminProfile = () => {
         }
       );
       const users = res.data;
-      setAlumni(users.filter((u) => u.role === 'alumni'));
-      setStudents(users.filter((u) => u.role === 'student'));
+      setAlumni(users.filter((u) => u.role === 'alumni' && u.isApproved));
+      setStudents(users.filter((u) => u.role === 'student' && u.isApproved));
     } catch (err) {
       console.error('Error fetching users:', err);
       setError('Failed to load user profiles');

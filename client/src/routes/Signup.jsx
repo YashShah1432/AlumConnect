@@ -294,19 +294,7 @@ const Signup = () => {
               </p>
             </div>
 
-            {(apiError || apiSuccess) && (
-              <div className={`mx-6 mt-4 rounded-lg border px-4 py-3 text-sm flex items-start gap-2 ${apiError
-                  ? 'border-red-200 bg-red-50 text-red-700'
-                  : 'border-green-200 bg-green-50 text-green-700'
-                }`}>
-                {apiError ? (
-                  <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                ) : (
-                  <CheckCircle2 className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                )}
-                <span>{apiError || apiSuccess}</span>
-              </div>
-            )}
+
 
             <form onSubmit={handleSubmit} className="px-6 pb-6 pt-4 space-y-4">
               {/* Basic info */}
@@ -786,6 +774,21 @@ const Signup = () => {
                 </p>
               </div>
             </form>
+            {(apiError || apiSuccess) && (
+              <div
+                className={`mx-auto mb-0 mb-6 w-full max-w-md rounded-lg border px-5 py-3 text-sm flex items-center gap-3 shadow-sm ${apiError
+                    ? 'border-red-200 bg-red-50 text-red-700'
+                    : 'border-green-200 bg-green-50 text-green-700'
+                  }`}
+              >
+                {apiError ? (
+                  <AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
+                ) : (
+                  <CheckCircle2 className="h-5 w-5 flex-shrink-0 mt-0.5" />
+                )}
+                <span className="flex-1">{apiError || apiSuccess}</span>
+              </div>
+            )}
           </div>
         </div>
       </div>

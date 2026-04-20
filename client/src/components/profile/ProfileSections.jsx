@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaCalendarAlt, FaHome, FaMapMarkerAlt, FaGraduationCap, FaBriefcase } from 'react-icons/fa';
+import { FaCalendarAlt, FaHome, FaMapMarkerAlt, FaGraduationCap, FaBriefcase, BookOpenIcon } from 'react-icons/fa';
 import InfoItem from './InfoItem';
 
 const formatDate = (dateString) => {
@@ -37,7 +37,7 @@ const ProfileSections = ({ profile }) => {
       <div>
         <h2 className="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">Academic & Professional</h2>
         <InfoItem 
-          icon={<FaGraduationCap />} 
+          icon={<BookOpenIcon />} 
           label="Branch" 
           value={profile.branch} 
         />

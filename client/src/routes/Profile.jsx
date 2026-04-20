@@ -6,7 +6,7 @@ import ProfileHeader from '../components/profile/ProfileHeader';
 import SocialLinks from '../components/profile/SocialLinks';
 import ProfileSections from '../components/profile/ProfileSections';
 import ActivitySection from '../components/profile/ActivitySection';
-import { Mail, MapPin, Calendar, Phone, User, Clock } from 'lucide-react';
+import { Mail, MapPin, Calendar, Phone, User, Clock, IdCard } from 'lucide-react';
 import { useSidebarLayout } from '../hooks/useSidebarLayout';
 
 const Profile = () => {
@@ -158,7 +158,7 @@ const Profile = () => {
 
                   <div className="flex items-center space-x-3 bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-200">
                     <div className="flex-shrink-0 w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                      <MapPin className="w-5 h-5 text-green-600" />
+                      <IdCard className="w-5 h-5 text-green-600" />
                     </div>
                     <div>
                       <p className="text-sm font-medium text-gray-500">PRN</p>

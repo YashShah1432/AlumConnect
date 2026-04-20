@@ -1,7 +1,7 @@
 const User = require('../models/users');
 const Otp = require('../models/otp');
 const bcrypt = require('bcrypt');
-const { sendOtpMail } = require('../utils/email');
+const { sendOtpMail, sendApprovalMail, sendRejectionMail } = require('../utils/email');
 
 const OTP_ATTEMPT_LIMIT = 5;
 const OTP_EXPIRY_MINUTES = 5;
@@ -198,4 +198,30 @@ exports.resetPassword = async (req, res) => {
   await user.save();
   await Otp.deleteOne({ email }); // Remove OTP after use
   res.json({ message: 'Password reset successful' });
+};
+
+exports.approveUser = async (req, res) => {
+  const { id } = req.params;
+  const user = await User.findByIdAndUpdate(id, { isApproved: true, rejectionReason: null }, { new: true });
+  if (!user) return res.status(404).json({ error: 'User not found' });
+
+  // Send approval email with login button
+  const loginUrl = process.env.FRONTEND_LOGIN_URL || 'http://localhost:5173/login';
+  await sendApprovalMail(user.email, loginUrl);
+
+  res.json({ message: 'User approved', user });
+};
+
+exports.rejectUser = async (req, res) => {
+  const { id } = req.params;
+  const { reason } = req.body;
+  const user = await User.findByIdAndUpdate(id, { isApproved: false, rejectionReason: reason || 'Rejected by admin' }, { new: true });
+  if (!user) return res.status(404).json({ error: 'User not found' });
+
+  // Send rejection email with reason
+  await sendRejectionMail(user.email, reason || 'Rejected by admin');
+
+  // Optionally: delete user instead of just flagging
+  await User.findByIdAndDelete(id);
+  res.json({ message: 'User rejected and deleted' });
 };
