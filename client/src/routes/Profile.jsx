@@ -52,11 +52,11 @@ const Profile = () => {
           ...response.data.data
         }));
       } else {
-      // backend used success: false
-      setError(response.data.message || 'Failed to update profile');
+        // backend used success: false
+        setError(response.data.message || 'Failed to update profile');
       }
     } catch (err) {
-       console.error('Profile update error (client):', err.response?.data || err.message);
+      console.error('Profile update error (client):', err.response?.data || err.message);
       setError(err.response?.data?.message || 'Failed to update profile');
     }
   };
@@ -126,9 +126,14 @@ const Profile = () => {
                       <div className="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
                         <Mail className="w-5 h-5 text-blue-600" />
                       </div>
-                      <div>
+                      <div className="min-w-0 flex-1">
                         <p className="text-sm font-medium text-gray-500">Email</p>
-                        <p className="text-sm font-semibold text-gray-900">{profile.email}</p>
+                        <p
+                          className="text-sm font-semibold text-gray-900 md:truncate md:overflow-hidden md:whitespace-nowrap md:max-w-[220px] lg:max-w-[260px]"
+                          title={profile.email}
+                        >
+                          {profile.email}
+                        </p>
                       </div>
                     </div>
                   )}

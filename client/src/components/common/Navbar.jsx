@@ -16,7 +16,7 @@ const Navbar = () => {
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [isMessagePopupOpen, setIsMessagePopupOpen] = useState(false);
-  
+
   // Hooks
   const navigate = useNavigate();
   const location = useLocation();
@@ -28,7 +28,7 @@ const Navbar = () => {
     const checkScreenSize = () => {
       setIsSmallScreen(window.innerWidth < 768);
     };
-    
+
     checkScreenSize();
     window.addEventListener('resize', checkScreenSize);
     return () => window.removeEventListener('resize', checkScreenSize);
@@ -44,10 +44,10 @@ const Navbar = () => {
     try {
       // Disconnect socket on logout
       socketService.disconnect();
-      
+
       // Logout and navigate
       handleLogout(navigate, setUser);
-      
+
       // Optional: Show success toast
       toast.success('Logged out successfully');
     } catch (error) {
@@ -107,10 +107,10 @@ const Navbar = () => {
 
         {/* Right side - Notifications, DMs, Profile */}
         <div className="flex items-center">
-          
+
           {/* Messages */}
-          <button 
-            onClick={toggleMessagePopup} 
+          <button
+            onClick={toggleMessagePopup}
             className="p-2 mx-1 hover:bg-gray-50 rounded-xl relative transition-all duration-200 cursor-pointer"
           >
             <MessageSquare className="w-5 h-5 text-gray-600" />
@@ -123,7 +123,7 @@ const Navbar = () => {
 
           {/* Profile Dropdown */}
           <div className="relative profile-menu ml-2">
-            <button 
+            <button
               onClick={toggleProfileMenu}
               className="flex items-center space-x-2 p-1.5 hover:bg-gray-50 rounded-xl transition-all duration-200 cursor-pointer"
             >
@@ -165,7 +165,7 @@ const Navbar = () => {
                         alt="Profile"
                         className="w-12 h-12 rounded-full ring-2 ring-blue-100"
                       />
-                      <div className="flex-1">
+                      <div className="flex-1 w-0">
                         <h3 className="text-base font-semibold text-gray-800 truncate">
                           {user?.name || 'User'}
                         </h3>
@@ -173,7 +173,12 @@ const Navbar = () => {
                           <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                             {user?.role || 'Student'}
                           </span>
-                          <p className="text-gray-500 text-xs ml-1 truncate">{user?.email || 'No email available'}</p>
+                          <p
+    className="text-gray-500 text-xs ml-1 truncate overflow-hidden whitespace-nowrap w-full max-w-[160px] md:max-w-[220px] lg:max-w-[260px]"
+    title={user?.email}
+  >
+    {user?.email || 'No email available'}
+  </p>
                         </div>
                       </div>
                     </div>
@@ -195,7 +200,7 @@ const Navbar = () => {
                       <span className="font-medium text-sm">My Profile</span>
                     </button>
                   )}
-                  
+
                   <button
                     onClick={logoutUser}
                     className="flex items-center space-x-3 w-full px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200 mt-1"
@@ -211,9 +216,9 @@ const Navbar = () => {
       </nav>
 
       {/* Message Popup */}
-      <MessagePopup 
-        open={isMessagePopupOpen} 
-        onClose={() => setIsMessagePopupOpen(false)} 
+      <MessagePopup
+        open={isMessagePopupOpen}
+        onClose={() => setIsMessagePopupOpen(false)}
       />
     </>
   );
