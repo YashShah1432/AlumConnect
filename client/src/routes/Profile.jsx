@@ -156,29 +156,27 @@ const Profile = () => {
                     </div>
                   )} */}
 
-                  {profile.location && (
-                    <div className="flex items-center space-x-3 bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-200">
-                      <div className="flex-shrink-0 w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                        <MapPin className="w-5 h-5 text-green-600" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-gray-500">Location</p>
-                        <p className="text-sm font-semibold text-gray-900">{profile.location}</p>
-                      </div>
+                  <div className="flex items-center space-x-3 bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-200">
+                    <div className="flex-shrink-0 w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                      <MapPin className="w-5 h-5 text-green-600" />
                     </div>
-                  )}
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">PRN</p>
+                      <p className="text-sm font-semibold text-gray-900">{profile.PRN ? profile.PRN : 'N/A'}</p>
+                    </div>
+                  </div>
 
-                  {profile.phone && (
-                    <div className="flex items-center space-x-3 bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-200">
-                      <div className="flex-shrink-0 w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
-                        <Phone className="w-5 h-5 text-purple-600" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-gray-500">Phone</p>
-                        <p className="text-sm font-semibold text-gray-900">{profile.phone}</p>
-                      </div>
+                  <div className="flex items-center space-x-3 bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-200">
+                    <div className="flex-shrink-0 w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                      <Phone className="w-5 h-5 text-purple-600" />
                     </div>
-                  )}
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">Phone</p>
+                      <p className="text-sm font-semibold text-gray-900">
+                        {profile.phone ? profile.phone : 'N/A'}
+                      </p>
+                    </div>
+                  </div>
 
                   {profile.joinDate && (
                     <div className="flex items-center space-x-3 bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-200">
@@ -198,13 +196,23 @@ const Profile = () => {
                 {/* Rest of the components remain the same */}
                 <div className="mt-8">
                   {profile.socialLinks && (
-                    <div className="bg-gray-50 rounded-2xl p-6">
-                      <h3 className="text-lg font-semibold mb-4 flex items-center space-x-2">
-                        <User className="w-5 h-5 text-blue-600" />
-                        <span>Social Profiles</span>
-                      </h3>
-                      <SocialLinks socialLinks={profile.socialLinks} />
-                    </div>
+                    (() => {
+                      const { linkedin, instagram, github, x } = profile.socialLinks;
+                      const hasAny = linkedin || instagram || github || x;
+                      if (!hasAny) return null;
+                      return (
+                        <div className="bg-gray-50 rounded-2xl p-6">
+                          <h3 className="text-lg font-semibold mb-4 flex items-center space-x-2">
+                            <User className="w-5 h-5 text-blue-600" />
+                            <span>Social Profiles</span>
+                          </h3>
+                          {(linkedin || instagram || github || x)
+                            ? <SocialLinks socialLinks={profile.socialLinks} />
+                            : <p className="text-gray-500 text-sm">No social profiles added yet.</p>
+                          }
+                        </div>
+                      );
+                    })()
                   )}
                 </div>
 

@@ -47,6 +47,8 @@ router.get("/profile", (req, res) => {
     id: req.user.id,
     name: req.user.name,
     email: req.user.email,
+    phone: req.user.phone,
+    PRN: req.user.PRN,
     role: req.user.role,
     dob: req.user.dob,
     branch: req.user.branch,
