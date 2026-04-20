@@ -1,6 +1,7 @@
 import React from 'react';
-import { FaCalendarAlt, FaHome, FaMapMarkerAlt, FaGraduationCap, FaBriefcase, BookOpenIcon } from 'react-icons/fa';
+import { FaCalendarAlt, FaHome, FaMapMarkerAlt, FaGraduationCap, FaBriefcase } from 'react-icons/fa';
 import InfoItem from './InfoItem';
+import { BookOpenIcon }from 'lucide-react';
 
 const formatDate = (dateString) => {
   if (!dateString) return 'N/A';
@@ -37,7 +38,7 @@ const ProfileSections = ({ profile }) => {
       <div>
         <h2 className="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">Academic & Professional</h2>
         <InfoItem 
-          icon={<BookOpenIcon />} 
+          icon={<BookOpenIcon size={18} />} 
           label="Branch" 
           value={profile.branch} 
         />
