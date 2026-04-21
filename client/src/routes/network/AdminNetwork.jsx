@@ -291,7 +291,7 @@ const AdminNetwork = () => {
 
         {/* Tab Content */}
         {selectedTab === 'profiles' && (
-          <div className="min-h-[200px] py-6">
+          <div className="min-h-[200px]">
             <section className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
               <div className="flex flex-col md:flex-row md:items-center gap-3">
                 <h2 className="text-xl font-bold text-gray-900">Filter:</h2>

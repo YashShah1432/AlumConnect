@@ -65,17 +65,19 @@ router.post('/event', verifyAdmin, upload.single('image'), async (req, res) => {
 
 // 2️⃣ Get All Announcements (Admin sees everything)
 // Route: GET /api/admin/announcements/all
+// ...existing code...
 router.get('/all', verifyAdmin, async (req, res) => {
   try {
-    const announcements = await Announcement.find().sort({ createdAt: -1 });
+    // Defensive: check DB connection
+    if (!Announcement.db.readyState || Announcement.db.readyState !== 1) {
+      console.error("❌ MongoDB not connected");
+      return res.status(503).json({ error: 'Database unavailable' });
+    }
+    const announcements = await Announcement.find({}).sort({ createdAt: -1 }).lean();
     res.json(announcements);
   } catch (error) {
-    // ...existing code...
-    console.error("❌ Error fetching all announcements:", {
-      message: error.message,
-      stack: error.stack,
-    });
-    res.status(500).json({ error: 'Server error' });
+    console.error("❌ Error fetching all announcements:", error.message, error.stack);
+    res.status(500).json({ error: 'Server error', details: error.message });
   }
 });
 

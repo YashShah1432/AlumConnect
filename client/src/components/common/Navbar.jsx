@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Bell, MessageSquare, LogOut, User, Menu } from 'lucide-react';
+import { Bell, MessageSquare, LogOut, User, Menu, BarChart3 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import WITLogo from "../../../assets/WIT_logo.png";
 import { toast } from 'react-toastify';
 import { handleLogout } from '../../utils/authUtils';
+import { FaTachometerAlt } from "react-icons/fa"; // Dashboard icon
 
 // Import context and components
 import { useUser } from '../../context/UserContext';
@@ -107,11 +108,22 @@ const Navbar = () => {
 
         {/* Right side - Notifications, DMs, Profile */}
         <div className="flex items-center">
+          {user && user.role === "admin" && (
+  <button
+    className="p-2 mx-1 hover:bg-gray-50 rounded-xl relative transition-all duration-200 cursor-pointer"
+    title="Dashboard"
+    onClick={() => navigate("/admin/dashboard")}
+    style={{ display: isSmallScreen ? "inline-flex" : "inline-flex", alignItems: "center" }}
+  >
+    <BarChart3 className="w-5 h-5 text-gray-600" />
+  </button>
+)}
 
           {/* Messages */}
           <button
             onClick={toggleMessagePopup}
             className="p-2 mx-1 hover:bg-gray-50 rounded-xl relative transition-all duration-200 cursor-pointer"
+            title="Chat"
           >
             <MessageSquare className="w-5 h-5 text-gray-600" />
             {unreadCount > 0 && (
@@ -174,11 +186,11 @@ const Navbar = () => {
                             {user?.role || 'Student'}
                           </span>
                           <p
-    className="text-gray-500 text-xs ml-1 truncate overflow-hidden whitespace-nowrap w-full max-w-[160px] md:max-w-[220px] lg:max-w-[260px]"
-    title={user?.email}
-  >
-    {user?.email || 'No email available'}
-  </p>
+                            className="text-gray-500 text-xs ml-1 truncate overflow-hidden whitespace-nowrap w-full max-w-[160px] md:max-w-[220px] lg:max-w-[260px]"
+                            title={user?.email}
+                          >
+                            {user?.email || 'No email available'}
+                          </p>
                         </div>
                       </div>
                     </div>

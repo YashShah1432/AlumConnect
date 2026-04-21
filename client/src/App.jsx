@@ -55,6 +55,7 @@ import AdminNetwork from './routes/network/AdminNetwork';
 import AdminDonations from './routes/AdminDonations';
 import AdminProfile from './routes/AdminProfile';
 import AdminDiscussion from './routes/AdminDiscussion';
+import AdminDashboard from "./routes/AdminDashboard";
 
 // Messaging
 import { MessageProvider } from './context/MessageContext';
@@ -117,6 +118,14 @@ const AppRoutes = () => {
       {role === 'admin' ? (
         // Admin-specific routes
         <>
+          <Route
+            path="/admin/dashboard"
+            element={
+              <ProtectedRoute>
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/admin/announcements"
             element={
